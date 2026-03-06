@@ -1,6 +1,8 @@
 ﻿import { initializeApp, deleteApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, orderBy, limit, writeBatch, deleteDoc, getDocs, initializeFirestore, memoryLocalCache, deleteField, where } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, orderBy, limit, writeBatch, deleteDoc, getDocs, initializeFirestore, memoryLocalCache, deleteField, where, runTransaction } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+window.getFirestore = getFirestore;
+window.runTransaction = runTransaction;
 import { getAnalytics } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js';
 // --- 9. FINAL INITIALIZATION ---
 window.initSystem = async () => {
@@ -492,44 +494,62 @@ window.updateField = (id, field, value) => {
     window.showLoading(true);
 
     try {
-        let batch = writeBatch(db);
+        const dbRef = getFirestore();
         let c = 0;
+
         for (const [id, changes] of unsavedChanges) {
             const sanitizedChanges = {};
             Object.keys(changes).forEach(key => {
                 if (changes[key] !== undefined) sanitizedChanges[key] = changes[key];
             });
 
-            // [FIX] Restore raw collection path
             const docRef = doc(db, COLLECTION_NAME, id);
-            batch.set(docRef, sanitizedChanges, { merge: true });
-
-            const logId = `log_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
             const org = standardData.find(d => String(d._id) === String(id));
+            const baseLastModified = org && org._lastModified ? org._lastModified : 0;
 
-            const details = Object.entries(sanitizedChanges).map(([f, v]) => ({
-                field: f,
-                old: (org && org[f] !== undefined) ? org[f] : '',
-                new: (v !== undefined) ? v : ''
-            }));
+            try {
+                // 4순위 취약점 방어: 트랜잭션을 통한 저장 충돌 검증 (Optimistic UI 락킹)
+                await runTransaction(dbRef, async (transaction) => {
+                    const sfDoc = await transaction.get(docRef);
+                    if (!sfDoc.exists()) throw "DOCUMENT_NOT_FOUND";
 
-            const targetName = (org && org._customer !== undefined) ? org._customer : '알 수 없음';
+                    const serverLastModified = sfDoc.data()._lastModified || 0;
 
-            // [FIX] Restore raw collection path
-            batch.set(doc(db, LOG_COLLECTION_NAME, logId), {
-                _id: logId,
-                timestamp: new Date().toISOString(),
-                user: currentUserName,
-                action: '수정',
-                targetId: id,
-                targetName: targetName,
-                details: details
-            });
+                    // 다른 작업자가 이미 이 데이터를 저장했다면 (서버의 시간이 내가 아까 가져온 시간보다 미래라면)
+                    if (serverLastModified > baseLastModified) {
+                        throw "DATA_CONFLICT";
+                    }
 
-            c++;
-            if (c >= 200) { await batch.commit(); batch = writeBatch(db); c = 0; }
+                    // 안전 확인: 변경점만 부분 병합(Merge)하고 새로운 수정 시간 각인
+                    sanitizedChanges._lastModified = Date.now();
+                    transaction.set(docRef, sanitizedChanges, { merge: true });
+                });
+
+                // 성공 시 로깅 (배열이 크지 않으므로 트랜잭션 외부에 단순 기록)
+                const logId = `log_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+                const details = Object.entries(sanitizedChanges).filter(([k, v]) => k !== '_lastModified').map(([f, v]) => ({ field: f, old: (org && org[f] !== undefined) ? org[f] : '', new: (v !== undefined) ? v : '' }));
+                const targetName = (org && org._customer !== undefined) ? org._customer : '알 수 없음';
+                await setDoc(doc(db, LOG_COLLECTION_NAME, logId), { _id: logId, timestamp: new Date().toISOString(), user: currentUserName, action: '수정', targetId: id, targetName: targetName, details: details });
+                c++;
+            } catch (err) {
+                console.warn("트랜잭션 실패/충돌 발생:", err);
+                if (err === "DATA_CONFLICT") {
+                    const rowCustomer = (org && org._customer) || '해당 데이터';
+                    if (confirm(`⚠️ [충돌 감지]\n\n내가 작성하는 동안 누군가 "${rowCustomer}" 행의 데이터를 먼저 수정/저장했습니다!\n\n(확인)을 누르시면 남의 수정을 무시하고 내 내용을 강제로 덮어씌웁니다.\n(취소)를 누르시면 저장이 취소되고 페이지를 새로고침하여 최신 상태를 받아옵니다.`)) {
+                        // 강제 덮어쓰기 (Admin Override 동작)
+                        sanitizedChanges._lastModified = Date.now();
+                        await setDoc(docRef, sanitizedChanges, { merge: true });
+                        c++;
+                    } else {
+                        // 취소 시 즉각 중단하고 새로고침 유도
+                        window.location.reload();
+                        return;
+                    }
+                } else if (err !== "DOCUMENT_NOT_FOUND") {
+                    throw err; // 알 수 없는 네트워크 에러는 상위 캐치(catch)로 위임
+                }
+            }
         }
-        if (c > 0) await batch.commit();
 
         unsavedChanges.clear();
         window.updateSaveButton();
