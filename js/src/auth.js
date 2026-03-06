@@ -132,6 +132,47 @@ window.completeLogin = async (name, id, role) => {
     if (auth && auth.currentUser) {
         window.syncSettings();
         window.syncData();
+
+        // --- 🛡️ [보안 패치] 내 계정 권한 실시간 감시 (세션 무결성 방어) ---
+        onSnapshot(doc(db, USERS_COLLECTION_NAME, id), (docSnap) => {
+            if (!docSnap.exists()) {
+                window.showToast("관리자에 의해 계정 권한이 회수되었습니다.");
+                signOut(auth);
+                window.location.reload();
+            } else {
+                const newRole = docSnap.data().role;
+                const oldRole = localStorage.getItem('er_system_role');
+
+                if (newRole !== oldRole) {
+                    localStorage.setItem('er_system_role', newRole);
+                    const aBtn = document.getElementById('adminManagementBtn');
+                    const asBtn = document.getElementById('btnAdminSettings');
+                    const dBtn = document.getElementById('bulkDeleteBtn');
+
+                    if (newRole === 'admin' || newRole === 'system') {
+                        if (aBtn) aBtn.classList.remove('hidden');
+                        if (asBtn) asBtn.classList.remove('hidden');
+                        if (dBtn) dBtn.classList.remove('hidden');
+                        window.showToast("관리자 권한이 실시간으로 활성화되었습니다.");
+                    } else {
+                        if (aBtn) aBtn.classList.add('hidden');
+                        if (asBtn) asBtn.classList.add('hidden');
+                        if (dBtn) dBtn.classList.add('hidden');
+                        const modal = document.getElementById('userManagementModal');
+                        if (modal) modal.classList.add('hidden');
+                        window.showToast("권한이 실시간으로 일반(Staff)으로 변경되었습니다.");
+                    }
+
+                    if (typeof window.renderTable === 'function') {
+                        window.renderTable(window.currentTableData || []);
+                    }
+                    if (typeof window.renderTableHeader === 'function') {
+                        window.renderTableHeader();
+                    }
+                }
+            }
+        });
+        // ------------------------------------------------------------------
     }
 };
 
