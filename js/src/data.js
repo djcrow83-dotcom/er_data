@@ -327,7 +327,12 @@ window.deleteUserAcc = async (id) => {
             // [FIX] Restore raw collection path
             await deleteDoc(doc(db, USERS_COLLECTION_NAME, id));
             window.loadUserList();
-            window.showToast("삭제되었습니다.");
+
+            // 2안: 삭제 후 파이어베이스 콘솔 가이드 팝업 제공
+            const msg = `권한 문서가 삭제되었습니다.\n\n⚠️ 완전한 계정 파기를 위해 파이어베이스 Authentication 콘솔에서도 이 계정을 직접 삭제해 주셔야 합니다.\n\n삭제할 이메일을 복사하세요:`;
+            prompt(msg, id); // 이메일 주소를 쉽게 복사할 수 있도록 prompt 제공
+
+            window.showToast("권한 삭제 완료. 파이어베이스 콘솔(Auth) 삭제를 잊지 마세요.");
         } catch (e) {
             console.error(e);
             window.showToast("삭제 실패: " + e.message);
