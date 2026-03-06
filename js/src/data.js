@@ -259,7 +259,7 @@ window.closeUserManagementModal = () => document.getElementById('userManagementM
 
 window.addNewUser = async () => {
     const name = document.getElementById('newUserName').value.trim();
-    const id = document.getElementById('newUserId').value.trim();
+    const id = document.getElementById('newUserId').value.trim().toLowerCase();
     const pw = document.getElementById('newUserPw').value;
     const role = document.getElementById('newUserRole').value;
     if (!name || !id || !pw) return window.showToast("이름, 이메일, 비밀번호를 모두 입력해주세요.");
