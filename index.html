@@ -1,61 +1,240 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ER 처리 현황 시스템 V60.36 (Syntax Fix)</title>
-    
+    <title>ER 처리 현황 시스템 V60.40 (Standalone Fix)</title>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- PapaParse (CSV Parser) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
+
     <!-- Chart.js (Graph) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- SheetJS (Excel Download) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        body { font-family: 'Pretendard', sans-serif; background-color: #FDF6F0; }
-        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(180, 120, 80, 0.1), 0 4px 6px -2px rgba(180, 120, 80, 0.05); }
-        .clickable-card { cursor: pointer; transition: all 0.2s; }
-        .clickable-card:active { transform: scale(0.98); }
-        .clickable-card:hover { box-shadow: 0 0 0 2px #D97756; }
-        .custom-scrollbar::-webkit-scrollbar { height: 10px; width: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #FAF3EE; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #D4C4B8; border-radius: 4px; }
-        .reason-btn.active, .channel-btn.active, .status-btn.active, .pic-btn.active { background-color: #D97756; color: white; border-color: #D97756; }
-        .reason-btn.active .count-badge, .channel-btn.active .count-badge, .status-btn.active .count-badge, .pic-btn.active .count-badge { background-color: rgba(255,255,255,0.2); color: white; }
-        .status-select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e"); background-position: right 0.5rem center; background-repeat: no-repeat; background-size: 1.5em 1.5em; padding-right: 2.5rem; appearance: none; }
-        #loadingOverlay { background-color: rgba(253, 246, 240, 0.85); backdrop-filter: blur(4px); }
-        .modal-overlay { background-color: rgba(80, 50, 30, 0.4); backdrop-filter: blur(4px); }
-        .table-input { width: 100%; background: transparent; border: 1px solid transparent; padding: 4px 6px; border-radius: 4px; transition: all 0.2s; font-size: 0.8rem; }
-        .table-input:hover { border-color: #E8DDD4; background-color: #ffffff; }
-        .table-input:focus { outline: none; border-color: #D97756; background-color: #ffffff; box-shadow: 0 0 0 2px rgba(217, 119, 86, 0.12); }
-        .unsaved-input { border-color: #f97316 !important; background-color: #fff7ed !important; }
-        .transition-colors { transition-property: background-color, border-color, color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
-        th { white-space: nowrap; }
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
-        .toast { background-color: #5C3D2E; color: white; padding: 12px 24px; border-radius: 8px; margin-top: 10px; box-shadow: 0 4px 6px -1px rgba(92, 61, 46, 0.2); opacity: 0; transform: translateY(20px); transition: all 0.3s ease-out; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        @keyframes pulse-orange { 0%, 100% { box-shadow: 0 0 0 0 rgba(217, 119, 86, 0.7); } 50% { box-shadow: 0 0 0 4px rgba(217, 119, 86, 0.3); } }
-        .save-active { animation: pulse-orange 2s infinite; background-color: #C4623E !important; }
-        .combined-btn { opacity: 0; transition: opacity 0.2s; }
-        tr:hover .combined-btn { opacity: 1; }
-        .custom-checkbox { width: 1.25rem; height: 1.25rem; border-radius: 0.25rem; border: 1px solid #D4C4B8; cursor: pointer; accent-color: #D97756; }
-        .filter-icon-btn { opacity: 0; transition: opacity 0.2s, color 0.2s; }
-        th:hover .filter-icon-btn { opacity: 1; }
-        .filter-icon-btn.active { opacity: 1 !important; color: #D97756 !important; }
-        .option-chip { display: inline-flex; align-items: center; padding: 4px 10px; background-color: #f1f5f9; border-radius: 9999px; font-size: 0.85rem; color: #475569; margin-right: 6px; margin-bottom: 6px; border: 1px solid #e2e8f0; }
-        .option-chip button { margin-left: 6px; color: #94a3b8; transition: color 0.2s; }
-        .option-chip button:hover { color: #ef4444; }
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #FDF6F0;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(180, 120, 80, 0.1), 0 4px 6px -2px rgba(180, 120, 80, 0.05);
+        }
+
+        .clickable-card {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clickable-card:active {
+            transform: scale(0.98);
+        }
+
+        .clickable-card:hover {
+            box-shadow: 0 0 0 2px #D97756;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 10px;
+            width: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #FAF3EE;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D4C4B8;
+            border-radius: 4px;
+        }
+
+        .reason-btn.active,
+        .channel-btn.active,
+        .status-btn.active,
+        .pic-btn.active {
+            background-color: #D97756;
+            color: white;
+            border-color: #D97756;
+        }
+
+        .reason-btn.active .count-badge,
+        .channel-btn.active .count-badge,
+        .status-btn.active .count-badge,
+        .pic-btn.active .count-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .status-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            appearance: none;
+        }
+
+        #loadingOverlay {
+            background-color: rgba(253, 246, 240, 0.85);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay {
+            background-color: rgba(80, 50, 30, 0.4);
+            backdrop-filter: blur(4px);
+        }
+
+        .table-input {
+            width: 100%;
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 4px 6px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .table-input:hover {
+            border-color: #E8DDD4;
+            background-color: #ffffff;
+        }
+
+        .table-input:focus {
+            outline: none;
+            border-color: #D97756;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 2px rgba(217, 119, 86, 0.12);
+        }
+
+        .unsaved-input {
+            border-color: #f97316 !important;
+            background-color: #fff7ed !important;
+        }
+
+        .transition-colors {
+            transition-property: background-color, border-color, color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
+        }
+
+        th {
+            white-space: nowrap;
+        }
+
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background-color: #5C3D2E;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px -1px rgba(92, 61, 46, 0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease-out;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes pulse-orange {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(217, 119, 86, 0.7);
+            }
+
+            50% {
+                box-shadow: 0 0 0 4px rgba(217, 119, 86, 0.3);
+            }
+        }
+
+        .save-active {
+            animation: pulse-orange 2s infinite;
+            background-color: #C4623E !important;
+        }
+
+        .combined-btn {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        tr:hover .combined-btn {
+            opacity: 1;
+        }
+
+        .custom-checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 0.25rem;
+            border: 1px solid #D4C4B8;
+            cursor: pointer;
+            accent-color: #D97756;
+        }
+
+        .filter-icon-btn {
+            opacity: 0;
+            transition: opacity 0.2s, color 0.2s;
+        }
+
+        th:hover .filter-icon-btn {
+            opacity: 1;
+        }
+
+        .filter-icon-btn.active {
+            opacity: 1 !important;
+            color: #D97756 !important;
+        }
+
+        .option-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            background-color: #f1f5f9;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            color: #475569;
+            margin-right: 6px;
+            margin-bottom: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .option-chip button {
+            margin-left: 6px;
+            color: #94a3b8;
+            transition: color 0.2s;
+        }
+
+        .option-chip button:hover {
+            color: #ef4444;
+        }
     </style>
 </head>
+
 <body class="text-[#3D2E24] overflow-hidden">
 
     <!-- [LOGIN VIEW] -->
@@ -63,27 +242,45 @@
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-10 border border-[#E8DDD4] relative">
             <div class="absolute top-0 left-0 w-full h-1.5 bg-[#D97756]"></div>
             <div class="text-center mb-10">
-                <div class="mx-auto w-16 h-16 bg-[#D97756] rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-[#F0C9B8]">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                <div
+                    class="mx-auto w-16 h-16 bg-[#D97756] rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-[#F0C9B8]">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                        </path>
+                    </svg>
                 </div>
                 <h1 class="text-2xl font-bold text-[#3D2E24] tracking-tight">ER 처리 현황 시스템</h1>
-                <p class="text-[#8B7B6E] mt-2 text-sm" id="auth-status-msg">서버 연결 중...</p>
+                <p class="text-[#8B7B6E] mt-2 text-sm" id="auth-status-msg">인증 상태 확인 중...</p>
             </div>
             <div class="space-y-5">
                 <div>
-                    <label class="block text-xs font-bold text-[#6B5D52] mb-1.5 ml-1">아이디</label>
-                    <input type="text" id="loginId" class="w-full px-4 py-3 bg-[#FAF3EE] border border-[#E8DDD4] rounded-lg focus:outline-none focus:border-[#D97756] text-[#3D2E24]" placeholder="ID" onkeyup="if(event.key==='Enter') document.getElementById('loginPw').focus()">
+                    <label class="block text-xs font-bold text-[#6B5D52] mb-1.5 ml-1">이메일 계정</label>
+                    <input type="email" id="loginId"
+                        class="w-full px-4 py-3 bg-[#FAF3EE] border border-[#E8DDD4] rounded-lg focus:outline-none focus:border-[#D97756] text-[#3D2E24]"
+                        placeholder="admin@example.com"
+                        onkeyup="if(event.key==='Enter') document.getElementById('loginPw').focus()">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-[#6B5D52] mb-1.5 ml-1">비밀번호</label>
-                    <input type="password" id="loginPw" class="w-full px-4 py-3 bg-[#FAF3EE] border border-[#E8DDD4] rounded-lg focus:outline-none focus:border-[#D97756] text-[#3D2E24]" placeholder="Password" onkeyup="if(event.key==='Enter') window.loginSystem()">
+                    <input type="password" id="loginPw"
+                        class="w-full px-4 py-3 bg-[#FAF3EE] border border-[#E8DDD4] rounded-lg focus:outline-none focus:border-[#D97756] text-[#3D2E24]"
+                        placeholder="Password" onkeyup="if(event.key==='Enter') window.loginSystem()">
                 </div>
-                <button onclick="window.loginSystem()" id="loginBtn" class="w-full py-3.5 bg-[#D97756] hover:bg-[#C4623E] text-white font-bold rounded-lg transition-colors shadow-md mt-4 flex items-center justify-center gap-2 group" disabled>
-                    <span>로그인</span>
-                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                <button onclick="window.loginSystem()" id="loginBtn"
+                    class="w-full py-3.5 bg-[#D97756] hover:bg-[#C4623E] text-white font-bold rounded-lg transition-colors shadow-md mt-4 flex items-center justify-center gap-2 group"
+                    disabled>
+                    <span>안전하게 로그인</span>
+                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
                 </button>
             </div>
-            <div class="mt-8 pt-6 border-t border-[#FAF3EE] text-center"><p class="text-xs text-[#B8A99C]">시스템 문의: <span class="font-bold text-[#8B7B6E]">IT 지원팀</span></p></div>
+            <div class="mt-8 pt-6 border-t border-[#FAF3EE] text-center">
+                <p class="text-xs text-[#B8A99C]">시스템 문의: <span class="font-bold text-[#8B7B6E]">IT 지원팀</span></p>
+            </div>
         </div>
     </div>
 
@@ -94,90 +291,147 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="bg-[#D97756] text-white p-2 rounded-lg shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                            </path>
+                        </svg>
                     </div>
                     <div>
                         <h1 class="text-xl font-bold text-[#3D2E24] tracking-tight flex items-center gap-2">
-                            ER 처리 현황 시스템 V60.36
-                            <span class="text-xs font-medium text-white bg-gray-400 px-2 py-0.5 rounded-full transition-all duration-500 flex items-center gap-1" id="cloudStatus">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            ER 처리 현황 시스템 V60.40
+                            <span
+                                class="text-xs font-medium text-white bg-gray-400 px-2 py-0.5 rounded-full transition-all duration-500 flex items-center gap-1"
+                                id="cloudStatus">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
                                 대기 중
                             </span>
-                            <span id="archiveModeBadge" class="hidden text-xs font-bold text-white bg-amber-500 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
-                                아카이브 조회 중 (읽기전용)
+                            <span id="archiveModeBadge"
+                                class="hidden text-xs font-bold text-white bg-amber-500 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4">
+                                    </path>
+                                </svg>
+                                아카이브 조회 중
                             </span>
+                            <button id="dataModeBtn" onclick="window.toggleDataMode()"
+                                class="text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-full transition-colors ml-1 shadow-sm border border-indigo-100"
+                                title="클릭 시 전체 데이터를 불러옵니다.">
+                                최근 3개월 조회 중
+                            </button>
                         </h1>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button id="saveChangesBtn" onclick="saveAllChanges()" class="hidden px-4 py-2 text-sm font-bold text-white bg-[#B8A99C] rounded-lg transition-all flex items-center gap-2 shadow-sm" disabled>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    <button id="saveChangesBtn" onclick="saveAllChanges()"
+                        class="hidden px-4 py-2 text-sm font-bold text-white bg-[#B8A99C] rounded-lg transition-all flex items-center gap-2 shadow-sm"
+                        disabled>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                            </path>
+                        </svg>
                         변경사항 저장 <span id="unsavedCount" class="bg-white/20 px-1.5 rounded text-xs ml-1">0</span>
                     </button>
                     <div class="h-6 w-px bg-[#E8DDD4] mx-1"></div>
-                    
+
                     <!-- [ADMIN: 사용자 관리 버튼] -->
-                    <button id="adminManagementBtn" onclick="window.openUserManagementModal()" class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#FAF3EE] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]" title="사용자 관리">
-                        <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <button id="adminManagementBtn" onclick="window.openUserManagementModal()"
+                        class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#FAF3EE] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]"
+                        title="사용자 관리">
+                        <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
                         <span class="hidden sm:inline">사용자 관리</span>
                     </button>
 
                     <!-- Admin Settings Button -->
-                    <button id="btnAdminSettings" onclick="openSettingsModal()" class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#FAF3EE] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]" title="관리자 설정">
-                        <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <button id="btnAdminSettings" onclick="openSettingsModal()"
+                        class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#FAF3EE] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]"
+                        title="관리자 설정">
+                        <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
                         <span class="hidden sm:inline">설정</span>
                     </button>
-                    
-                    <button onclick="openLogModal()" class="flex items-center gap-2 px-3 py-1.5 bg-[#F5EDE6] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]" title="변경 로그">
-                        <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+
+                    <button onclick="openLogModal()"
+                        class="flex items-center gap-2 px-3 py-1.5 bg-[#F5EDE6] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]"
+                        title="변경 로그">
+                        <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                         <span class="hidden sm:inline">로그</span>
                     </button>
-                    
-                    <button onclick="downloadBackup()" class="hidden md:flex px-4 py-2 text-sm font-medium text-white bg-[#6B4D3E] hover:bg-[#5C3D2E] rounded-lg transition-colors items-center gap-2 shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+
+                    <button onclick="downloadBackup()"
+                        class="hidden md:flex px-4 py-2 text-sm font-medium text-white bg-[#6B4D3E] hover:bg-[#5C3D2E] rounded-lg transition-colors items-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
                         백업
                     </button>
 
                     <div class="h-6 w-px bg-[#E8DDD4] mx-1"></div>
-                    
+
                     <!-- User Profile & Logout -->
                     <div class="flex items-center gap-3 pl-1">
                         <div class="flex flex-col items-end">
                             <span id="userNameDisplay" class="text-sm font-bold text-[#3D2E24]">사용자</span>
-                            <button id="btnLogout" class="text-[11px] text-[#B85C4A] hover:underline font-bold tracking-wide">로그아웃</button>
+                            <button id="btnLogout"
+                                class="text-[11px] text-[#B85C4A] hover:underline font-bold tracking-wide">로그아웃</button>
                         </div>
-                        <div id="userAvatar" class="w-9 h-9 rounded-full bg-[#D97756] text-white flex items-center justify-center font-bold text-sm shadow-sm uppercase border-2 border-white">?</div>
+                        <div id="userAvatar"
+                            class="w-9 h-9 rounded-full bg-[#D97756] text-white flex items-center justify-center font-bold text-sm shadow-sm uppercase border-2 border-white">
+                            ?</div>
                     </div>
                 </div>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="flex-grow overflow-y-auto custom-scrollbar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 w-full">
+        <main
+            class="flex-grow overflow-y-auto custom-scrollbar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 w-full">
             <div id="dashboard" class="space-y-4 animate-fade-in">
-                
+
                 <!-- [UI개선1] 핵심 숫자 바 -->
                 <section class="bg-white rounded-lg shadow-sm border border-[#E8DDD4] px-5 py-3">
                     <div class="flex items-center gap-3 flex-wrap">
-                        <div onclick="filterByTotal()" class="flex items-center gap-2 px-3 py-1.5 bg-[#FAF3EE] hover:bg-[#F5EDE6] rounded-md cursor-pointer transition-colors border border-[#E8DDD4]">
+                        <div onclick="filterByTotal()"
+                            class="flex items-center gap-2 px-3 py-1.5 bg-[#FAF3EE] hover:bg-[#F5EDE6] rounded-md cursor-pointer transition-colors border border-[#E8DDD4]">
                             <span class="text-xs font-medium text-[#8B7B6E]">전체</span>
                             <span class="text-sm font-bold text-[#3D2E24]" id="quickTotal">0</span>
                         </div>
-                        <div onclick="filterByUnprocessed()" class="flex items-center gap-2 px-3 py-1.5 bg-[#FFF5EB] hover:bg-[#FFECD9] rounded-md cursor-pointer transition-colors border border-[#E8D0B8]">
+                        <div onclick="filterByUnprocessed()"
+                            class="flex items-center gap-2 px-3 py-1.5 bg-[#FFF5EB] hover:bg-[#FFECD9] rounded-md cursor-pointer transition-colors border border-[#E8D0B8]">
                             <span class="text-xs font-medium text-[#A67A52]">미처리</span>
                             <span class="text-sm font-bold text-[#8B5E3C]" id="quickUnprocessed">0</span>
                         </div>
-                        <div onclick="filterByUrgent()" class="flex items-center gap-2 px-3 py-1.5 bg-[#FFF0EC] hover:bg-[#FFE4DD] rounded-md cursor-pointer transition-colors border border-[#E8C0B4]">
+                        <div onclick="filterByUrgent()"
+                            class="flex items-center gap-2 px-3 py-1.5 bg-[#FFF0EC] hover:bg-[#FFE4DD] rounded-md cursor-pointer transition-colors border border-[#E8C0B4]">
                             <span class="text-xs font-medium text-[#B85C4A]">장기미처리</span>
                             <span class="text-sm font-bold text-[#944839]" id="quickUrgent">0</span>
                         </div>
-                        <div class="flex items-center gap-2 px-3 py-1.5 bg-[#F2F0E8] rounded-md border border-[#DDD9CE]">
+                        <div
+                            class="flex items-center gap-2 px-3 py-1.5 bg-[#F2F0E8] rounded-md border border-[#DDD9CE]">
                             <span class="text-xs font-medium text-[#6B7B5E]">처리완료</span>
                             <span class="text-sm font-bold text-[#4D5E3E]" id="quickCompleted">0</span>
                         </div>
                         <div class="h-5 w-px bg-[#E8DDD4] mx-1"></div>
-                        <div class="flex items-center gap-2 px-3 py-1.5 bg-[#FDF0EB] rounded-md border border-[#F0C9B8]">
+                        <div
+                            class="flex items-center gap-2 px-3 py-1.5 bg-[#FDF0EB] rounded-md border border-[#F0C9B8]">
                             <span class="text-xs font-medium text-[#D97756]">환불총액</span>
                             <span class="text-sm font-bold text-[#C4623E]" id="quickRefundTotal">₩0</span>
                         </div>
@@ -186,68 +440,100 @@
 
                 <!-- 현황 대시보드 -->
                 <section class="bg-white rounded-lg shadow-sm border border-[#E8DDD4] overflow-hidden">
-                    <button onclick="toggleDashboard()" class="w-full px-6 py-3 flex justify-between items-center bg-[#FAF3EE] hover:bg-[#F5EDE6] transition-colors text-left group">
+                    <button onclick="toggleDashboard()"
+                        class="w-full px-6 py-3 flex justify-between items-center bg-[#FAF3EE] hover:bg-[#F5EDE6] transition-colors text-left group">
                         <div class="flex items-center gap-2">
-                            <div class="p-1.5 bg-white rounded-md border border-[#E8DDD4] text-[#D97756] shadow-sm group-hover:border-[#E8B4A0] transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
+                            <div
+                                class="p-1.5 bg-white rounded-md border border-[#E8DDD4] text-[#D97756] shadow-sm group-hover:border-[#E8B4A0] transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z">
+                                    </path>
+                                </svg>
                             </div>
                             <h3 class="text-base font-bold text-[#3D2E24]">현황 대시보드</h3>
                         </div>
                         <div class="flex items-center gap-2 text-[#B8A99C]">
                             <span class="text-xs font-medium">열기/닫기</span>
-                            <svg id="dashboardArrow" class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg id="dashboardArrow" class="w-5 h-5 transform transition-transform duration-200"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
                         </div>
                     </button>
-                    
+
                     <div id="dashboardContent" class="hidden border-t border-[#E8DDD4] bg-white animate-fade-in">
                         <!-- KPI 카드 -->
                         <div id="kpiContent" class="p-6 bg-[#FAF3EE]/50">
                             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
-                                <div onclick="filterByTotal()" class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#6B5D52] clickable-card card-hover" title="전체 건 보기">
+                                <div onclick="filterByTotal()"
+                                    class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#6B5D52] clickable-card card-hover"
+                                    title="전체 건 보기">
                                     <div class="flex flex-col h-full justify-between">
-                                        <p class="text-xs font-bold text-[#6B5D52] uppercase tracking-wider mb-2">전체 건수</p>
+                                        <p class="text-xs font-bold text-[#6B5D52] uppercase tracking-wider mb-2">전체 건수
+                                        </p>
                                         <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiTotal">0</h3>
                                     </div>
                                 </div>
-                                <div onclick="filterByUnprocessed()" class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#8B7B6E] clickable-card card-hover" title="미처리 건만 보기">
+                                <div onclick="filterByUnprocessed()"
+                                    class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#8B7B6E] clickable-card card-hover"
+                                    title="미처리 건만 보기">
                                     <div class="flex flex-col h-full justify-between">
-                                        <p class="text-xs font-bold text-[#8B7B6E] uppercase tracking-wider mb-2">미처리 건수</p>
+                                        <p class="text-xs font-bold text-[#8B7B6E] uppercase tracking-wider mb-2">미처리 건수
+                                        </p>
                                         <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiUnprocessed">0</h3>
                                     </div>
                                 </div>
-                                <div onclick="filterByUrgent()" class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#B85C4A] clickable-card card-hover" title="장기 미처리 건만 보기">
+                                <div onclick="filterByUrgent()"
+                                    class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#B85C4A] clickable-card card-hover"
+                                    title="장기 미처리 건만 보기">
                                     <div class="flex flex-col h-full justify-between">
-                                        <p class="text-xs font-bold text-[#B85C4A] uppercase tracking-wider mb-2">장기 미처리</p>
+                                        <p class="text-xs font-bold text-[#B85C4A] uppercase tracking-wider mb-2">장기 미처리
+                                        </p>
                                         <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiUrgent">0</h3>
                                     </div>
                                 </div>
-                                <div onclick="filterByDefect()" class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#C4623E] clickable-card card-hover" title="불량 건만 보기">
+                                <div onclick="filterByDefect()"
+                                    class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#C4623E] clickable-card card-hover"
+                                    title="불량 건만 보기">
                                     <div class="flex flex-col h-full justify-between">
-                                        <p class="text-xs font-bold text-[#C4623E] uppercase tracking-wider mb-2">불량 판정</p>
+                                        <p class="text-xs font-bold text-[#C4623E] uppercase tracking-wider mb-2">불량 판정
+                                        </p>
                                         <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiDefect">0</h3>
                                     </div>
                                 </div>
-                                <div onclick="filterByMisdelivery()" class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#A67A52] clickable-card card-hover" title="오배송 건만 보기">
+                                <div onclick="filterByMisdelivery()"
+                                    class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#A67A52] clickable-card card-hover"
+                                    title="오배송 건만 보기">
                                     <div class="flex flex-col h-full justify-between">
-                                        <p class="text-xs font-bold text-[#A67A52] uppercase tracking-wider mb-2">오배송</p>
+                                        <p class="text-xs font-bold text-[#A67A52] uppercase tracking-wider mb-2">오배송
+                                        </p>
                                         <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiMisdelivery">0</h3>
                                     </div>
                                 </div>
-                                <div onclick="filterByExchange()" class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-sky-500 clickable-card card-hover" title="교환 건만 보기">
+                                <div onclick="filterByExchange()"
+                                    class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-sky-500 clickable-card card-hover"
+                                    title="교환 건만 보기">
                                     <div class="flex flex-col h-full justify-between">
-                                        <p class="text-xs font-bold text-sky-500 uppercase tracking-wider mb-2">교환 건수</p>
+                                        <p class="text-xs font-bold text-sky-500 uppercase tracking-wider mb-2">교환 건수
+                                        </p>
                                         <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiExchangeRate">0</h3>
                                     </div>
                                 </div>
-                                <div onclick="filterByReturn()" class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#D97756] clickable-card card-hover" title="반품 건만 보기">
+                                <div onclick="filterByReturn()"
+                                    class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#D97756] clickable-card card-hover"
+                                    title="반품 건만 보기">
                                     <div class="flex flex-col h-full justify-between">
-                                        <p class="text-xs font-bold text-[#D97756] uppercase tracking-wider mb-2">반품 건수</p>
+                                        <p class="text-xs font-bold text-[#D97756] uppercase tracking-wider mb-2">반품 건수
+                                        </p>
                                         <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiReturnRate">0</h3>
                                     </div>
                                 </div>
                                 <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#B8A060]">
                                     <div class="flex flex-col h-full justify-between">
-                                        <p class="text-xs font-bold text-[#A6905A] uppercase tracking-wider mb-2">불량률</p>
+                                        <p class="text-xs font-bold text-[#A6905A] uppercase tracking-wider mb-2">불량률
+                                        </p>
                                         <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiDefectRate">0%</h3>
                                     </div>
                                 </div>
@@ -259,13 +545,17 @@
                             <div class="flex justify-between items-center mb-4">
                                 <h4 class="text-sm font-bold text-[#5C4A3E]">환불액 추이</h4>
                                 <div class="bg-[#F5EDE6] p-1 rounded-lg flex text-xs font-bold">
-                                    <button onclick="setChartPeriod('daily')" id="btn-chart-daily" class="px-3 py-1.5 rounded-md transition-colors bg-white text-[#D97756] shadow-sm">일간</button>
-                                    <button onclick="setChartPeriod('weekly')" id="btn-chart-weekly" class="px-3 py-1.5 rounded-md transition-colors text-[#8B7B6E] hover:bg-white/50">주간</button>
-                                    <button onclick="setChartPeriod('monthly')" id="btn-chart-monthly" class="px-3 py-1.5 rounded-md transition-colors text-[#8B7B6E] hover:bg-white/50">월간</button>
+                                    <button onclick="setChartPeriod('daily')" id="btn-chart-daily"
+                                        class="px-3 py-1.5 rounded-md transition-colors bg-white text-[#D97756] shadow-sm">일간</button>
+                                    <button onclick="setChartPeriod('weekly')" id="btn-chart-weekly"
+                                        class="px-3 py-1.5 rounded-md transition-colors text-[#8B7B6E] hover:bg-white/50">주간</button>
+                                    <button onclick="setChartPeriod('monthly')" id="btn-chart-monthly"
+                                        class="px-3 py-1.5 rounded-md transition-colors text-[#8B7B6E] hover:bg-white/50">월간</button>
                                 </div>
                             </div>
                             <div id="refundChartContent">
-                                <div id="refundDataContainer" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3"></div>
+                                <div id="refundDataContainer"
+                                    class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3"></div>
                             </div>
                         </div>
                         <div class="border-t border-[#E8DDD4]"></div>
@@ -273,8 +563,12 @@
                         <div class="p-6">
                             <div class="mb-4 flex justify-between items-center">
                                 <h4 class="text-sm font-bold text-[#5C4A3E]">사유별 현황판</h4>
-                                <button onclick="filterByTotal()" class="text-xs text-[#8B7B6E] hover:text-[#D97756] underline flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                <button onclick="filterByTotal()"
+                                    class="text-xs text-[#8B7B6E] hover:text-[#D97756] underline flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
                                     초기화
                                 </button>
                             </div>
@@ -291,8 +585,12 @@
                         <!-- 필터 -->
                         <div class="flex items-center gap-2 mb-3 flex-wrap">
                             <div id="statusButtons" class="flex flex-wrap gap-2"></div>
-                            <button onclick="resetStatusFilter()" class="text-xs text-[#B8A99C] hover:text-[#D97756] ml-1 whitespace-nowrap">
-                                <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <button onclick="resetStatusFilter()"
+                                class="text-xs text-[#B8A99C] hover:text-[#D97756] ml-1 whitespace-nowrap">
+                                <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
                                 해제
                             </button>
                         </div>
@@ -300,26 +598,45 @@
                         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                             <div class="flex items-center gap-2">
                                 <h3 class="text-lg font-bold text-[#3D2E24]" id="tableTitle">상세 내역 리스트</h3>
-                                <span id="activeFilterBadge" class="hidden px-2 py-1 bg-[#FDF0EB] text-[#C4623E] text-xs font-bold rounded-md"></span>
-                                
-                                <div id="bulkActionContainer" class="hidden flex items-center gap-2 ml-4 p-1 bg-[#FDF0EB] border border-[#FDF0EB] rounded-lg animate-fade-in">
-                                    <span class="text-xs font-bold text-[#C4623E] ml-2" id="selectedCountDisplay">0개 선택</span>
+                                <span id="activeFilterBadge"
+                                    class="hidden px-2 py-1 bg-[#FDF0EB] text-[#C4623E] text-xs font-bold rounded-md"></span>
+
+                                <div id="bulkActionContainer"
+                                    class="hidden flex items-center gap-2 ml-4 p-1 bg-[#FDF0EB] border border-[#FDF0EB] rounded-lg animate-fade-in">
+                                    <span class="text-xs font-bold text-[#C4623E] ml-2" id="selectedCountDisplay">0개
+                                        선택</span>
                                     <div class="h-4 w-px bg-[#F5D5C8] mx-1"></div>
-                                    <select onchange="if(this.value){ applyBulkStatus(this.value); this.value=''; }" class="text-xs border-[#F0C9B8] rounded px-2 py-1 focus:ring-[#D97756] outline-none">
-                                        <option value="">상태 변경...</option><option value="처리완료">처리완료</option><option value="보류">보류</option><option value="미처리">미처리</option>
+                                    <select onchange="if(this.value){ applyBulkStatus(this.value); this.value=''; }"
+                                        class="text-xs border-[#F0C9B8] rounded px-2 py-1 focus:ring-[#D97756] outline-none">
+                                        <option value="">상태 변경...</option>
+                                        <option value="처리완료">처리완료</option>
+                                        <option value="보류">보류</option>
+                                        <option value="미처리">미처리</option>
                                     </select>
-                                    <button onclick="applyBulkPicToSelf()" class="px-2 py-1 text-xs bg-white border border-[#F0C9B8] hover:bg-[#FDF0EB] text-[#C4623E] rounded whitespace-nowrap">담당자 배정</button>
+                                    <button onclick="applyBulkPicToSelf()"
+                                        class="px-2 py-1 text-xs bg-white border border-[#F0C9B8] hover:bg-[#FDF0EB] text-[#C4623E] rounded whitespace-nowrap">담당자
+                                        배정</button>
                                     <div class="h-4 w-px bg-[#F5D5C8] mx-1"></div>
-                                    <button onclick="promptDeleteSelected()" class="px-2 py-1 text-xs bg-[#B85C4A] hover:bg-[#944839] text-white rounded whitespace-nowrap">삭제</button>
+                                    <button onclick="promptDeleteSelected()"
+                                        class="px-2 py-1 text-xs bg-[#B85C4A] hover:bg-[#944839] text-white rounded whitespace-nowrap">삭제</button>
                                 </div>
 
-                                 <div class="flex gap-2 items-center ml-2">
-                                    <button id="btnAddRow" onclick="addNewRow()" class="px-3 py-1.5 text-xs font-bold text-white bg-[#6B8F5E] hover:bg-[#5A7A4E] rounded-md transition-colors flex items-center gap-1 shadow-sm">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                <div class="flex gap-2 items-center ml-2">
+                                    <button id="btnAddRow" onclick="window.addNewRow()"
+                                        class="px-3 py-1.5 text-xs font-bold text-white bg-[#6B8F5E] hover:bg-[#5A7A4E] rounded-md transition-colors flex items-center gap-1 shadow-sm">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 4v16m8-8H4"></path>
+                                        </svg>
                                         신규 등록
                                     </button>
-                                    <button onclick="document.getElementById('listCsvInput').click()" class="px-3 py-1.5 text-xs font-bold text-[#D97756] bg-[#FDF0EB] hover:bg-[#F5D5C8] rounded-md transition-colors flex items-center gap-1 shadow-sm">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                    <button onclick="document.getElementById('listCsvInput').click()"
+                                        class="px-3 py-1.5 text-xs font-bold text-[#D97756] bg-[#FDF0EB] hover:bg-[#F5D5C8] rounded-md transition-colors flex items-center gap-1 shadow-sm">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
+                                            </path>
+                                        </svg>
                                         엑셀/CSV 등록
                                     </button>
                                     <input type="file" id="listCsvInput" class="hidden" accept=".csv">
@@ -327,33 +644,49 @@
                             </div>
                             <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
                                 <div class="flex items-center gap-1 flex-wrap">
-                                    <button onclick="setDateRange('all')" id="dr-all" class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-[#D97756] text-white border-[#D97756]">전체</button>
-                                    <button onclick="setDateRange('today')" id="dr-today" class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">오늘</button>
-                                    <button onclick="setDateRange('7d')" id="dr-7d" class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">7일</button>
-                                    <button onclick="setDateRange('30d')" id="dr-30d" class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">30일</button>
-                                    <button onclick="setDateRange('custom')" id="dr-custom" class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">직접입력</button>
+                                    <button onclick="setDateRange('all')" id="dr-all"
+                                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-[#D97756] text-white border-[#D97756]">전체</button>
+                                    <button onclick="setDateRange('today')" id="dr-today"
+                                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">오늘</button>
+                                    <button onclick="setDateRange('7d')" id="dr-7d"
+                                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">7일</button>
+                                    <button onclick="setDateRange('30d')" id="dr-30d"
+                                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">30일</button>
+                                    <button onclick="setDateRange('custom')" id="dr-custom"
+                                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">직접입력</button>
                                 </div>
                                 <div id="customDatePanel" class="hidden flex items-center gap-1">
-                                    <input type="date" id="dateFrom" class="px-2 py-1.5 text-xs border border-[#D4C4B8] rounded-lg focus:ring-[#D97756] focus:border-[#D97756]" onchange="applyDateRange()">
+                                    <input type="date" id="dateFrom"
+                                        class="px-2 py-1.5 text-xs border border-[#D4C4B8] rounded-lg focus:ring-[#D97756] focus:border-[#D97756]"
+                                        onchange="applyDateRange()">
                                     <span class="text-xs text-[#B8A99C]">~</span>
-                                    <input type="date" id="dateTo" class="px-2 py-1.5 text-xs border border-[#D4C4B8] rounded-lg focus:ring-[#D97756] focus:border-[#D97756]" onchange="applyDateRange()">
+                                    <input type="date" id="dateTo"
+                                        class="px-2 py-1.5 text-xs border border-[#D4C4B8] rounded-lg focus:ring-[#D97756] focus:border-[#D97756]"
+                                        onchange="applyDateRange()">
                                 </div>
                                 <div class="flex gap-2 w-full sm:w-auto">
                                     <div class="relative w-full sm:w-64">
-                                        <input type="text" id="tableSearch" placeholder="통합 검색 (Space로 구분, Enter)" onkeyup="if(event.key === 'Enter') window.applyLocalFilters(true)"
+                                        <input type="text" id="tableSearch" placeholder="통합 검색 (Space로 구분, Enter)"
+                                            onkeyup="if(event.key === 'Enter') window.applyLocalFilters(true)"
                                             class="w-full pl-10 pr-4 py-2 bg-[#FAF3EE] border border-[#D4C4B8] text-[#2D1F17] text-sm rounded-lg focus:ring-[#D97756] focus:border-[#D97756] transition-colors">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <svg class="w-4 h-4 text-[#B8A99C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg class="w-4 h-4 text-[#B8A99C]" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                            </svg>
                                         </div>
                                     </div>
-                                    <button onclick="window.applyLocalFilters(true)" class="px-4 py-2 bg-indigo-600 text-white text-sm font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm whitespace-nowrap">
+                                    <button onclick="window.applyLocalFilters(true)"
+                                        class="px-4 py-2 bg-indigo-600 text-white text-sm font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm whitespace-nowrap">
                                         검색
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="overflow-x-auto overflow-y-auto custom-scrollbar flex-grow" style="height: 600px;">
                         <table class="min-w-full divide-y divide-[#E8DDD4]">
                             <thead class="bg-[#FAF3EE]" id="tableHeaderRow"></thead>
@@ -374,8 +707,10 @@
             <h3 class="text-lg font-bold mb-2 text-[#2D1F17]">확인</h3>
             <p class="text-sm text-[#8B7B6E] mb-6" id="genericConfirmMessage"></p>
             <div class="flex gap-3">
-                <button onclick="window.closeGenericConfirm()" class="flex-1 py-2 border border-[#E8DDD4] rounded-lg hover:bg-[#FAF3EE] font-medium text-[#6B5D52]">취소</button>
-                <button id="genericConfirmBtn" class="flex-1 py-2 bg-[#D97756] text-white rounded-lg font-bold hover:bg-[#C4623E]">확인</button>
+                <button onclick="window.closeGenericConfirm()"
+                    class="flex-1 py-2 border border-[#E8DDD4] rounded-lg hover:bg-[#FAF3EE] font-medium text-[#6B5D52]">취소</button>
+                <button id="genericConfirmBtn"
+                    class="flex-1 py-2 bg-[#D97756] text-white rounded-lg font-bold hover:bg-[#C4623E]">확인</button>
             </div>
         </div>
     </div>
@@ -384,52 +719,79 @@
     <div id="userManagementModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center modal-overlay">
         <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl border border-[#E8DDD4]">
             <div class="p-5 bg-[#FAF3EE] border-b border-[#E8DDD4] flex justify-between items-center">
-                <h3 class="font-bold text-[#3D2E24]">사용자 계정 관리</h3>
-                <button onclick="window.closeUserManagementModal()" class="text-[#B8A99C] hover:text-[#6B5D52] text-2xl">✕</button>
+                <h3 class="font-bold text-[#3D2E24]">사용자 계정 권한 관리</h3>
+                <button onclick="window.closeUserManagementModal()"
+                    class="text-[#B8A99C] hover:text-[#6B5D52] text-2xl">✕</button>
             </div>
             <div class="p-6">
                 <div class="bg-[#FDF6F0] p-4 rounded-xl mb-6 border border-[#E8DDD4]">
-                    <h4 class="text-xs font-bold text-[#D97756] mb-3 uppercase tracking-wider">신규 담당자 등록</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        <input id="newUserName" class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]" placeholder="이름">
-                        <input id="newUserId" class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]" placeholder="아이디">
-                        <input id="newUserPw" type="text" class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]" placeholder="비밀번호">
-                        <select id="newUserRole" class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756] bg-white">
+                    <h4 class="text-xs font-bold text-[#D97756] mb-1 uppercase tracking-wider">신규 담당자 권한 부여</h4>
+                    <p class="text-[10px] text-[#8B7B6E] mb-3 leading-tight">
+                        ⚠️ 직원의 로그인 계정(비밀번호)은 반드시 파이어베이스 콘솔(Authentication)에서 직접 생성해주세요.<br>
+                        이곳에서는 생성된 이메일 계정에 대한 시스템 접속 권한만 부여합니다.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        <input id="newUserName"
+                            class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
+                            placeholder="이름 (예: 김담당)">
+                        <input id="newUserId" type="email"
+                            class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
+                            placeholder="가입된 이메일 주소">
+                        <select id="newUserRole"
+                            class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756] bg-white">
                             <option value="staff">일반 (Staff)</option>
                             <option value="admin">관리자 (Admin)</option>
-                            <option value="system">시스템 (System)</option>
                         </select>
                     </div>
-                    <button onclick="window.addNewUser()" class="w-full mt-3 bg-[#D97756] text-white py-2.5 rounded-lg font-bold shadow-sm hover:bg-[#C4623E] transition-all">계정 생성</button>
+                    <button onclick="window.addNewUser()"
+                        class="w-full mt-3 bg-[#D97756] text-white py-2.5 rounded-lg font-bold shadow-sm hover:bg-[#C4623E] transition-all">권한
+                        등록</button>
                 </div>
-                
-                <h4 class="text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">사용자 목록</h4>
-                <div id="userListContainer" class="max-h-60 overflow-y-auto border rounded-xl divide-y custom-scrollbar"></div>
+
+                <h4 class="text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">등록된 권한 목록</h4>
+                <div id="userListContainer"
+                    class="max-h-60 overflow-y-auto border rounded-xl divide-y custom-scrollbar"></div>
             </div>
         </div>
     </div>
-    
+
     <!-- Admin Settings Modal (Existing) -->
     <div id="settingsModal" class="fixed inset-0 z-[100] flex items-center justify-center modal-overlay hidden">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl h-[85vh] flex flex-col border border-slate-100">
             <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-xl">
                 <div>
                     <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
                         관리자 설정
                     </h3>
                     <p class="text-xs text-slate-500 mt-1">공통 코드 및 데이터 관리를 수행합니다.</p>
                 </div>
-                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-200 rounded-full transition-colors">✕</button>
+                <button onclick="closeSettingsModal()"
+                    class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-200 rounded-full transition-colors">✕</button>
             </div>
-            
+
             <div class="flex border-b border-slate-200 px-5 overflow-x-auto">
-                <button onclick="switchSettingsTab('reasons')" id="tab-reasons" class="px-4 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors whitespace-nowrap">사유</button>
-                <button onclick="switchSettingsTab('shipping')" id="tab-shipping" class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap">배송비</button>
-                <button onclick="switchSettingsTab('conditions')" id="tab-conditions" class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap">제품상태</button>
-                <button onclick="switchSettingsTab('channels')" id="tab-channels" class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap">판매처</button>
-                <button onclick="switchSettingsTab('archive')" id="tab-archive" class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                <button onclick="switchSettingsTab('reasons')" id="tab-reasons"
+                    class="px-4 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors whitespace-nowrap">사유</button>
+                <button onclick="switchSettingsTab('shipping')" id="tab-shipping"
+                    class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap">배송비</button>
+                <button onclick="switchSettingsTab('conditions')" id="tab-conditions"
+                    class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap">제품상태</button>
+                <button onclick="switchSettingsTab('channels')" id="tab-channels"
+                    class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap">판매처</button>
+                <button onclick="switchSettingsTab('archive')" id="tab-archive"
+                    class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4">
+                        </path>
+                    </svg>
                     데이터 관리 (아카이브)
                 </button>
             </div>
@@ -437,8 +799,11 @@
             <div class="flex-grow overflow-y-auto custom-scrollbar p-6 bg-white">
                 <div id="section-common-codes">
                     <div class="flex gap-2 mb-6">
-                        <input type="text" id="newOptionInput" class="flex-grow px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="새 항목 입력" onkeyup="if(event.key === 'Enter') addCurrentOption()">
-                        <button onclick="addCurrentOption()" class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">추가</button>
+                        <input type="text" id="newOptionInput"
+                            class="flex-grow px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                            placeholder="새 항목 입력" onkeyup="if(event.key === 'Enter') addCurrentOption()">
+                        <button onclick="addCurrentOption()"
+                            class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">추가</button>
                     </div>
 
                     <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
@@ -453,21 +818,30 @@
                     <div class="space-y-6">
                         <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
                             <h4 class="text-base font-bold text-slate-800 mb-2">아카이브 데이터 조회 모드</h4>
-                            <p class="text-sm text-slate-500 mb-4">현재 화면에 과거에 아카이빙된(보관된) 데이터를 불러옵니다. <br><span class="text-amber-600 font-bold">주의: 조회 모드에서는 데이터 수정이 불가능합니다.</span></p>
-                            <button id="btnToggleArchive" onclick="toggleArchiveMode()" class="w-full py-3 bg-white border border-slate-300 hover:bg-amber-50 hover:border-amber-300 text-slate-700 font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
-                                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            <p class="text-sm text-slate-500 mb-4">현재 화면에 과거에 아카이빙된(보관된) 데이터를 불러옵니다. <br><span
+                                    class="text-amber-600 font-bold">주의: 조회 모드에서는 데이터 수정이 불가능합니다.</span></p>
+                            <button id="btnToggleArchive" onclick="toggleArchiveMode()"
+                                class="w-full py-3 bg-white border border-slate-300 hover:bg-amber-50 hover:border-amber-300 text-slate-700 font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
+                                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                    </path>
+                                </svg>
                                 <span>아카이브 데이터 조회하기</span>
                             </button>
                         </div>
                         <hr class="border-slate-100">
-                        <div class="bg-white p-5 rounded-xl border-2 border-indigo-50 hover:border-indigo-100 transition-colors">
+                        <div
+                            class="bg-white p-5 rounded-xl border-2 border-indigo-50 hover:border-indigo-100 transition-colors">
                             <h4 class="text-base font-bold text-indigo-900 mb-2">데이터 아카이빙 (보관 처리)</h4>
                             <p class="text-sm text-slate-500 mb-4">
                                 처리가 완료된 오래된 데이터를 별도 저장소로 이동하여 시스템 속도를 개선합니다.
                             </p>
                             <div class="flex items-center gap-3 mb-4 bg-indigo-50/50 p-3 rounded-lg">
                                 <span class="text-sm font-bold text-indigo-700">기준: 처리완료 상태 & </span>
-                                <select id="archiveThreshold" class="bg-white border border-indigo-200 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2">
+                                <select id="archiveThreshold"
+                                    class="bg-white border border-indigo-200 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2">
                                     <option value="1">1개월 이전</option>
                                     <option value="3" selected>3개월 이전</option>
                                     <option value="6">6개월 이전</option>
@@ -475,8 +849,13 @@
                                 </select>
                                 <span class="text-sm font-bold text-indigo-700">데이터</span>
                             </div>
-                            <button onclick="archiveProcessedData()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors shadow-md flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                            <button onclick="archiveProcessedData()"
+                                class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors shadow-md flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                                    </path>
+                                </svg>
                                 아카이빙 실행
                             </button>
                         </div>
@@ -493,37 +872,56 @@
                 <h3 class="text-lg font-bold text-[#3D2E24] flex items-center gap-2">데이터 변경 이력</h3>
                 <button onclick="closeLogModal()" class="text-[#B8A99C] hover:text-[#6B5D52]">✕</button>
             </div>
-            <div id="logListContainer" class="flex-grow overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#FAF3EE]/50"></div>
+            <div id="logListContainer" class="flex-grow overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#FAF3EE]/50">
+            </div>
         </div>
     </div>
 
     <!-- Other Modals (Column Filter, Reason Input, Combined, Delete, Bulk Update) -->
-    <div id="columnFilterModal" class="absolute bg-white border border-[#E8DDD4] shadow-xl rounded-lg p-3 z-[90] hidden w-64 text-sm">
-        <div class="flex justify-between items-center mb-2 pb-2 border-b border-[#F0E8E0]"><span class="font-bold text-[#5C4A3E]">필터 선택</span><button onclick="closeColumnFilterModal()" class="text-[#B8A99C] hover:text-[#6B5D52]">✕</button></div>
-        <div class="flex items-center gap-2 mb-2 px-1"><input type="checkbox" id="columnFilterSelectAll" class="custom-checkbox" onchange="toggleColumnFilterSelectAll(this.checked)"><label for="columnFilterSelectAll" class="text-[#6B5D52] cursor-pointer select-none">전체 선택</label></div>
+    <div id="columnFilterModal"
+        class="absolute bg-white border border-[#E8DDD4] shadow-xl rounded-lg p-3 z-[90] hidden w-64 text-sm">
+        <div class="flex justify-between items-center mb-2 pb-2 border-b border-[#F0E8E0]"><span
+                class="font-bold text-[#5C4A3E]">필터 선택</span><button onclick="closeColumnFilterModal()"
+                class="text-[#B8A99C] hover:text-[#6B5D52]">✕</button></div>
+        <div class="flex items-center gap-2 mb-2 px-1"><input type="checkbox" id="columnFilterSelectAll"
+                class="custom-checkbox" onchange="toggleColumnFilterSelectAll(this.checked)"><label
+                for="columnFilterSelectAll" class="text-[#6B5D52] cursor-pointer select-none">전체 선택</label></div>
         <div id="columnFilterList" class="max-h-60 overflow-y-auto custom-scrollbar space-y-1 mb-3"></div>
-        <div class="flex gap-2"><button onclick="clearColumnFilter()" class="flex-1 py-1.5 border border-[#D4C4B8] rounded text-[#6B5D52] hover:bg-[#FAF3EE] text-xs font-bold">초기화</button><button onclick="applyColumnFilter()" class="flex-1 py-1.5 bg-[#D97756] text-white rounded hover:bg-[#C4623E] text-xs font-bold">적용</button></div>
+        <div class="flex gap-2"><button onclick="clearColumnFilter()"
+                class="flex-1 py-1.5 border border-[#D4C4B8] rounded text-[#6B5D52] hover:bg-[#FAF3EE] text-xs font-bold">초기화</button><button
+                onclick="applyColumnFilter()"
+                class="flex-1 py-1.5 bg-[#D97756] text-white rounded hover:bg-[#C4623E] text-xs font-bold">적용</button>
+        </div>
     </div>
 
     <div id="reasonInputModal" class="fixed inset-0 z-[80] flex items-center justify-center modal-overlay hidden">
-        <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm transform transition-all scale-100 opacity-100 border border-[#F0E8E0]">
+        <div
+            class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm transform transition-all scale-100 opacity-100 border border-[#F0E8E0]">
             <div class="mb-4">
                 <h3 class="text-lg font-bold text-[#3D2E24]">기타 사유 입력</h3>
                 <p class="text-sm text-[#8B7B6E]">구체적인 사유를 입력해주세요.</p>
             </div>
-            <input type="text" id="reasonDetailInput" class="w-full px-4 py-2 border border-[#D4C4B8] rounded-lg focus:ring-2 focus:ring-[#D97756] outline-none mb-4" onkeyup="if(event.key==='Enter') submitReasonInput()">
+            <input type="text" id="reasonDetailInput"
+                class="w-full px-4 py-2 border border-[#D4C4B8] rounded-lg focus:ring-2 focus:ring-[#D97756] outline-none mb-4"
+                onkeyup="if(event.key==='Enter') submitReasonInput()">
             <div class="flex gap-2">
-                <button onclick="closeReasonInputModal()" class="flex-1 py-2 border border-[#D4C4B8] rounded-lg text-[#5C4A3E] hover:bg-[#FAF3EE] font-medium">건너뛰기</button>
-                <button onclick="submitReasonInput()" class="flex-1 py-2 bg-[#D97756] text-white rounded-lg hover:bg-[#C4623E] font-bold">저장</button>
+                <button onclick="closeReasonInputModal()"
+                    class="flex-1 py-2 border border-[#D4C4B8] rounded-lg text-[#5C4A3E] hover:bg-[#FAF3EE] font-medium">건너뛰기</button>
+                <button onclick="submitReasonInput()"
+                    class="flex-1 py-2 bg-[#D97756] text-white rounded-lg hover:bg-[#C4623E] font-bold">저장</button>
             </div>
         </div>
     </div>
 
     <div id="combinedModal" class="fixed inset-0 z-[70] flex items-center justify-center modal-overlay hidden">
-        <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-5xl transform transition-all scale-100 opacity-100 border border-slate-100">
+        <div
+            class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-5xl transform transition-all scale-100 opacity-100 border border-slate-100">
             <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
                 <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
                     합포(묶음배송) 상품 관리
                 </h3>
                 <button onclick="closeCombinedModal()" class="text-slate-400 hover:text-slate-600">✕</button>
@@ -536,26 +934,40 @@
                 <div class="w-24 text-right">상품금액</div>
                 <div class="w-8"></div>
             </div>
-            <div id="combinedItemsList" class="space-y-2 mb-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-1"></div>
-            <button onclick="addCombinedItemInput()" class="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-indigo-500 transition-colors text-sm font-bold flex items-center justify-center gap-2 mb-4">상품 추가하기</button>
+            <div id="combinedItemsList" class="space-y-2 mb-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-1">
+            </div>
+            <button onclick="addCombinedItemInput()"
+                class="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-indigo-500 transition-colors text-sm font-bold flex items-center justify-center gap-2 mb-4">상품
+                추가하기</button>
             <div class="flex justify-between items-center bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
                 <div class="flex gap-6">
-                    <div><span class="text-xs font-bold text-slate-500 block">총 할인금액</span><span class="text-lg font-bold text-rose-500" id="combinedDiscountPreview">₩0</span></div>
-                    <div><span class="text-xs font-bold text-slate-500 block">총 상품금액</span><span class="text-lg font-bold text-indigo-600" id="combinedTotalPreview">₩0</span></div>
+                    <div><span class="text-xs font-bold text-slate-500 block">총 할인금액</span><span
+                            class="text-lg font-bold text-rose-500" id="combinedDiscountPreview">₩0</span></div>
+                    <div><span class="text-xs font-bold text-slate-500 block">총 상품금액</span><span
+                            class="text-lg font-bold text-indigo-600" id="combinedTotalPreview">₩0</span></div>
                 </div>
             </div>
             <div class="flex gap-3">
-                <button onclick="closeCombinedModal()" class="flex-1 py-2.5 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors">취소</button>
-                <button onclick="saveCombinedItems()" class="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 shadow-md transition-colors">적용하기</button>
+                <button onclick="closeCombinedModal()"
+                    class="flex-1 py-2.5 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors">취소</button>
+                <button onclick="saveCombinedItems()"
+                    class="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 shadow-md transition-colors">적용하기</button>
             </div>
         </div>
     </div>
 
     <div id="userModal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden">
-        <div class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md transform transition-all scale-100 opacity-100 border border-[#F0E8E0]">
-            <div class="text-center mb-6"><h3 class="text-xl font-bold text-[#2D1F17]">작업자 이름 설정</h3></div>
-            <input type="text" id="usernameInput" class="w-full px-4 py-3 border border-[#D4C4B8] rounded-lg text-center font-bold mb-4" placeholder="예: 김담당" onkeyup="if(event.key === 'Enter') saveUserIdentity()">
-            <button onclick="saveUserIdentity()" class="w-full py-3 bg-[#D97756] hover:bg-[#C4623E] text-white font-bold rounded-lg shadow-lg"> 확인</button>
+        <div
+            class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md transform transition-all scale-100 opacity-100 border border-[#F0E8E0]">
+            <div class="text-center mb-6">
+                <h3 class="text-xl font-bold text-[#2D1F17]">작업자 이름 설정</h3>
+            </div>
+            <input type="text" id="usernameInput"
+                class="w-full px-4 py-3 border border-[#D4C4B8] rounded-lg text-center font-bold mb-4"
+                placeholder="예: 김담당" onkeyup="if(event.key === 'Enter') saveUserIdentity()">
+            <button onclick="saveUserIdentity()"
+                class="w-full py-3 bg-[#D97756] hover:bg-[#C4623E] text-white font-bold rounded-lg shadow-lg">
+                확인</button>
         </div>
     </div>
 
@@ -564,19 +976,26 @@
             <h3 class="text-lg font-bold mb-2 text-[#2D1F17]">삭제 확인</h3>
             <p class="text-sm text-[#8B7B6E] mb-4" id="deleteModalMessage">삭제하시겠습니까?</p>
             <div class="flex gap-3">
-                <button onclick="closeDeleteModal()" class="flex-1 py-2 border rounded-lg hover:bg-[#FAF3EE]">취소</button>
-                <button id="confirmDeleteBtn" class="flex-1 py-2 bg-[#B85C4A] text-white rounded-lg font-bold">삭제</button>
+                <button onclick="closeDeleteModal()"
+                    class="flex-1 py-2 border rounded-lg hover:bg-[#FAF3EE]">취소</button>
+                <button id="confirmDeleteBtn"
+                    class="flex-1 py-2 bg-[#B85C4A] text-white rounded-lg font-bold">삭제</button>
             </div>
         </div>
     </div>
-    
+
     <div id="bulkUpdateModal" class="fixed inset-0 z-[85] flex items-center justify-center modal-overlay hidden">
         <div class="bg-white rounded-xl p-6 w-full max-w-sm shadow-2xl">
             <h3 class="text-lg font-bold mb-4">일괄 수정</h3>
             <div class="space-y-3 mb-6">
-                <select id="bulkFieldSelect" class="w-full px-3 py-2 border rounded-lg text-sm" onchange="updateBulkValueInput(this.value)">
-                    <option value="_status">처리상태</option><option value="_pic">처리자</option><option value="_channel">판매처</option>
-                    <option value="_reason">사유</option><option value="_courier">배송사</option><option value="_product_condition">제품상태</option>
+                <select id="bulkFieldSelect" class="w-full px-3 py-2 border rounded-lg text-sm"
+                    onchange="updateBulkValueInput(this.value)">
+                    <option value="_status">처리상태</option>
+                    <option value="_pic">처리자</option>
+                    <option value="_channel">판매처</option>
+                    <option value="_reason">사유</option>
+                    <option value="_courier">배송사</option>
+                    <option value="_product_condition">제품상태</option>
                 </select>
                 <div id="bulkValueContainer"></div>
             </div>
@@ -591,36 +1010,36 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, orderBy, limit, writeBatch, deleteDoc, getDocs, initializeFirestore, memoryLocalCache, deleteField } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, signOut, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, orderBy, limit, writeBatch, deleteDoc, getDocs, initializeFirestore, memoryLocalCache, deleteField, where } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
         import { getAnalytics } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js';
 
         // --- 1. CONSTANTS ---
         const LIVE_COLLECTION_NAME = 'er_data';
         const ARCHIVE_COLLECTION_NAME = 'er_status_archive_shared_v1';
         let currentCollectionName = LIVE_COLLECTION_NAME;
-        const COLLECTION_NAME = LIVE_COLLECTION_NAME; 
+        const COLLECTION_NAME = LIVE_COLLECTION_NAME;
         const LOG_COLLECTION_NAME = 'er_status_logs_shared_v1';
         const SETTINGS_COLLECTION_NAME = 'er_settings_shared_v1';
         const USERS_COLLECTION_NAME = 'er_users_v60';
 
         const COLUMNS = [
-             { id: '_date', label: 'E/R팀입고', width: '120px' }, { id: '_customer', label: '고객명', width: '80px' },
-             { id: '_user_id', label: '아이디', width: '90px' }, { id: '_phone', label: '전화번호', width: '110px' },
-             { id: '_courier', label: '배송사', width: '80px' }, 
-             { id: '_tracking', label: '송장번호', width: '120px' },
-             { id: '_order_date', label: '주문일', width: '110px' },
-             { id: '_ship_date', label: '출고일', width: '110px' }, 
-             { id: '_delivery_completed_date', label: '배송완료일', width: '100px' },
-             { id: '_channel', label: '판매처', width: '100px' }, { id: '_order_id', label: '주문번호', width: '140px' },
-             { id: '_product', label: '상품명', width: '240px' }, { id: '_product_price', label: '상품금액', width: '90px', align: 'right' },
-             { id: '_discount_info', label: '할인내용', width: '120px' }, { id: '_discount_amount', label: '할인금액', width: '90px', align: 'right' },
-             { id: '_payment_amount', label: '결제금액', width: '90px', align: 'right' }, { id: '_shipping_cost_paid', label: '배송비금액', width: '90px', align: 'right' },
-             { id: '_refund_amount', label: '환불액', width: '90px', align: 'right' }, { id: '_refund_method', label: '환불수단', width: '100px' },
-             { id: '_refund_ledger', label: '환불장', width: '80px' }, { id: '_product_condition', label: '제품상태', width: '100px' },
-             { id: '_type', label: '구분', width: '70px' }, { id: '_reason', label: '사유', width: '120px' },
-             { id: '_shipping', label: '배송비', width: '80px' }, { id: '_processingNote', label: '처리 특이사항', width: '150px' },
-             { id: '_status', label: '처리상태', width: '100px' }, { id: '_pic', label: '처리자', width: '80px' }
+            { id: '_date', label: 'E/R팀입고', width: '120px' }, { id: '_customer', label: '고객명', width: '80px' },
+            { id: '_user_id', label: '아이디', width: '90px' }, { id: '_phone', label: '전화번호', width: '110px' },
+            { id: '_courier', label: '배송사', width: '80px' },
+            { id: '_tracking', label: '송장번호', width: '120px' },
+            { id: '_order_date', label: '주문일', width: '110px' },
+            { id: '_ship_date', label: '출고일', width: '110px' },
+            { id: '_delivery_completed_date', label: '배송완료일', width: '100px' },
+            { id: '_channel', label: '판매처', width: '100px' }, { id: '_order_id', label: '주문번호', width: '140px' },
+            { id: '_product', label: '상품명', width: '240px' }, { id: '_product_price', label: '상품금액', width: '90px', align: 'right' },
+            { id: '_discount_info', label: '할인내용', width: '120px' }, { id: '_discount_amount', label: '할인금액', width: '90px', align: 'right' },
+            { id: '_payment_amount', label: '결제금액', width: '90px', align: 'right' }, { id: '_shipping_cost_paid', label: '배송비금액', width: '90px', align: 'right' },
+            { id: '_refund_amount', label: '환불액', width: '90px', align: 'right' }, { id: '_refund_method', label: '환불수단', width: '100px' },
+            { id: '_refund_ledger', label: '환불장', width: '80px' }, { id: '_product_condition', label: '제품상태', width: '100px' },
+            { id: '_type', label: '구분', width: '70px' }, { id: '_reason', label: '사유', width: '120px' },
+            { id: '_shipping', label: '배송비', width: '80px' }, { id: '_processingNote', label: '처리 특이사항', width: '150px' },
+            { id: '_status', label: '처리상태', width: '100px' }, { id: '_pic', label: '처리자', width: '80px' }
         ];
         const FIELD_LABELS = { '_status': '처리상태', '_pic': '처리자', '_product': '상품명', '_reason': '사유', '_shipping': '배송비', '_processingNote': '처리메모', '_refund_amount': '환불액', '_payment_amount': '결제금액', '_product_condition': '제품상태', '_tracking': '송장번호', '_channel': '판매처' };
 
@@ -628,22 +1047,24 @@
         let app, auth, db, analytics;
         let standardData = [], selectedIds = new Set(), unsavedChanges = new Map();
         let currentUserName = localStorage.getItem('er_system_username') || 'Guest';
-        let activeStatus='', activeDate='', activeReason='', activeType='', isFilteringUrgent=false, deleteTargetIds = [], searchTimeout;
+        let activeStatus = '', activeDate = '', activeReason = '', activeType = '', isFilteringUrgent = false, deleteTargetIds = [], searchTimeout;
         let currentChartPeriod = 'daily', dateRangeMode = 'all', dateRangeFrom = null, dateRangeTo = null;
         let columnFilters = {}, columnSortField = '', columnSortOrder = '', activeCombinedRowId = null, activeColumnFilter = null;
         window.currentTableData = [];
-        let globalOptions = { reasons: [], shipping: [], conditions: [], channels: [] }; 
+        let globalOptions = { reasons: [], shipping: [], conditions: [], channels: [] };
         let activeSettingsTab = 'reasons', isArchiveMode = false;
         let activeReasonRowId = null;
-        let unsubscribeSettings = null, unsubscribeData = null; 
+        let unsubscribeSettings = null, unsubscribeData = null;
         let isEditing = false, pendingSync = false, syncTimeout = null;
 
+        let dataFetchMode = 'recent'; // 'recent' 또는 'all'
+
         // --- 3. GLOBAL FUNCTIONS (Hoisted) ---
-        
+
         let cleanupRetryCount = 0;
         window.cleanupPendingData = async () => {
             if (!db) return;
-            
+
             if (standardData.length === 0) {
                 if (cleanupRetryCount < 10) {
                     cleanupRetryCount++;
@@ -654,7 +1075,7 @@
 
             try {
                 const pendingItems = standardData.filter(d => d._archiving_status === 'pending' || d._delete_status === 'pending');
-                
+
                 if (pendingItems.length === 0) return;
 
                 let batch = writeBatch(db);
@@ -662,14 +1083,15 @@
                 let totalCleaned = 0;
 
                 for (const data of pendingItems) {
-                    const docId = String(data._id); 
+                    const docId = String(data._id);
+                    // [FIX] Restore raw collection path without 'artifacts/appId...'
                     const ref = doc(db, LIVE_COLLECTION_NAME, docId);
-                    
+
                     batch.update(ref, {
                         _archiving_status: deleteField(),
                         _delete_status: deleteField()
                     });
-                    
+
                     batchCount++;
                     totalCleaned++;
 
@@ -689,11 +1111,11 @@
         window.escapeHtml = (unsafe) => {
             if (unsafe == null) return '';
             return String(unsafe)
-                 .replace(/&/g, "&amp;")
-                 .replace(/</g, "&lt;")
-                 .replace(/>/g, "&gt;")
-                 .replace(/"/g, "&quot;")
-                 .replace(/'/g, "&#039;");
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         };
 
         window.pendingConfirmAction = null;
@@ -707,70 +1129,70 @@
             window.pendingConfirmAction = null;
         };
         document.getElementById('genericConfirmBtn').onclick = () => {
-            if(window.pendingConfirmAction) window.pendingConfirmAction();
+            if (window.pendingConfirmAction) window.pendingConfirmAction();
             window.closeGenericConfirm();
         };
 
-        window.parseDate = (s) => { 
-            if(!s) return 0;
+        window.parseDate = (s) => {
+            if (!s) return 0;
             const koreanMatch = s.match(/(\d+)월\s*(\d+)일/);
             const now = new Date();
             let year = now.getFullYear();
-            if(koreanMatch) {
+            if (koreanMatch) {
                 const parsed = new Date(year, parseInt(koreanMatch[1]) - 1, parseInt(koreanMatch[2]));
                 if (parsed.getTime() > now.getTime() + 7 * 24 * 60 * 60 * 1000) year--;
                 return new Date(year, parseInt(koreanMatch[1]) - 1, parseInt(koreanMatch[2])).getTime();
             }
-            
+
             if (typeof s === 'string' && s.includes('-')) {
                 const parts = s.split('-');
                 if (parts.length >= 3) {
                     return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])).getTime();
                 }
             }
-            
+
             const d = new Date(s);
             return isNaN(d.getTime()) ? 0 : d.getTime();
         };
-        window.parseMoney = (v) => parseInt(String(v).replace(/[^0-9-]/g,'')) || 0;
+        window.parseMoney = (v) => parseInt(String(v).replace(/[^0-9-]/g, '')) || 0;
         window.formatMoney = (n) => '₩' + n.toLocaleString();
-        window.isUrgent = (r) => (r._status!=='처리완료' && (Date.now() - window.parseDate(r._date)) > 259200000);
+        window.isUrgent = (r) => (r._status !== '처리완료' && (Date.now() - window.parseDate(r._date)) > 259200000);
         window.getStatusIcon = (s) => s === '처리완료' ? '✔' : (s === '보류' ? '!' : '-');
         window.showToast = (m) => {
             const container = document.getElementById('toast-container');
-            if(!container) return;
-            const d = document.createElement('div'); d.className='toast show'; d.innerText = m;
+            if (!container) return;
+            const d = document.createElement('div'); d.className = 'toast show'; d.innerText = m;
             container.appendChild(d);
-            setTimeout(() => { if(d.parentNode) d.remove(); }, 3000);
+            setTimeout(() => { if (d.parentNode) d.remove(); }, 3000);
         };
-        window.showLoading = (s) => { const overlay = document.getElementById('loadingOverlay'); if(overlay) overlay.classList.toggle('hidden', !s); };
+        window.showLoading = (s) => { const overlay = document.getElementById('loadingOverlay'); if (overlay) overlay.classList.toggle('hidden', !s); };
 
         window.updateSaveButton = () => {
-             const c = unsavedChanges.size;
-             const badge = document.getElementById('unsavedCount');
-             if(badge) badge.innerText = c;
-             const btn = document.getElementById('saveChangesBtn');
-             if(btn) { btn.classList.toggle('hidden', c === 0); btn.disabled = (c === 0); }
+            const c = unsavedChanges.size;
+            const badge = document.getElementById('unsavedCount');
+            if (badge) badge.innerText = c;
+            const btn = document.getElementById('saveChangesBtn');
+            if (btn) { btn.classList.toggle('hidden', c === 0); btn.disabled = (c === 0); }
         };
 
         window.updateSelectionUI = () => {
             const count = selectedIds.size;
             const disp = document.getElementById('selectedCountDisplay');
-            if(disp) disp.innerText = count + '개 선택';
+            if (disp) disp.innerText = count + '개 선택';
             const container = document.getElementById('bulkActionContainer');
-            if(container) {
-                if(count>0) { container.classList.remove('hidden'); container.classList.add('flex'); }
+            if (container) {
+                if (count > 0) { container.classList.remove('hidden'); container.classList.add('flex'); }
                 else { container.classList.add('hidden'); container.classList.remove('flex'); }
             }
             const cb = document.getElementById('selectAllCheckboxTop');
-            if(cb) cb.checked = (standardData.length > 0 && selectedIds.size === standardData.length);
+            if (cb) cb.checked = (standardData.length > 0 && selectedIds.size === standardData.length);
         };
-        
+
         window.updateTableCheckboxes = () => { document.querySelectorAll('.row-check').forEach(c => c.checked = selectedIds.has(c.value)); };
 
         window.getMergedData = () => {
             return standardData
-                .filter(d => d._customer || d._product || d._order_id) // [추가] 빈 데이터(더미)가 통계 및 차트에 잡히지 않도록 원천 차단
+                .filter(d => d._customer || d._product || d._order_id)
                 .map(d => {
                     const pending = unsavedChanges.get(String(d._id));
                     return pending ? { ...d, ...pending } : d;
@@ -780,24 +1202,24 @@
         window.updateKPI = () => {
             const data = window.getMergedData();
             const total = data.length;
-            const unprocessed = data.filter(d => (d._status||'').trim()==='미처리').length;
+            const unprocessed = data.filter(d => (d._status || '').trim() === '미처리').length;
             const urgent = data.filter(d => window.isUrgent(d)).length;
-            const processed = data.filter(d => (d._status||'').trim()==='처리완료').length;
-            const defect = data.filter(d => (d._product_condition||'').trim()==='불량').length;
-            const exchange = data.filter(d => (d._type||'').includes('교환')).length;
-            const refundCount = data.filter(d => (d._type||'').includes('반품')).length;
+            const processed = data.filter(d => (d._status || '').trim() === '처리완료').length;
+            const defect = data.filter(d => (d._product_condition || '').trim() === '불량').length;
+            const exchange = data.filter(d => (d._type || '').includes('교환')).length;
+            const refundCount = data.filter(d => (d._type || '').includes('반품')).length;
             const refundSum = data.reduce((acc, d) => acc + window.parseMoney(d._refund_amount), 0);
-            const defectRate = total > 0 ? ((defect/total)*100).toFixed(1) : 0;
-            
-            const qMap = {quickTotal:total, quickUnprocessed:unprocessed, quickUrgent:urgent, quickCompleted:processed, quickRefundTotal:window.formatMoney(refundSum)};
-            Object.entries(qMap).forEach(([id, val]) => { const el = document.getElementById(id); if(el) el.innerText = val.toLocaleString(); });
-            const kpiMap = {kpiTotal:total, kpiUnprocessed:unprocessed, kpiUrgent:urgent, kpiDefect:defect, kpiMisdelivery:data.filter(d=>(d._reason||'').includes('오배송')).length, kpiExchangeRate:exchange, kpiReturnRate:refundCount, kpiDefectRate:defectRate+'%'};
-            Object.entries(kpiMap).forEach(([id, val]) => { const el = document.getElementById(id); if(el) el.innerText = val.toLocaleString(); });
+            const defectRate = total > 0 ? ((defect / total) * 100).toFixed(1) : 0;
+
+            const qMap = { quickTotal: total, quickUnprocessed: unprocessed, quickUrgent: urgent, quickCompleted: processed, quickRefundTotal: window.formatMoney(refundSum) };
+            Object.entries(qMap).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.innerText = val.toLocaleString(); });
+            const kpiMap = { kpiTotal: total, kpiUnprocessed: unprocessed, kpiUrgent: urgent, kpiDefect: defect, kpiMisdelivery: data.filter(d => (d._reason || '').includes('오배송')).length, kpiExchangeRate: exchange, kpiReturnRate: refundCount, kpiDefectRate: defectRate + '%' };
+            Object.entries(kpiMap).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.innerText = val.toLocaleString(); });
         };
 
         window.renderRefundStats = () => {
             const container = document.getElementById('refundDataContainer');
-            if(!container) return;
+            if (!container) return;
             const data = window.getMergedData();
             const aggregated = {};
             data.forEach(row => {
@@ -807,38 +1229,38 @@
                 if (!ts) return;
                 const d = new Date(ts);
                 let key = '', label = '';
-                if(currentChartPeriod === 'daily') { key = d.toISOString().split('T')[0]; label = `${d.getMonth()+1}/${d.getDate()}`; }
-                else if(currentChartPeriod === 'weekly') {
+                if (currentChartPeriod === 'daily') { key = d.toISOString().split('T')[0]; label = `${d.getMonth() + 1}/${d.getDate()}`; }
+                else if (currentChartPeriod === 'weekly') {
                     const firstDay = new Date(d.getFullYear(), 0, 1);
                     const week = Math.ceil(((d - firstDay) / 86400000 + firstDay.getDay() + 1) / 7);
-                    key = `${d.getFullYear()}-W${week.toString().padStart(2,'0')}`; label = `${d.getFullYear().toString().slice(-2)}년 ${week}주`;
-                } else { key = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}`; label = `${d.getFullYear()}년 ${d.getMonth()+1}월`; }
-                if(!aggregated[key]) aggregated[key] = { label, amount: 0 };
+                    key = `${d.getFullYear()}-W${week.toString().padStart(2, '0')}`; label = `${d.getFullYear().toString().slice(-2)}년 ${week}주`;
+                } else { key = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`; label = `${d.getFullYear()}년 ${d.getMonth() + 1}월`; }
+                if (!aggregated[key]) aggregated[key] = { label, amount: 0 };
                 aggregated[key].amount += amount;
             });
-            const sorted = Object.entries(aggregated).sort((a,b) => a[0].localeCompare(b[0])).slice(-7);
+            const sorted = Object.entries(aggregated).sort((a, b) => a[0].localeCompare(b[0])).slice(-7);
             container.innerHTML = sorted.map(([k, d]) => `<div class="bg-[#FAF3EE] p-3 rounded-lg text-center shadow-sm hover:bg-white transition-all border border-transparent hover:border-[#D97756]"><span class="text-[10px] font-bold text-[#8B7B6E] block mb-1">${d.label}</span><span class="text-sm font-bold text-[#D97756]">${window.formatMoney(d.amount)}</span></div>`).join('');
         };
 
         window.renderAllButtons = () => {
             const sDiv = document.getElementById('statusButtons');
-            if(!sDiv) return;
+            if (!sDiv) return;
             const data = window.getMergedData();
             const counts = { '미처리': 0, '처리완료': 0, '보류': 0 };
-            data.forEach(d => { if(counts[d._status]!==undefined) counts[d._status]++; else counts['미처리']++; });
-            sDiv.innerHTML = ['미처리', '처리완료', '보류'].map(s => `<button onclick="window.setActiveStatus('${s}')" class="status-btn px-4 py-1.5 border border-[#D4C4B8] rounded-md bg-white text-xs font-bold text-[#6B5D52] hover:bg-[#FAF3EE] transition-colors ${activeStatus===s?'active':''}"> ${s} <span class="count-badge ml-1 bg-[#F5EDE6] text-[#8B7B6E] px-1 rounded">${counts[s]}</span> </button>`).join('');
+            data.forEach(d => { if (counts[d._status] !== undefined) counts[d._status]++; else counts['미처리']++; });
+            sDiv.innerHTML = ['미처리', '처리완료', '보류'].map(s => `<button onclick="window.setActiveStatus('${s}')" class="status-btn px-4 py-1.5 border border-[#D4C4B8] rounded-md bg-white text-xs font-bold text-[#6B5D52] hover:bg-[#FAF3EE] transition-colors ${activeStatus === s ? 'active' : ''}"> ${s} <span class="count-badge ml-1 bg-[#F5EDE6] text-[#8B7B6E] px-1 rounded">${counts[s]}</span> </button>`).join('');
             const rDiv = document.getElementById('reasonButtons');
-            if(rDiv) {
-                const reasons = [...new Set(standardData.map(d=>d._reason).filter(r=>r))];
-                rDiv.innerHTML = reasons.map(r => `<button onclick="window.setActiveReason('${r}')" class="reason-btn px-2 py-1 text-xs border border-[#E8DDD4] rounded-full hover:bg-[#F5EDE6] ${activeReason===r?'active':''}">${r}</button>`).join('');
+            if (rDiv) {
+                const reasons = [...new Set(standardData.map(d => d._reason).filter(r => r))];
+                rDiv.innerHTML = reasons.map(r => `<button onclick="window.setActiveReason('${r}')" class="reason-btn px-2 py-1 text-xs border border-[#E8DDD4] rounded-full hover:bg-[#F5EDE6] ${activeReason === r ? 'active' : ''}">${r}</button>`).join('');
             }
         };
 
         window.renderTableHeader = () => {
             const thead = document.getElementById('tableHeaderRow');
-            if(!thead) return;
+            if (!thead) return;
             let html = `<tr><th class="px-4 py-3 text-center sticky top-0 left-0 z-50 bg-[#FAF3EE] border-r border-[#E8DDD4] border-b min-w-[50px] w-[50px]"><input type="checkbox" id="selectAllCheckboxTop" onchange="window.toggleSelectAll(this.checked)" class="w-5 h-5 accent-[#D97756]"></th>`;
-            
+
             COLUMNS.forEach(col => {
                 let stickyClass = 'sticky top-0 z-40 bg-[#FAF3EE]';
                 let style = `min-width:${col.width}; width:${col.width};`;
@@ -850,12 +1272,12 @@
         };
 
         window.debounceSearch = () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => window.applyLocalFilters(true), 300); };
-        window.toggleSelectAll = (c) => { selectedIds = c ? new Set(window.currentTableData.map(d=>String(d._id))) : new Set(); window.applyLocalFilters(); };
-        window.toggleRowSelection = (id) => { const s=String(id); if(selectedIds.has(s)) selectedIds.delete(s); else selectedIds.add(s); window.updateSelectionUI(); };
+        window.toggleSelectAll = (c) => { selectedIds = c ? new Set(window.currentTableData.map(d => String(d._id))) : new Set(); window.applyLocalFilters(); };
+        window.toggleRowSelection = (id) => { const s = String(id); if (selectedIds.has(s)) selectedIds.delete(s); else selectedIds.add(s); window.updateSelectionUI(); };
 
         window.renderTable = (data) => {
             const tbody = document.getElementById('tableBody');
-            if(!tbody) return;
+            if (!tbody) return;
 
             let focusedRowId = null;
             let focusedFieldClass = null;
@@ -865,59 +1287,59 @@
                 if (tr) focusedRowId = tr.id;
                 focusedFieldClass = Array.from(document.activeElement.classList).find(c => c.startsWith('field-'));
                 if (document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'text') {
-                    try { focusedSelection = document.activeElement.selectionStart; } catch(e){}
+                    try { focusedSelection = document.activeElement.selectionStart; } catch (e) { }
                 }
             }
 
-            if(data.length === 0) {
+            if (data.length === 0) {
                 tbody.innerHTML = '';
                 document.getElementById('emptyState').classList.remove('hidden');
                 return;
             }
             document.getElementById('emptyState').classList.add('hidden');
-            
+
             let rows = '';
             const now = Date.now();
             data.forEach(d => {
                 const pending = unsavedChanges.get(String(d._id)) || {};
                 const r = { ...d, ...pending };
                 let isUrgent = (r._status !== '처리완료' && (now - window.parseDate(r._date)) > 259200000);
-                
+
                 const bgClass = isUrgent ? 'bg-[#FEE2E2] hover:bg-[#FECACA]' : 'hover:bg-[#FAF3EE]';
                 const stickyBg = isUrgent ? 'bg-[#FEE2E2]' : 'bg-white';
                 const isSel = selectedIds.has(String(d._id));
-                
-                const ropt = `<option value="">선택</option>` + ['변심', '불량', '색상', '사이즈', '색상/사이즈', '수선', '오배송'].map(x=>`<option value="${x}" ${r._reason===x?'selected':''}>${x}</option>`).join('');
-                const sopt = `<option value="">선택</option>` + ['결제', '입금', '차감', '무상', '무료배송권', '동봉'].map(x=>`<option value="${x}" ${r._shipping===x?'selected':''}>${x}</option>`).join('');
-                const copt = `<option value="">선택</option>` + ['정상', '불량'].map(x=>`<option value="${x}" ${r._product_condition===x?'selected':''}>${x}</option>`).join('');
+
+                const ropt = `<option value="">선택</option>` + ['변심', '불량', '색상', '사이즈', '색상/사이즈', '수선', '오배송'].map(x => `<option value="${x}" ${r._reason === x ? 'selected' : ''}>${x}</option>`).join('');
+                const sopt = `<option value="">선택</option>` + ['결제', '입금', '차감', '무상', '무료배송권', '동봉'].map(x => `<option value="${x}" ${r._shipping === x ? 'selected' : ''}>${x}</option>`).join('');
+                const copt = `<option value="">선택</option>` + ['정상', '불량'].map(x => `<option value="${x}" ${r._product_condition === x ? 'selected' : ''}>${x}</option>`).join('');
 
                 rows += `<tr id="row-${d._id}" class="${bgClass} border-b border-[#E8DDD4] transition-colors group">
                     <td class="px-4 py-2 text-center sticky left-0 z-30 ${stickyBg} border-r border-[#F0E8E0] min-w-[50px]">
-                        <input type="checkbox" class="w-5 h-5 accent-[#D97756] row-check" value="${d._id}" ${isSel?'checked':''} onchange="window.toggleRowSelection('${d._id}')">
+                        <input type="checkbox" class="w-5 h-5 accent-[#D97756] row-check" value="${d._id}" ${isSel ? 'checked' : ''} onchange="window.toggleRowSelection('${d._id}')">
                     </td>`;
-                
+
                 COLUMNS.forEach(col => {
                     let tdClass = `px-2 py-2 align-top`;
                     let tdStyle = '';
-                    
+
                     const val = r[col.id] || '';
                     let inputHtml = '';
-                    if(col.id === '_status') {
-                        const icon = val==='처리완료' ? '✔' : (val==='보류'?'!':'-');
-                        const color = val==='처리완료'?'text-[#5E7A4A]':(val==='보류'?'text-[#A67A52]':'text-[#B8A99C]');
-                        const statusOpts = ['미처리', '처리완료', '보류'].map(x => `<option value="${x}" ${val===x?'selected':''}>${x}</option>`).join('');
-                        inputHtml = `<div class="flex items-center gap-1"><span class="status-icon text-xs font-bold w-3 text-center ${color}">${icon}</span><select class="flex-grow text-xs border rounded p-1 outline-none focus:border-[#D97756] font-bold ${color} field-_status ${pending._status?'unsaved-input':''}" onchange="window.updateField('${d._id}', '_status', this.value)">${statusOpts}</select></div>`;
+                    if (col.id === '_status') {
+                        const icon = val === '처리완료' ? '✔' : (val === '보류' ? '!' : '-');
+                        const color = val === '처리완료' ? 'text-[#5E7A4A]' : (val === '보류' ? 'text-[#A67A52]' : 'text-[#B8A99C]');
+                        const statusOpts = ['미처리', '처리완료', '보류'].map(x => `<option value="${x}" ${val === x ? 'selected' : ''}>${x}</option>`).join('');
+                        inputHtml = `<div class="flex items-center gap-1"><span class="status-icon text-xs font-bold w-3 text-center ${color}">${icon}</span><select class="flex-grow text-xs border rounded p-1 outline-none focus:border-[#D97756] font-bold ${color} field-_status ${pending._status ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}', '_status', this.value)">${statusOpts}</select></div>`;
                     } else if (col.id === '_reason') {
-                        inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_reason ${pending._reason?'unsaved-input':''}" onchange="window.updateField('${d._id}','_reason',this.value)">${ropt}</select>`;
+                        inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_reason ${pending._reason ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_reason',this.value)">${ropt}</select>`;
                     } else if (col.id === '_shipping') {
-                        inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_shipping ${pending._shipping?'unsaved-input':''}" onchange="window.updateField('${d._id}','_shipping',this.value)">${sopt}</select>`;
+                        inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_shipping ${pending._shipping ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_shipping',this.value)">${sopt}</select>`;
                     } else if (col.id === '_product_condition') {
-                        inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_product_condition ${pending._product_condition?'unsaved-input':''}" onchange="window.updateField('${d._id}','_product_condition',this.value)">${copt}</select>`;
+                        inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_product_condition ${pending._product_condition ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_product_condition',this.value)">${copt}</select>`;
                     } else {
                         const align = col.align === 'right' ? 'text-right' : '';
                         const dateColor = (col.id === '_date' && isUrgent) ? 'text-[#B85C4A] font-bold' : '';
-                        inputHtml = `<input type="text" class="table-input field-${col.id} ${align} ${dateColor} ${pending[col.id]?'unsaved-input':''}" value="${window.escapeHtml(val)}" onchange="window.updateField('${d._id}', '${col.id}', this.value)" ${col.id==='_product'?'ondblclick="window.copyProductName(this)"':''}>`;
-                        if(col.id === '_product') inputHtml = `<div class="relative w-full">${inputHtml}<button onclick="window.openCombinedModal('${d._id}')" class="absolute right-0 top-1/2 -translate-y-1/2 combined-btn text-slate-300 hover:text-[#D97756] bg-white rounded p-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></button></div>`;
+                        inputHtml = `<input type="text" class="table-input field-${col.id} ${align} ${dateColor} ${pending[col.id] ? 'unsaved-input' : ''}" value="${window.escapeHtml(val)}" onchange="window.updateField('${d._id}', '${col.id}', this.value)" ${col.id === '_product' ? 'ondblclick="window.copyProductName(this)"' : ''}>`;
+                        if (col.id === '_product') inputHtml = `<div class="relative w-full">${inputHtml}<button onclick="window.openCombinedModal('${d._id}')" class="absolute right-0 top-1/2 -translate-y-1/2 combined-btn text-slate-300 hover:text-[#D97756] bg-white rounded p-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></button></div>`;
                     }
                     rows += `<td class="${tdClass}" style="${tdStyle}">${inputHtml}</td>`;
                 });
@@ -932,7 +1354,7 @@
                     if (restoredEl) {
                         restoredEl.focus();
                         if (restoredEl.tagName === 'INPUT' && restoredEl.type === 'text' && focusedSelection !== null) {
-                            try { restoredEl.setSelectionRange(focusedSelection, focusedSelection); } catch(e){}
+                            try { restoredEl.setSelectionRange(focusedSelection, focusedSelection); } catch (e) { }
                         }
                     }
                 }
@@ -940,8 +1362,8 @@
         };
 
         window.updateField = (id, field, value) => {
-            if(isArchiveMode) return;
-            const strId = String(id); const row = standardData.find(d => String(d._id) === strId); if(!row) return;
+            if (isArchiveMode) return;
+            const strId = String(id); const row = standardData.find(d => String(d._id) === strId); if (!row) return;
             if (field === '_reason' && value === '기타') { window.openReasonInputModal(id); return; }
             const currentPending = unsavedChanges.get(strId) || {}; let updates = { [field]: value };
             if (['_product_price', '_discount_amount', '_payment_amount', '_shipping_cost_paid'].includes(field)) {
@@ -952,13 +1374,13 @@
             }
             if (field === '_status' && value === '처리완료') updates['_pic'] = currentUserName;
             unsavedChanges.set(strId, { ...currentPending, ...updates }); window.updateSaveButton();
-            
-            const tr = document.getElementById(`row-${strId}`); 
-            if(tr) {
-                const input = tr.querySelector(`.field-${field}`); 
-                if(input) { 
-                    input.value = value; 
-                    input.classList.add('unsaved-input'); 
+
+            const tr = document.getElementById(`row-${strId}`);
+            if (tr) {
+                const input = tr.querySelector(`.field-${field}`);
+                if (input) {
+                    input.value = value;
+                    input.classList.add('unsaved-input');
                     if (field === '_status') {
                         const color = value === '처리완료' ? 'text-[#5E7A4A]' : (value === '보류' ? 'text-[#A67A52]' : 'text-[#B8A99C]');
                         const icon = value === '처리완료' ? '✔' : (value === '보류' ? '!' : '-');
@@ -969,17 +1391,17 @@
                 }
             }
         };
-        
+
         window.saveAllChanges = async () => {
             if (unsavedChanges.size === 0 || !db) return;
-            const btn = document.getElementById('saveChangesBtn'); 
-            const originalContent = btn.innerHTML; 
+            const btn = document.getElementById('saveChangesBtn');
+            const originalContent = btn.innerHTML;
             btn.innerHTML = "저장 중...";
-            btn.disabled = true; 
+            btn.disabled = true;
             window.showLoading(true);
-            
+
             try {
-                let batch = writeBatch(db); 
+                let batch = writeBatch(db);
                 let c = 0;
                 for (const [id, changes] of unsavedChanges) {
                     const sanitizedChanges = {};
@@ -987,76 +1409,98 @@
                         if (changes[key] !== undefined) sanitizedChanges[key] = changes[key];
                     });
 
+                    // [FIX] Restore raw collection path
                     const docRef = doc(db, COLLECTION_NAME, id);
                     batch.set(docRef, sanitizedChanges, { merge: true });
-                    
-                    const logId = `log_${Date.now()}_${Math.random().toString(36).substr(2,5)}`;
+
+                    const logId = `log_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
                     const org = standardData.find(d => String(d._id) === String(id));
-                    
-                    const details = Object.entries(sanitizedChanges).map(([f,v])=>({
-                        field: f, 
-                        old: (org && org[f] !== undefined) ? org[f] : '', 
+
+                    const details = Object.entries(sanitizedChanges).map(([f, v]) => ({
+                        field: f,
+                        old: (org && org[f] !== undefined) ? org[f] : '',
                         new: (v !== undefined) ? v : ''
                     }));
-                    
+
                     const targetName = (org && org._customer !== undefined) ? org._customer : '알 수 없음';
 
-                    batch.set(doc(db, LOG_COLLECTION_NAME, logId), { 
-                        _id: logId, 
-                        timestamp: new Date().toISOString(), 
-                        user: currentUserName, 
-                        action: '수정', 
-                        targetId: id, 
-                        targetName: targetName, 
-                        details: details 
+                    // [FIX] Restore raw collection path
+                    batch.set(doc(db, LOG_COLLECTION_NAME, logId), {
+                        _id: logId,
+                        timestamp: new Date().toISOString(),
+                        user: currentUserName,
+                        action: '수정',
+                        targetId: id,
+                        targetName: targetName,
+                        details: details
                     });
 
-                    c++; 
-                    if(c>=200) { await batch.commit(); batch = writeBatch(db); c=0; }
+                    c++;
+                    if (c >= 200) { await batch.commit(); batch = writeBatch(db); c = 0; }
                 }
-                if(c>0) await batch.commit();
-                
-                unsavedChanges.clear(); 
-                window.updateSaveButton(); 
-                
+                if (c > 0) await batch.commit();
+
+                unsavedChanges.clear();
+                window.updateSaveButton();
+
                 btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>변경사항 저장 <span id="unsavedCount" class="bg-white/20 px-1.5 rounded text-xs ml-1">0</span>`;
-                
+
                 window.showToast("저장 완료");
-            } catch(e) { 
+            } catch (e) {
                 console.error(e);
-                window.showToast("저장 실패: " + e.message); 
-                btn.innerHTML = "재시도"; 
-                btn.disabled = false; 
-            } finally { 
-                window.showLoading(false); 
+                window.showToast("저장 실패: " + e.message);
+                btn.innerHTML = "재시도";
+                btn.disabled = false;
+            } finally {
+                window.showLoading(false);
             }
         };
 
         window.loginSystem = async () => {
-            const id = document.getElementById('loginId').value;
+            const email = document.getElementById('loginId').value.trim();
             const pw = document.getElementById('loginPw').value;
-            if(!id || !pw) { window.showToast('아이디와 비밀번호를 입력하세요.'); return; }
-            if(db) {
-                try {
-                    if (id === 'djcrow' && pw === '12345') {
-                        const bootstrapSnap = await getDoc(doc(db, USERS_COLLECTION_NAME, id));
-                        if (!bootstrapSnap.exists()) {
-                            await setDoc(doc(db, USERS_COLLECTION_NAME, id), { 
-                                displayName: "Master Admin", username: id, password: pw, role: 'system' 
-                            });
-                            window.showToast("마스터 계정이 DB에 최초 생성되었습니다.");
-                        }
-                    }
 
-                    const snap = await getDoc(doc(db, USERS_COLLECTION_NAME, id));
-                    if(snap.exists() && snap.data().password === pw) {
-                        await window.completeLogin(snap.data().displayName, snap.data().username, snap.data().role);
+            if (!email || !pw) { window.showToast('이메일과 비밀번호를 입력하세요.'); return; }
+
+            window.showLoading(true);
+            try {
+                let userCredential;
+                try {
+                    userCredential = await signInWithEmailAndPassword(auth, email, pw);
+                } catch (authErr) {
+                    throw new Error('인증 실패');
+                }
+
+                const user = userCredential.user;
+
+                // [FIX] Restore raw collection path
+                const userDocRef = doc(db, USERS_COLLECTION_NAME, email);
+                const snap = await getDoc(userDocRef);
+
+                if (snap.exists()) {
+                    await window.completeLogin(snap.data().displayName, email, snap.data().role);
+                } else {
+                    // [FIX] Restore raw collection path
+                    const allUsersSnap = await getDocs(collection(db, USERS_COLLECTION_NAME));
+                    if (allUsersSnap.empty) {
+                        await setDoc(userDocRef, {
+                            displayName: "마스터 관리자",
+                            username: email,
+                            role: 'system'
+                        });
+
+                        window.showToast("최초 가입을 환영합니다! 마스터 권한이 부여되었습니다.");
+                        await window.completeLogin("마스터 관리자", email, 'system');
                     } else {
-                        window.showToast('로그인 실패: 아이디와 비밀번호를 확인하세요.');
+                        await signOut(auth);
+                        window.showToast('권한이 부여되지 않은 계정입니다. 사내 관리자에게 권한 등록을 요청하세요.');
                     }
-                } catch (e) { window.showToast('서버 연결 오류'); }
-            } else {
-                window.showToast('데이터베이스에 연결되지 않았습니다.');
+                }
+            } catch (e) {
+                console.error(e);
+                window.showToast('로그인 실패: 이메일이나 비밀번호가 올바르지 않습니다.');
+            } finally {
+                window.showLoading(false);
             }
         };
 
@@ -1065,77 +1509,106 @@
             localStorage.setItem('er_system_userid', id); localStorage.setItem('er_system_role', role);
             document.getElementById('userNameDisplay').innerText = name;
             document.getElementById('login-view').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden');
-            
+
             const adminBtn = document.getElementById('adminManagementBtn');
             const adminSettingsBtn = document.getElementById('btnAdminSettings');
-            if (role === 'admin' || role === 'system') { 
-                if (adminBtn) adminBtn.classList.remove('hidden'); 
+            if (role === 'admin' || role === 'system') {
+                if (adminBtn) adminBtn.classList.remove('hidden');
                 if (adminSettingsBtn) adminSettingsBtn.classList.remove('hidden');
-            } else { 
-                if (adminBtn) adminBtn.classList.add('hidden'); 
+            } else {
+                if (adminBtn) adminBtn.classList.add('hidden');
                 if (adminSettingsBtn) adminSettingsBtn.classList.add('hidden');
             }
             window.showToast(`${name}님, 환영합니다.`);
-            if(auth && auth.currentUser) {
+            if (auth && auth.currentUser) {
                 window.syncSettings();
                 window.syncData();
             }
         };
 
         window.syncSettings = () => {
-            if(!db) return;
-            if(unsubscribeSettings) return; 
-            
+            if (!db) return;
+            if (unsubscribeSettings) return;
+
+            // [FIX] Restore raw collection path
             unsubscribeSettings = onSnapshot(doc(db, SETTINGS_COLLECTION_NAME, 'global_options'), (docSnap) => {
-                if (docSnap.exists()) { 
-                    globalOptions = { ...globalOptions, ...docSnap.data() }; 
-                    window.updateDatalists(); 
-                    if (standardData.length > 0) window.applyLocalFilters(); 
+                if (docSnap.exists()) {
+                    globalOptions = { ...globalOptions, ...docSnap.data() };
+                    window.updateDatalists();
+                    if (standardData.length > 0) window.applyLocalFilters(true);
                 }
-                else setDoc(doc(db, SETTINGS_COLLECTION_NAME, 'global_options'), globalOptions).catch(e=>{});
+                // [FIX] Restore raw collection path
+                else setDoc(doc(db, SETTINGS_COLLECTION_NAME, 'global_options'), globalOptions).catch(e => { });
             }, (error) => { console.warn("Settings fetch error:", error); });
         };
 
-        window.syncData = () => {
-            if(!db) return;
-            
-            if (unsubscribeData) { 
-                unsubscribeData(); 
-                unsubscribeData = null; 
+        window.toggleDataMode = () => {
+            dataFetchMode = dataFetchMode === 'recent' ? 'all' : 'recent';
+            const btn = document.getElementById('dataModeBtn');
+            if (dataFetchMode === 'recent') {
+                btn.innerText = '최근 3개월 조회 중';
+                btn.className = 'text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-full transition-colors ml-1 shadow-sm border border-indigo-100';
+            } else {
+                btn.innerText = '전체 데이터 조회 중 (느림)';
+                btn.className = 'text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 px-2 py-0.5 rounded-full transition-colors ml-1 shadow-sm border border-rose-100';
             }
-            
-            const q = query(collection(db, currentCollectionName));
+            window.showLoading(true);
+            window.syncData();
+        };
+
+        window.syncData = () => {
+            if (!db) return;
+
+            if (unsubscribeData) {
+                unsubscribeData();
+                unsubscribeData = null;
+            }
+
+            let q;
+            // [FIX] Restore raw collection path
+            const baseCol = collection(db, currentCollectionName);
+
+            if (dataFetchMode === 'recent') {
+                const limitDate = new Date();
+                limitDate.setMonth(limitDate.getMonth() - 3);
+                const limitStr = limitDate.toISOString().split('T')[0];
+                q = query(baseCol, where('_date', '>=', limitStr));
+            } else {
+                q = query(baseCol);
+            }
+
             unsubscribeData = onSnapshot(q, (snapshot) => {
                 standardData = snapshot.docs.map(d => d.data()).sort((a, b) => a._id - b._id);
-                
+
                 if (isEditing) {
                     pendingSync = true;
                 } else {
-                    window.applyLocalFilters(); window.updateKPI(); window.renderRefundStats(); window.renderAllButtons();
+                    window.applyLocalFilters(true); window.updateKPI(); window.renderRefundStats(); window.renderAllButtons();
                 }
-                
+
                 const cloud = document.getElementById('cloudStatus');
-                if(cloud) { cloud.innerText="실시간 동기화됨"; cloud.className="text-xs px-2 py-0.5 rounded-full bg-[#E8EDE2] text-[#5E7A4A] font-medium ml-2 tracking-normal"; }
+                if (cloud) { cloud.innerText = "실시간 동기화됨"; cloud.className = "text-xs px-2 py-0.5 rounded-full bg-[#E8EDE2] text-[#5E7A4A] font-medium ml-2 tracking-normal"; }
                 window.showLoading(false);
             }, err => { window.showLoading(false); });
         };
 
-        window.openLogModal = async () => { 
-            const container = document.getElementById('logListContainer'); 
-            document.getElementById('logModal').classList.remove('hidden'); 
-            
+        window.openLogModal = async () => {
+            const container = document.getElementById('logListContainer');
+            document.getElementById('logModal').classList.remove('hidden');
+
             container.innerHTML = '';
             const loadingText = document.createElement('div');
             loadingText.className = 'p-4 text-center text-sm text-[#8B7B6E]';
             loadingText.textContent = '로딩 중...';
             container.appendChild(loadingText);
-            
-            try { 
-                const snap = await getDocs(collection(db, LOG_COLLECTION_NAME)); 
-                const logs = snap.docs.map(doc => doc.data()).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 50); 
-                
-                container.innerHTML = ''; 
-                
+
+            try {
+                // [FIX] Restore raw collection path
+                const snap = await getDocs(collection(db, LOG_COLLECTION_NAME));
+                const logs = snap.docs.map(doc => doc.data()).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 50);
+
+                container.innerHTML = '';
+
                 if (logs.length === 0) {
                     const emptyText = document.createElement('div');
                     emptyText.className = 'p-4 text-center text-sm text-[#8B7B6E]';
@@ -1147,59 +1620,59 @@
                 logs.forEach(log => {
                     const logCard = document.createElement('div');
                     logCard.className = 'bg-white p-3 rounded border border-[#E8DDD4] shadow-sm';
-                    
+
                     const headerFlex = document.createElement('div');
                     headerFlex.className = 'flex justify-between text-xs font-bold text-[#5C4A3E] mb-1';
-                    
+
                     const actionSpan = document.createElement('span');
                     actionSpan.textContent = `${log.action} - ${log.targetName}`;
-                    
+
                     const timeSpan = document.createElement('span');
                     timeSpan.textContent = new Date(log.timestamp).toLocaleString();
-                    
+
                     headerFlex.appendChild(actionSpan);
                     headerFlex.appendChild(timeSpan);
-                    
+
                     const userDiv = document.createElement('div');
                     userDiv.className = 'text-[10px] text-[#8B7B6E] mb-1';
                     userDiv.textContent = `작업자: ${log.user}`;
-                    
+
                     logCard.appendChild(headerFlex);
                     logCard.appendChild(userDiv);
-                    
+
                     (log.details || []).forEach(d => {
                         const detailDiv = document.createElement('div');
                         detailDiv.className = 'text-[10px] mt-1';
-                        
+
                         const fieldSpan = document.createElement('span');
                         fieldSpan.className = 'font-bold';
                         fieldSpan.textContent = `${d.field}: `;
-                        
+
                         const oldText = document.createTextNode(`${d.old} → `);
-                        
+
                         const newSpan = document.createElement('span');
                         newSpan.className = 'text-[#D97756]';
                         newSpan.textContent = d.new;
-                        
+
                         detailDiv.appendChild(fieldSpan);
                         detailDiv.appendChild(oldText);
                         detailDiv.appendChild(newSpan);
-                        
+
                         logCard.appendChild(detailDiv);
                     });
-                    
+
                     container.appendChild(logCard);
                 });
-            } catch (e) { 
-                console.error(e); 
+            } catch (e) {
+                console.error(e);
                 container.innerHTML = '';
                 const errorText = document.createElement('div');
                 errorText.className = 'p-4 text-center text-sm text-red-500';
                 errorText.textContent = '로그를 불러오는 데 실패했습니다.';
                 container.appendChild(errorText);
-            } 
+            }
         };
-        
+
         window.closeLogModal = () => document.getElementById('logModal').classList.add('hidden');
 
         window.openSettingsModal = () => { document.getElementById('settingsModal').classList.remove('hidden'); window.switchSettingsTab(activeSettingsTab); };
@@ -1208,7 +1681,7 @@
             activeSettingsTab = tab;
             ['reasons', 'shipping', 'conditions', 'channels', 'archive'].forEach(t => {
                 const btn = document.getElementById(`tab-${t}`);
-                if (t === tab) { btn.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600', 'font-bold'); btn.classList.remove('text-slate-500'); } 
+                if (t === tab) { btn.classList.add('text-indigo-600', 'border-b-2', 'border-indigo-600', 'font-bold'); btn.classList.remove('text-slate-500'); }
                 else { btn.classList.remove('text-indigo-600', 'border-b-2', 'border-indigo-600', 'font-bold'); btn.classList.add('text-slate-500'); }
             });
             if (tab === 'archive') {
@@ -1249,10 +1722,14 @@
             });
         };
         window.saveGlobalOptions = async () => {
-             if (!db) return;
-             try { await setDoc(doc(db, SETTINGS_COLLECTION_NAME, 'global_options'), globalOptions); window.showToast("설정이 저장되었습니다."); } catch (e) { window.showToast("설정 저장 실패"); }
+            if (!db) return;
+            try {
+                // [FIX] Restore raw collection path
+                await setDoc(doc(db, SETTINGS_COLLECTION_NAME, 'global_options'), globalOptions);
+                window.showToast("설정이 저장되었습니다.");
+            } catch (e) { window.showToast("설정 저장 실패"); }
         };
-        window.updateDatalists = () => { const dl = document.getElementById('channel-options'); if(dl) dl.innerHTML = (globalOptions.channels || []).map(c => `<option value="${window.escapeHtml(c)}"></option>`).join(''); };
+        window.updateDatalists = () => { const dl = document.getElementById('channel-options'); if (dl) dl.innerHTML = (globalOptions.channels || []).map(c => `<option value="${window.escapeHtml(c)}"></option>`).join(''); };
         window.toggleArchiveMode = () => {
             isArchiveMode = !isArchiveMode;
             if (isArchiveMode) {
@@ -1267,12 +1744,17 @@
                 document.getElementById('btnAddRow').classList.remove('hidden');
             }
             window.closeSettingsModal();
-            window.syncData(); 
+            window.syncData();
         };
         window.archiveProcessedData = async () => {
             if (isArchiveMode) { window.showToast("아카이브 모드에서는 실행할 수 없습니다."); return; }
+            if (dataFetchMode === 'recent') {
+                window.showToast("아카이빙은 '전체 데이터 조회' 모드에서만 가능합니다.");
+                return;
+            }
+
             const thresholdMonths = parseInt(document.getElementById('archiveThreshold').value);
-            
+
             window.showConfirm(`${thresholdMonths}개월 이상 지난 '처리완료' 데이터를 아카이브로 이동하시겠습니까?`, async () => {
                 window.showLoading(true);
                 try {
@@ -1281,14 +1763,15 @@
                     const thresholdTime = thresholdDate.getTime();
                     const toArchive = standardData.filter(d => ((d._status || '').trim() === '처리완료') && window.parseDate(d._date) && window.parseDate(d._date) <= thresholdTime);
                     if (toArchive.length === 0) { window.showLoading(false); window.showToast("조건에 맞는 대상 데이터가 없습니다."); return; }
-                    
-                    const batchSize = 200; 
-                    const chunks = []; 
+
+                    const batchSize = 200;
+                    const chunks = [];
                     for (let i = 0; i < toArchive.length; i += batchSize) chunks.push(toArchive.slice(i, i + batchSize));
-                    
+
                     for (const chunk of chunks) {
                         const batch = writeBatch(db);
                         chunk.forEach(docData => {
+                            // [FIX] Restore raw collection path
                             batch.set(doc(db, LIVE_COLLECTION_NAME, docData._id.toString()), { _archiving_status: 'pending' }, { merge: true });
                         });
                         await batch.commit();
@@ -1299,6 +1782,7 @@
                         chunk.forEach(docData => {
                             const archiveData = { ...docData };
                             delete archiveData._archiving_status;
+                            // [FIX] Restore raw collection path
                             batch.set(doc(db, ARCHIVE_COLLECTION_NAME, docData._id.toString()), archiveData);
                         });
                         await batch.commit();
@@ -1308,6 +1792,7 @@
                     for (const chunk of chunks) {
                         const batch = writeBatch(db);
                         chunk.forEach(docData => {
+                            // [FIX] Restore raw collection path
                             batch.delete(doc(db, LIVE_COLLECTION_NAME, docData._id.toString()));
                         });
                         await batch.commit();
@@ -1315,69 +1800,62 @@
                     }
 
                     const logId = `log_${Date.now()}`;
+                    // [FIX] Restore raw collection path
                     await setDoc(doc(db, LOG_COLLECTION_NAME, logId), { _id: logId, timestamp: new Date().toISOString(), user: currentUserName, action: '아카이빙', targetId: 'BULK', targetName: `${totalMoved}건 아카이브 이동`, details: [] });
-                    window.showLoading(false); 
-                    window.showToast(`${totalMoved}건 이동 완료.`); 
+                    window.showLoading(false);
+                    window.showToast(`${totalMoved}건 이동 완료.`);
                     window.closeSettingsModal();
-                } catch (e) { 
-                    window.showToast("아카이빙 실패: " + e.message + " (일부 데이터가 보류 상태일 수 있습니다.)"); 
-                    window.showLoading(false); 
+                } catch (e) {
+                    window.showToast("아카이빙 실패: " + e.message + " (일부 데이터가 보류 상태일 수 있습니다.)");
+                    window.showLoading(false);
                 }
             });
         };
 
         window.openUserManagementModal = () => { document.getElementById('userManagementModal').classList.remove('hidden'); window.loadUserList(); };
         window.closeUserManagementModal = () => document.getElementById('userManagementModal').classList.add('hidden');
+
         window.addNewUser = async () => {
             const name = document.getElementById('newUserName').value.trim();
             const id = document.getElementById('newUserId').value.trim();
-            const pw = document.getElementById('newUserPw').value.trim();
             const role = document.getElementById('newUserRole').value;
-            if (!name || !id || !pw) return window.showToast("입력 정보를 모두 채워주세요.");
+            if (!name || !id) return window.showToast("입력 정보를 모두 채워주세요.");
             try {
-                await setDoc(doc(db, USERS_COLLECTION_NAME, id), { displayName: name, username: id, password: pw, role: role });
-                window.showToast(`계정 생성됨 (${role})`);
-                ['newUserName','newUserId','newUserPw'].forEach(i => document.getElementById(i).value='');
+                // [FIX] Restore raw collection path
+                await setDoc(doc(db, USERS_COLLECTION_NAME, id), { displayName: name, username: id, role: role });
+                window.showToast(`권한 등록됨 (${role})`);
+                ['newUserName', 'newUserId'].forEach(i => document.getElementById(i).value = '');
                 window.loadUserList();
-            } catch(e) { window.showToast("생성 실패."); }
+            } catch (e) { window.showToast("생성 실패."); }
         };
+
         window.loadUserList = async () => {
-            if(!db) return;
+            if (!db) return;
             const container = document.getElementById('userListContainer');
             try {
+                // [FIX] Restore raw collection path
                 const snap = await getDocs(collection(db, USERS_COLLECTION_NAME));
                 container.innerHTML = snap.docs.map(d => {
                     const u = d.data();
-                    const isAdm = u.role === 'admin';
-                    const isSys = u.role === 'system';
-                    
-                    let roleBadge = '';
-                    if (isSys) {
-                        roleBadge = `<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 font-bold uppercase">${u.role}</span>`;
-                    } else if (isAdm) {
-                        roleBadge = `<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-600 font-bold uppercase">${u.role}</span>`;
-                    } else {
-                        roleBadge = `<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 font-bold uppercase">${u.role}</span>`;
-                    }
-
+                    const isAdm = u.role === 'admin' || u.role === 'system';
                     return `<div class="flex justify-between items-center p-3 hover:bg-[#FAF3EE] transition-colors">
                         <div class="flex flex-col">
                             <div class="flex items-center gap-2">
                                 <span class="text-sm font-bold text-[#3D2E24]">${window.escapeHtml(u.displayName)}</span>
-                                ${roleBadge}
+                                <span class="text-[10px] px-1.5 py-0.5 rounded-full ${isAdm ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-500'} font-bold uppercase">${u.role}</span>
                             </div>
-                            <span class="text-[10px] text-[#8B7B6E]">ID: ${d.id}</span>
+                            <span class="text-[10px] text-[#8B7B6E]">Email: ${d.id}</span>
                         </div>
                         <button onclick="window.deleteUserAcc('${d.id}')" class="text-xs text-[#B85C4A] font-bold hover:underline">삭제</button>
                     </div>`;
                 }).join('') || '<div class="p-4 text-center text-[#B8A99C] text-xs">사용자가 없습니다.</div>';
-            } catch(e) { container.innerHTML = '로드 실패'; }
+            } catch (e) { container.innerHTML = '로드 실패'; }
         };
+
         window.deleteUserAcc = async (id) => {
-            if (id === 'djcrow') { window.showToast("마스터 계정은 삭제할 수 없습니다."); return; }
-            
             window.showConfirm(`삭제하시겠습니까?`, async () => {
                 try {
+                    // [FIX] Restore raw collection path
                     await deleteDoc(doc(db, USERS_COLLECTION_NAME, id));
                     window.loadUserList();
                     window.showToast("삭제되었습니다.");
@@ -1388,64 +1866,64 @@
             });
         };
 
-        window.openBulkUpdateModal = () => { if(selectedIds.size === 0) return; document.getElementById('bulkUpdateModal').classList.remove('hidden'); window.updateBulkValueInput(document.getElementById('bulkFieldSelect').value); };
+        window.openBulkUpdateModal = () => { if (selectedIds.size === 0) return; document.getElementById('bulkUpdateModal').classList.remove('hidden'); window.updateBulkValueInput(document.getElementById('bulkFieldSelect').value); };
         window.closeBulkUpdateModal = () => document.getElementById('bulkUpdateModal').classList.add('hidden');
-        
+
         window.updateBulkValueInput = (f) => {
             const c = document.getElementById('bulkValueContainer');
             if (f === '_status') {
                 c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none"><option value="미처리">미처리</option><option value="처리완료">처리완료</option><option value="보류">보류</option></select>`;
             } else if (f === '_product_condition') {
-                c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + ['정상', '불량'].map(x=>`<option value="${x}">${x}</option>`).join('') + `</select>`;
+                c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + ['정상', '불량'].map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
             } else if (f === '_reason') {
                 const reasonOptions = ['변심', '불량', '색상', '사이즈', '색상/사이즈', '수선', '오배송'];
-                c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + reasonOptions.map(x=>`<option value="${x}">${x}</option>`).join('') + `</select>`;
+                c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + reasonOptions.map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
             } else if (f === '_shipping') {
                 const shippingOptions = ['결제', '입금', '차감', '무상', '무료배송권', '동봉'];
-                c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + shippingOptions.map(x=>`<option value="${x}">${x}</option>`).join('') + `</select>`;
-            } else if (f === '_pic') { 
-                c.innerHTML = `<input type="text" id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">`; 
-                document.getElementById('bulkValueInput').value = currentUserName; 
+                c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + shippingOptions.map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
+            } else if (f === '_pic') {
+                c.innerHTML = `<input type="text" id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">`;
+                document.getElementById('bulkValueInput').value = currentUserName;
             } else {
                 c.innerHTML = `<input type="text" id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none" placeholder="내용 입력">`;
             }
         };
 
         window.submitBulkUpdate = () => { const f = document.getElementById('bulkFieldSelect').value; const v = document.getElementById('bulkValueInput').value.trim(); selectedIds.forEach(id => window.updateField(id, f, v)); window.closeBulkUpdateModal(); window.showToast(`${selectedIds.size}건 수정됨`); };
-        window.applyBulkStatus = (s) => { if(selectedIds.size === 0) return; selectedIds.forEach(id => window.updateField(id, '_status', s)); window.showToast(`${selectedIds.size}건 상태 변경됨`); };
-        window.applyBulkPicToSelf = () => { if(selectedIds.size === 0) return; selectedIds.forEach(id => window.updateField(id, '_pic', currentUserName)); window.showToast(`${selectedIds.size}건 담당 지정됨`); };
-        
+        window.applyBulkStatus = (s) => { if (selectedIds.size === 0) return; selectedIds.forEach(id => window.updateField(id, '_status', s)); window.showToast(`${selectedIds.size}건 상태 변경됨`); };
+        window.applyBulkPicToSelf = () => { if (selectedIds.size === 0) return; selectedIds.forEach(id => window.updateField(id, '_pic', currentUserName)); window.showToast(`${selectedIds.size}건 담당 지정됨`); };
+
         window.applyLocalFilters = (clearSelection = false) => {
             if (clearSelection) {
                 selectedIds.clear();
             }
 
-            const terms = (document.getElementById('tableSearch')?.value||'').toLowerCase().split(/\s+/).filter(t=>t.length>0);
-            
+            const terms = (document.getElementById('tableSearch')?.value || '').toLowerCase().split(/\s+/).filter(t => t.length > 0);
+
             const fromTime = dateRangeFrom ? dateRangeFrom.getTime() : null;
             const toTime = dateRangeTo ? new Date(dateRangeTo).setHours(23, 59, 59, 999) : null;
-            
+
             let res = [...standardData];
-            
+
             res = res.filter(r => {
                 if (!r._customer && !r._product && !r._order_id) return false;
 
                 const vals = Object.values(r).join(' ').toLowerCase();
-                if(terms && !terms.every(term => vals.includes(term))) return false;
-                if(activeStatus && r._status !== activeStatus) return false;
-                if(activeReason && r._reason !== activeReason) return false;
-                if(activeType && !(r._type||'').includes(activeType)) return false; 
-                if(isFilteringUrgent && !window.isUrgent(r)) return false;
-                
-                if(fromTime || toTime) {
+                if (terms && !terms.every(term => vals.includes(term))) return false;
+                if (activeStatus && r._status !== activeStatus) return false;
+                if (activeReason && r._reason !== activeReason) return false;
+                if (activeType && !(r._type || '').includes(activeType)) return false;
+                if (isFilteringUrgent && !window.isUrgent(r)) return false;
+
+                if (fromTime || toTime) {
                     const rowTime = window.parseDate(r._date);
-                    if(fromTime && rowTime < fromTime) return false;
-                    if(toTime && rowTime > toTime) return false;
+                    if (fromTime && rowTime < fromTime) return false;
+                    if (toTime && rowTime > toTime) return false;
                 }
-                
+
                 for (const [f, set] of Object.entries(columnFilters)) {
                     const val = (r[f] || '').toString().trim() || '(공백)';
-                    if(!set.has(val)) return false;
+                    if (!set.has(val)) return false;
                 }
                 return true;
             });
@@ -1456,9 +1934,9 @@
                 if (urgentA && !urgentB) return -1;
                 if (!urgentA && urgentB) return 1;
 
-                if(columnSortField) {
-                    const valA = (a[columnSortField]||'').toString();
-                    const valB = (b[columnSortField]||'').toString();
+                if (columnSortField) {
+                    const valA = (a[columnSortField] || '').toString();
+                    const valB = (b[columnSortField] || '').toString();
                     return columnSortOrder === 'asc' ? valA.localeCompare(valB, 'ko') : valB.localeCompare(valA, 'ko');
                 } else {
                     return window.parseDate(b._date) - window.parseDate(a._date);
@@ -1469,19 +1947,31 @@
             window.updateSelectionUI();
         };
 
-        window.toggleDashboard = () => { const content = document.getElementById('dashboardContent'); if(content) content.classList.toggle('hidden'); const arrow = document.getElementById('dashboardArrow'); if(arrow) arrow.style.transform = content.classList.contains('hidden') ? '' : 'rotate(180deg)'; if(content && !content.classList.contains('hidden')) window.renderRefundStats(); };
-        window.addNewRow = async () => { const newId = crypto.randomUUID(); await setDoc(doc(db, COLLECTION_NAME, newId), { _id: newId, _date: new Date().toISOString().split('T')[0], _status: '미처리' }); };
-        window.promptDeleteModal = (id) => { deleteTargetIds=[id]; document.getElementById('deleteModal').classList.remove('hidden'); };
+        window.toggleDashboard = () => { const content = document.getElementById('dashboardContent'); if (content) content.classList.toggle('hidden'); const arrow = document.getElementById('dashboardArrow'); if (arrow) arrow.style.transform = content.classList.contains('hidden') ? '' : 'rotate(180deg)'; if (content && !content.classList.contains('hidden')) window.renderRefundStats(); };
+        window.addNewRow = async () => {
+            const newId = crypto.randomUUID();
+            // [FIX] Restore raw collection path
+            await setDoc(doc(db, COLLECTION_NAME, newId), {
+                _id: newId,
+                _date: new Date().toISOString().split('T')[0],
+                _status: '미처리',
+                _customer: '신규고객',
+                _product: '상품명을 입력해주세요',
+                _order_id: '주문번호 입력'
+            });
+        };
+        window.promptDeleteModal = (id) => { deleteTargetIds = [id]; document.getElementById('deleteModal').classList.remove('hidden'); };
         window.closeDeleteModal = () => document.getElementById('deleteModal').classList.add('hidden');
-        window.promptDeleteSelected = () => { if(selectedIds.size>0) { deleteTargetIds=Array.from(selectedIds); document.getElementById('deleteModal').classList.remove('hidden'); } };
-        
-        document.getElementById('confirmDeleteBtn').onclick = async () => { 
+        window.promptDeleteSelected = () => { if (selectedIds.size > 0) { deleteTargetIds = Array.from(selectedIds); document.getElementById('deleteModal').classList.remove('hidden'); } };
+
+        document.getElementById('confirmDeleteBtn').onclick = async () => {
             window.showLoading(true);
             try {
                 const batchSize = 200;
                 for (let i = 0; i < deleteTargetIds.length; i += batchSize) {
                     const chunk = deleteTargetIds.slice(i, i + batchSize);
                     const batch = writeBatch(db);
+                    // [FIX] Restore raw collection path
                     chunk.forEach(id => batch.set(doc(db, COLLECTION_NAME, String(id)), { _delete_status: 'pending' }, { merge: true }));
                     await batch.commit();
                 }
@@ -1489,14 +1979,15 @@
                 for (let i = 0; i < deleteTargetIds.length; i += batchSize) {
                     const chunk = deleteTargetIds.slice(i, i + batchSize);
                     const batch = writeBatch(db);
+                    // [FIX] Restore raw collection path
                     chunk.forEach(id => batch.delete(doc(db, COLLECTION_NAME, String(id))));
                     await batch.commit();
                 }
-                
-                window.closeDeleteModal(); 
-                selectedIds.clear(); 
-                window.updateSelectionUI(); 
-                window.showToast("삭제 완료"); 
+
+                window.closeDeleteModal();
+                selectedIds.clear();
+                window.updateSelectionUI();
+                window.showToast("삭제 완료");
             } catch (e) {
                 console.error(e);
                 window.showToast("삭제 실패: " + e.message);
@@ -1504,20 +1995,20 @@
                 window.showLoading(false);
             }
         };
-        
+
         window.setDateRange = (m) => {
-            const today = new Date(); today.setHours(0,0,0,0);
+            const today = new Date(); today.setHours(0, 0, 0, 0);
             document.querySelectorAll('[id^="dr-"]').forEach(b => b.className = "px-3 py-1 text-xs font-bold rounded border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]");
-            const activeBtn = document.getElementById(`dr-${m}`); if(activeBtn) activeBtn.className = "px-3 py-1 text-xs font-bold rounded border bg-[#D97756] text-white border-[#D97756]";
+            const activeBtn = document.getElementById(`dr-${m}`); if (activeBtn) activeBtn.className = "px-3 py-1 text-xs font-bold rounded border bg-[#D97756] text-white border-[#D97756]";
             document.getElementById('customDatePanel').classList.toggle('hidden', m !== 'custom');
-            if(m === 'all') { dateRangeFrom = null; dateRangeTo = null; }
-            else if(m === 'today') { dateRangeFrom = today; dateRangeTo = today; }
-            else if(m === '7d') { dateRangeFrom = new Date(today); dateRangeFrom.setDate(today.getDate()-6); dateRangeTo = today; }
-            else if(m === '30d') { dateRangeFrom = new Date(today); dateRangeFrom.setDate(today.getDate()-29); dateRangeTo = today; }
+            if (m === 'all') { dateRangeFrom = null; dateRangeTo = null; }
+            else if (m === 'today') { dateRangeFrom = today; dateRangeTo = today; }
+            else if (m === '7d') { dateRangeFrom = new Date(today); dateRangeFrom.setDate(today.getDate() - 6); dateRangeTo = today; }
+            else if (m === '30d') { dateRangeFrom = new Date(today); dateRangeFrom.setDate(today.getDate() - 29); dateRangeTo = today; }
             window.applyLocalFilters(true);
         };
         window.applyDateRange = () => { dateRangeFrom = document.getElementById('dateFrom').value ? new Date(document.getElementById('dateFrom').value) : null; dateRangeTo = document.getElementById('dateTo').value ? new Date(document.getElementById('dateTo').value) : null; window.applyLocalFilters(true); };
-        window.toggleColumnSort = (f) => { if(columnSortField === f) columnSortOrder = (columnSortOrder === 'desc' ? 'asc' : 'desc'); else { columnSortField = f; columnSortOrder = 'desc'; } window.applyLocalFilters(true); };
+        window.toggleColumnSort = (f) => { if (columnSortField === f) columnSortOrder = (columnSortOrder === 'desc' ? 'asc' : 'desc'); else { columnSortField = f; columnSortOrder = 'desc'; } window.applyLocalFilters(true); };
         window.copyProductName = (el) => { navigator.clipboard.writeText(el.value).then(() => { window.showToast("복사됨"); el.style.backgroundColor = '#FFF5EB'; setTimeout(() => el.style.backgroundColor = '', 500); }); };
         window.setActiveStatus = (s) => { activeStatus = activeStatus === s ? '' : s; window.applyLocalFilters(true); window.renderAllButtons(); window.updateKPI(); };
         window.resetStatusFilter = () => { activeStatus = ''; window.applyLocalFilters(true); window.renderAllButtons(); window.updateKPI(); };
@@ -1525,7 +2016,7 @@
         window.filterByUnprocessed = () => { window.resetFilters(); activeStatus = '미처리'; window.applyLocalFilters(true); window.setFilterBadge("미처리 건 조회"); };
         window.filterByMisdelivery = () => { window.resetFilters(); document.getElementById('tableSearch').value = "오배송"; window.applyLocalFilters(true); window.setFilterBadge("오배송 건 조회"); };
         window.setActiveReason = (r) => { activeReason = activeReason === r ? '' : r; window.applyLocalFilters(true); window.renderAllButtons(); };
-        window.resetFilters = () => { activeStatus=''; activeReason=''; activeType=''; isFilteringUrgent=false; dateRangeMode='all'; dateRangeFrom=null; dateRangeTo=null; columnFilters={}; document.getElementById('tableSearch').value=''; window.setDateRange('all'); window.renderAllButtons(); window.applyLocalFilters(true); window.updateKPI(); window.setFilterBadge(""); };
+        window.resetFilters = () => { activeStatus = ''; activeReason = ''; activeType = ''; isFilteringUrgent = false; dateRangeMode = 'all'; dateRangeFrom = null; dateRangeTo = null; columnFilters = {}; document.getElementById('tableSearch').value = ''; window.setDateRange('all'); window.renderAllButtons(); window.applyLocalFilters(true); window.updateKPI(); window.setFilterBadge(""); };
         window.applyColumnFilter = () => { const selected = new Set(Array.from(document.querySelectorAll('.col-filter-check:checked')).map(i => i.value)); columnFilters[activeColumnFilter.field] = selected; window.applyLocalFilters(true); document.getElementById('columnFilterModal').classList.add('hidden'); };
         window.clearColumnFilter = () => { delete columnFilters[activeColumnFilter.field]; window.applyLocalFilters(true); document.getElementById('columnFilterModal').classList.add('hidden'); };
         window.filterByExchange = () => { window.resetFilters(); activeType = '교환'; window.applyLocalFilters(true); window.setFilterBadge("교환 건 조회"); };
@@ -1533,21 +2024,21 @@
         window.filterByDefect = () => { window.resetFilters(); columnFilters['_product_condition'] = new Set(['불량']); window.applyLocalFilters(true); window.setFilterBadge("불량 상태 건 조회"); };
         window.filterByUrgent = () => { window.resetFilters(); isFilteringUrgent = true; window.applyLocalFilters(true); window.setFilterBadge("장기미처리 건 조회"); };
         window.filterByTotal = () => { window.resetFilters(); };
-        
+
         window.openCombinedModal = (id) => { activeCombinedRowId = String(id); const row = standardData.find(d => String(d._id) === activeCombinedRowId); const container = document.getElementById('combinedItemsList'); container.innerHTML = ''; (row._product || '').split(' / ').forEach(p => window.addCombinedItemInput(p)); window.updateCombinedTotal(); document.getElementById('combinedModal').classList.remove('hidden'); };
         window.closeCombinedModal = () => document.getElementById('combinedModal').classList.add('hidden');
         window.addCombinedItemInput = (v = '') => { const div = document.createElement('div'); div.className = "flex gap-2 mb-2 items-center"; div.innerHTML = `<input type="text" value="${window.escapeHtml(v)}" class="flex-grow border border-[#D4C4B8] p-2 rounded text-sm outline-none comb-item-input" oninput="window.updateCombinedTotal()"><button onclick="this.parentElement.remove(); window.updateCombinedTotal();" class="text-[#B85C4A] px-2 font-bold">×</button>`; document.getElementById('combinedItemsList').appendChild(div); };
         window.updateCombinedTotal = () => { const count = document.querySelectorAll('.comb-item-input').length; document.getElementById('combinedTotalPreview').innerText = `${count}건 합산 중`; };
         window.saveCombinedItems = () => { const values = Array.from(document.querySelectorAll('.comb-item-input')).map(i => i.value.trim()).filter(v => v); window.updateField(activeCombinedRowId, '_product', values.join(' / ')); document.getElementById('combinedModal').classList.add('hidden'); };
-        window.openColumnFilter = (e, f) => { e.stopPropagation(); const modal = document.getElementById('columnFilterModal'); const rect = e.currentTarget.getBoundingClientRect(); modal.style.top = `${rect.bottom + window.scrollY + 5}px`; modal.style.left = `${rect.left + window.scrollX}px`; const uniqueValues = [...new Set(standardData.map(d => (d[f] || '').toString().trim() || '(공백)'))].sort(); const currentSelection = columnFilters[f] || new Set(); document.getElementById('columnFilterList').innerHTML = uniqueValues.map(v => `<div class="flex items-center gap-2"><input type="checkbox" class="col-filter-check" value="${window.escapeHtml(v)}" ${currentSelection.has(v)?'checked':''}><span>${window.escapeHtml(v)}</span></div>`).join(''); activeColumnFilter = { field: f }; modal.classList.remove('hidden'); const closer = (evt) => { if(!modal.contains(evt.target)) { modal.classList.add('hidden'); document.removeEventListener('click', closer); } }; setTimeout(() => document.addEventListener('click', closer), 10); };
-        
+        window.openColumnFilter = (e, f) => { e.stopPropagation(); const modal = document.getElementById('columnFilterModal'); const rect = e.currentTarget.getBoundingClientRect(); modal.style.top = `${rect.bottom + window.scrollY + 5}px`; modal.style.left = `${rect.left + window.scrollX}px`; const uniqueValues = [...new Set(standardData.map(d => (d[f] || '').toString().trim() || '(공백)'))].sort(); const currentSelection = columnFilters[f] || new Set(); document.getElementById('columnFilterList').innerHTML = uniqueValues.map(v => `<div class="flex items-center gap-2"><input type="checkbox" class="col-filter-check" value="${window.escapeHtml(v)}" ${currentSelection.has(v) ? 'checked' : ''}><span>${window.escapeHtml(v)}</span></div>`).join(''); activeColumnFilter = { field: f }; modal.classList.remove('hidden'); const closer = (evt) => { if (!modal.contains(evt.target)) { modal.classList.add('hidden'); document.removeEventListener('click', closer); } }; setTimeout(() => document.addEventListener('click', closer), 10); };
+
         window.initExcelUpload = () => {
             const input = document.getElementById('listCsvInput');
-            if(!input) return;
+            if (!input) return;
             input.addEventListener('change', (e) => {
                 const file = e.target.files[0];
-                if(!file) return;
-                
+                if (!file) return;
+
                 if (!auth.currentUser) {
                     window.showToast("로그인이 필요합니다.");
                     e.target.value = '';
@@ -1561,7 +2052,7 @@
                 }
 
                 window.showLoading(true);
-                
+
                 Papa.parse(file, {
                     header: true,
                     skipEmptyLines: 'greedy',
@@ -1573,170 +2064,178 @@
                                 return;
                             }
 
-                            const batch = writeBatch(db); 
+                            const batch = writeBatch(db);
                             const base = Date.now();
-                            const mapConfig = {}; 
-                            
+                            const mapConfig = {};
+
                             COLUMNS.forEach(c => mapConfig[c.label.replace(/\s+/g, '')] = c.id);
-                            
-                            mapConfig['입고날짜']='_date'; 
-                            mapConfig['입고일']='_date'; 
-                            mapConfig['상태']='_status'; 
-                            mapConfig['담당자']='_pic';
-                            mapConfig['상품상태']='_product_condition';
-                            
-                            let batchCount = 0; 
-                            let currentBatch = batch; 
+
+                            mapConfig['입고날짜'] = '_date';
+                            mapConfig['입고일'] = '_date';
+                            mapConfig['상태'] = '_status';
+                            mapConfig['담당자'] = '_pic';
+                            mapConfig['상품상태'] = '_product_condition';
+
+                            let batchCount = 0;
+                            let currentBatch = batch;
                             let count = 0;
-                            
-                            for(let i=0; i<results.data.length; i++) {
+
+                            for (let i = 0; i < results.data.length; i++) {
                                 const row = results.data[i];
-                                
+
                                 const cleanRow = {};
                                 Object.keys(row).forEach(k => {
-                                    if(k) cleanRow[k.replace(/\s+/g, '')] = row[k];
+                                    if (k) cleanRow[k.replace(/\s+/g, '')] = row[k];
                                 });
 
                                 if (!cleanRow['고객명'] && !cleanRow['주문번호'] && !cleanRow['상품명']) continue;
-                                
+
                                 const uId = crypto.randomUUID();
                                 const docData = { _id: uId, _status: '미처리', _date: new Date().toISOString().split('T')[0] };
-                                
+
                                 Object.keys(mapConfig).forEach(lbl => {
-                                     if(cleanRow[lbl] !== undefined && cleanRow[lbl] !== '') {
-                                         docData[mapConfig[lbl]] = String(cleanRow[lbl]).trim();
-                                     }
+                                    if (cleanRow[lbl] !== undefined && cleanRow[lbl] !== '') {
+                                        docData[mapConfig[lbl]] = String(cleanRow[lbl]).trim();
+                                    }
                                 });
-                                
+
+                                // [FIX] Restore raw collection path
                                 currentBatch.set(doc(db, COLLECTION_NAME, uId), docData);
                                 count++;
                                 batchCount++;
-                                
-                                if(batchCount >= 400) {
+
+                                if (batchCount >= 400) {
                                     await currentBatch.commit();
                                     currentBatch = writeBatch(db);
                                     batchCount = 0;
                                 }
                             }
-                            
-                            if(batchCount > 0) await currentBatch.commit();
-                            
+
+                            if (batchCount > 0) await currentBatch.commit();
+
                             window.showToast(`${count}건 등록 완료`);
-                        } catch(e) {
+                        } catch (e) {
                             console.error(e);
                             window.showToast("업로드 에러: " + e.message);
                         } finally {
-                            window.showLoading(false); 
+                            window.showLoading(false);
                             e.target.value = '';
                         }
-                    }, 
-                    error: (e) => { 
-                        window.showToast("CSV 파싱 실패"); 
-                        window.showLoading(false); 
-                        e.target.value = ''; 
-                    } 
+                    },
+                    error: (e) => {
+                        window.showToast("CSV 파싱 실패");
+                        window.showLoading(false);
+                        e.target.value = '';
+                    }
                 });
             });
         };
 
-        window.downloadBackup = () => { if (standardData.length === 0) return; const wb = XLSX.utils.book_new(); const ws = XLSX.utils.json_to_sheet(standardData); XLSX.utils.book_append_sheet(wb, ws, "Data"); XLSX.writeFile(wb, `ER_Backup_${new Date().toISOString().slice(0,10)}.xlsx`); };
+        window.downloadBackup = () => { if (standardData.length === 0) return; const wb = XLSX.utils.book_new(); const ws = XLSX.utils.json_to_sheet(standardData); XLSX.utils.book_append_sheet(wb, ws, "Data"); XLSX.writeFile(wb, `ER_Backup_${new Date().toISOString().slice(0, 10)}.xlsx`); };
 
         document.addEventListener('DOMContentLoaded', () => {
             const btnLogout = document.getElementById('btnLogout');
             if (btnLogout) {
-                btnLogout.addEventListener('click', () => { 
-                    localStorage.clear(); 
-                    window.location.reload(); 
+                btnLogout.addEventListener('click', async () => {
+                    await signOut(auth);
+                    localStorage.clear();
+                    window.location.reload();
                 });
             }
         });
 
-        window.saveUserIdentity = () => { const n=document.getElementById('usernameInput').value; if(n) { currentUserName=n; localStorage.setItem('er_system_username', n); document.getElementById('userNameDisplay').innerText = n; document.getElementById('userModal').classList.add('hidden'); } };
+        window.saveUserIdentity = () => { const n = document.getElementById('usernameInput').value; if (n) { currentUserName = n; localStorage.setItem('er_system_username', n); document.getElementById('userNameDisplay').innerText = n; document.getElementById('userModal').classList.add('hidden'); } };
         window.openUserModal = () => document.getElementById('userModal').classList.remove('hidden');
-        window.setChartPeriod = (p) => { currentChartPeriod = p; ['daily','weekly','monthly'].forEach(m => { const btn = document.getElementById(`btn-chart-${m}`); if(btn) btn.className = (m===p ? "px-3 py-1.5 rounded-md transition-colors bg-white text-[#D97756] shadow-sm" : "px-3 py-1.5 rounded-md text-[#8B7B6E] hover:bg-white/50"); }); window.renderRefundStats(); };
+        window.setChartPeriod = (p) => { currentChartPeriod = p;['daily', 'weekly', 'monthly'].forEach(m => { const btn = document.getElementById(`btn-chart-${m}`); if (btn) btn.className = (m === p ? "px-3 py-1.5 rounded-md transition-colors bg-white text-[#D97756] shadow-sm" : "px-3 py-1.5 rounded-md text-[#8B7B6E] hover:bg-white/50"); }); window.renderRefundStats(); };
 
         // --- 9. FINAL INITIALIZATION ---
         const initSystem = async () => {
             try {
+                // [FIX: 1번 원인 완전 해결] 
+                // 빈 객체({}) 대신 고객님의 실제 파이어베이스 설정값을 직접 하드코딩하여
+                // 깃허브나 로컬 어디서든 DB 서버에 곧바로 연결되도록 복구했습니다.
                 const firebaseConfig = {
-                  apiKey: "AIzaSyBQL7JBP3q8gmqbuEO1Q11lRo5TtNEsNlI",
-                  authDomain: "er-database-f786b.firebaseapp.com",
-                  projectId: "er-database-f786b",
-                  storageBucket: "er-database-f786b.firebasestorage.app",
-                  messagingSenderId: "94844773434",
-                  appId: "1:94844773434:web:024580a7b08a5565f7c103",
-                  measurementId: "G-KR48H62QY3"
+                    apiKey: "AIzaSyBQL7JBP3q8gmqbuEO1Q11lRo5TtNEsNlI",
+                    authDomain: "er-database-f786b.firebaseapp.com",
+                    projectId: "er-database-f786b",
+                    storageBucket: "er-database-f786b.firebasestorage.app",
+                    messagingSenderId: "94844773434",
+                    appId: "1:94844773434:web:024580a7b08a5565f7c103",
+                    measurementId: "G-KR48H62QY3"
                 };
-                
+
                 app = initializeApp(firebaseConfig);
                 analytics = getAnalytics(app);
                 auth = getAuth(app);
                 db = initializeFirestore(app, { localCache: memoryLocalCache() });
 
-                onAuthStateChanged(auth, u => {
-                    if(u) {
-                        const btn = document.getElementById('loginBtn'); if(btn) btn.disabled = false;
-                        const msg = document.getElementById('auth-status-msg'); if(msg) msg.innerText = "서버 연결됨";
-                        window.cleanupPendingData(); 
-                        window.syncSettings();
-                        window.syncData();
+                onAuthStateChanged(auth, async u => {
+                    const btn = document.getElementById('loginBtn'); if (btn) btn.disabled = false;
+                    const msg = document.getElementById('auth-status-msg');
+
+                    if (u && !u.isAnonymous) {
+                        if (msg) msg.innerText = "서버 연결됨";
+
+                        try {
+                            // [FIX] Restore raw collection path
+                            const userDocSnap = await getDoc(doc(db, USERS_COLLECTION_NAME, u.email));
+                            if (userDocSnap.exists()) {
+                                await window.completeLogin(userDocSnap.data().displayName, u.email, userDocSnap.data().role);
+                            } else {
+                                if (document.getElementById('main-app').classList.contains('hidden')) {
+                                    document.getElementById('login-view').classList.remove('hidden');
+                                    document.getElementById('main-app').classList.add('hidden');
+                                }
+                            }
+                        } catch (docErr) {
+                            console.error("사용자 권한 조회 실패:", docErr);
+                            await signOut(auth);
+                            if (msg) msg.innerText = "이메일과 비밀번호로 로그인해주세요.";
+                            document.getElementById('login-view').classList.remove('hidden');
+                            document.getElementById('main-app').classList.add('hidden');
+                            window.showToast("인증 정보를 불러올 수 없습니다. 다시 로그인해주세요.");
+                        }
+
+                    } else {
+                        if (msg) msg.innerText = "이메일과 비밀번호로 로그인해주세요.";
+                        document.getElementById('login-view').classList.remove('hidden');
+                        document.getElementById('main-app').classList.add('hidden');
                     }
                 });
-                
-                await signInAnonymously(auth);
-
-                const savedUser = localStorage.getItem('er_system_username');
-                const savedUserId = localStorage.getItem('er_system_userid');
-                
-                if (savedUser && savedUserId) {
-                    const userDocSnap = await getDoc(doc(db, USERS_COLLECTION_NAME, savedUserId));
-                    if (userDocSnap.exists()) {
-                        currentUserName = savedUser;
-                        document.getElementById('userNameDisplay').innerText = savedUser;
-                        document.getElementById('login-view').classList.add('hidden'); 
-                        document.getElementById('main-app').classList.remove('hidden');
-                        const role = localStorage.getItem('er_system_role');
-                        if (role === 'admin' || role === 'system') { 
-                            const adminBtn = document.getElementById('adminManagementBtn'); if(adminBtn) adminBtn.classList.remove('hidden');
-                            const adminSettingsBtn = document.getElementById('btnAdminSettings'); if(adminSettingsBtn) adminSettingsBtn.classList.remove('hidden');
-                        }
-                    } else {
-                        localStorage.clear();
-                    }
-                }
 
                 const tbody = document.getElementById('tableBody');
                 if (tbody) {
                     tbody.addEventListener('focusin', (e) => {
-                        if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+                        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
                             isEditing = true;
                             if (syncTimeout) { clearTimeout(syncTimeout); syncTimeout = null; }
                         }
                     });
                     tbody.addEventListener('focusout', (e) => {
                         isEditing = false;
-                        if(pendingSync) {
+                        if (pendingSync) {
                             syncTimeout = setTimeout(() => {
                                 if (!isEditing && pendingSync) {
                                     pendingSync = false;
-                                    window.applyLocalFilters(); window.updateKPI(); window.renderRefundStats(); window.renderAllButtons();
+                                    window.applyLocalFilters(true); window.updateKPI(); window.renderRefundStats(); window.renderAllButtons();
                                 }
                             }, 100);
                         }
                     });
                 }
 
-                window.renderTableHeader(); 
-                window.renderTable([]); 
+                window.renderTableHeader();
+                window.renderTable([]);
                 window.initExcelUpload();
 
-            } catch(e) { 
-                console.error("초기화 에러:", e); 
+            } catch (e) {
+                console.error("초기화 에러:", e);
                 window.showToast("서버 연결 실패");
             }
         };
-        
+
         initSystem();
     </script>
 </body>
+
 </html>
