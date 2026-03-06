@@ -905,16 +905,20 @@ window.addNewUser = async () => {
     if (pw.length < 6) return window.showToast("비밀번호는 최소 6자 이상이어야 합니다.");
 
     window.showLoading(true);
-    let secondaryApp;
     try {
-        // 1. 보조 앱(Secondary App)을 생성하여 메인 관리자 세션 로그아웃 방지
-        secondaryApp = initializeApp(window.firebaseConfig, "SecondaryApp_" + Date.now());
-        const secondaryAuth = getAuth(secondaryApp);
+        // 1. REST API를 사용한 격리형 인증 계정 발급 (시스템 세션 로그아웃 방지 및 인덱싱 완전 분리)
+        const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${window.firebaseConfig.apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: id, password: pw, returnSecureToken: false })
+        });
 
-        // 2. 실제 인증 계정 발급
-        await createUserWithEmailAndPassword(secondaryAuth, id, pw);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error.message || 'Unknown Auth Error');
+        }
 
-        // 3. 기존 로직: Firestore 역할 맵핑 테이블에 등록
+        // 2. 기존 로직: Firestore 역할 맵핑 테이블에 등록
         // [FIX] Restore raw collection path
         await setDoc(doc(db, USERS_COLLECTION_NAME, id), { displayName: name, username: id, role: role });
 
@@ -923,15 +927,12 @@ window.addNewUser = async () => {
         window.loadUserList();
     } catch (e) {
         console.error("생성 실패:", e);
-        if (e.code === 'auth/email-already-in-use') {
+        if (e.message && e.message.includes('EMAIL_EXISTS')) {
             window.showToast("이미 사용 중인 이메일 계정입니다.");
         } else {
-            window.showToast("생성 실패: " + e.message);
+            window.showToast("생성 실패: " + (e.message || "알 수 없는 오류"));
         }
     } finally {
-        if (secondaryApp) {
-            await deleteApp(secondaryApp).catch(() => console.warn('보조 앱 삭제 처리됨'));
-        }
         window.showLoading(false);
     }
 };
