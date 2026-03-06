@@ -429,9 +429,17 @@ window.addNewRow = async () => {
         _order_id: '주문번호 입력'
     });
 };
-window.promptDeleteModal = (id) => { deleteTargetIds = [id]; document.getElementById('deleteModal').classList.remove('hidden'); };
+window.promptDeleteModal = (id) => {
+    const r = localStorage.getItem('er_system_role');
+    if (r !== 'admin' && r !== 'system') { window.showToast('삭제 권한이 없습니다.'); return; }
+    deleteTargetIds = [id]; document.getElementById('deleteModal').classList.remove('hidden');
+};
 window.closeDeleteModal = () => document.getElementById('deleteModal').classList.add('hidden');
-window.promptDeleteSelected = () => { if (selectedIds.size > 0) { deleteTargetIds = Array.from(selectedIds); document.getElementById('deleteModal').classList.remove('hidden'); } };
+window.promptDeleteSelected = () => {
+    const r = localStorage.getItem('er_system_role');
+    if (r !== 'admin' && r !== 'system') { window.showToast('삭제 권한이 없습니다.'); return; }
+    if (selectedIds.size > 0) { deleteTargetIds = Array.from(selectedIds); document.getElementById('deleteModal').classList.remove('hidden'); }
+};
 
 document.getElementById('confirmDeleteBtn').onclick = async () => {
     window.showLoading(true);

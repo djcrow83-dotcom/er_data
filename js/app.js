@@ -140,338 +140,348 @@ initSystem();
 
         let dataFetchMode = 'recent'; // 'recent' 또는 'all'
 
-﻿        // --- 3. GLOBAL FUNCTIONS (Hoisted) ---
+﻿// --- 3. GLOBAL FUNCTIONS (Hoisted) ---
 
-        let cleanupRetryCount = 0;
-        window.cleanupPendingData = async () => {
-            if (!db) return;
+let cleanupRetryCount = 0;
+window.cleanupPendingData = async () => {
+    if (!db) return;
 
-            if (standardData.length === 0) {
-                if (cleanupRetryCount < 10) {
-                    cleanupRetryCount++;
-                    setTimeout(window.cleanupPendingData, 1000);
-                }
-                return;
-            }
+    if (standardData.length === 0) {
+        if (cleanupRetryCount < 10) {
+            cleanupRetryCount++;
+            setTimeout(window.cleanupPendingData, 1000);
+        }
+        return;
+    }
 
-            try {
-                const pendingItems = standardData.filter(d => d._archiving_status === 'pending' || d._delete_status === 'pending');
+    try {
+        const pendingItems = standardData.filter(d => d._archiving_status === 'pending' || d._delete_status === 'pending');
 
-                if (pendingItems.length === 0) return;
+        if (pendingItems.length === 0) return;
 
-                let batch = writeBatch(db);
-                let batchCount = 0;
-                let totalCleaned = 0;
+        let batch = writeBatch(db);
+        let batchCount = 0;
+        let totalCleaned = 0;
 
-                for (const data of pendingItems) {
-                    const docId = String(data._id);
-                    // [FIX] Restore raw collection path without 'artifacts/appId...'
-                    const ref = doc(db, LIVE_COLLECTION_NAME, docId);
+        for (const data of pendingItems) {
+            const docId = String(data._id);
+            // [FIX] Restore raw collection path without 'artifacts/appId...'
+            const ref = doc(db, LIVE_COLLECTION_NAME, docId);
 
-                    batch.update(ref, {
-                        _archiving_status: deleteField(),
-                        _delete_status: deleteField()
-                    });
-
-                    batchCount++;
-                    totalCleaned++;
-
-                    if (batchCount >= 400) {
-                        await batch.commit();
-                        batch = writeBatch(db);
-                        batchCount = 0;
-                    }
-                }
-                if (batchCount > 0) await batch.commit();
-                if (totalCleaned > 0) console.log(`[System] 작업 중단으로 멈춰있던 데이터 ${totalCleaned}건 메모리 기반 자동 복구 완료.`);
-            } catch (e) {
-                console.warn("[System] 데이터 자동 정리 실패:", e);
-            }
-        };
-
-        window.escapeHtml = (unsafe) => {
-            if (unsafe == null) return '';
-            return String(unsafe)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        };
-
-        window.pendingConfirmAction = null;
-        window.showConfirm = (msg, action) => {
-            document.getElementById('genericConfirmMessage').innerText = msg;
-            window.pendingConfirmAction = action;
-            document.getElementById('genericConfirmModal').classList.remove('hidden');
-        };
-        window.closeGenericConfirm = () => {
-            document.getElementById('genericConfirmModal').classList.add('hidden');
-            window.pendingConfirmAction = null;
-        };
-        document.getElementById('genericConfirmBtn').onclick = () => {
-            if (window.pendingConfirmAction) window.pendingConfirmAction();
-            window.closeGenericConfirm();
-        };
-
-        window.parseDate = (s) => {
-            if (!s) return 0;
-            const koreanMatch = s.match(/(\d+)월\s*(\d+)일/);
-            const now = new Date();
-            let year = now.getFullYear();
-            if (koreanMatch) {
-                const parsed = new Date(year, parseInt(koreanMatch[1]) - 1, parseInt(koreanMatch[2]));
-                if (parsed.getTime() > now.getTime() + 7 * 24 * 60 * 60 * 1000) year--;
-                return new Date(year, parseInt(koreanMatch[1]) - 1, parseInt(koreanMatch[2])).getTime();
-            }
-
-            if (typeof s === 'string' && s.includes('-')) {
-                const parts = s.split('-');
-                if (parts.length >= 3) {
-                    return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])).getTime();
-                }
-            }
-
-            const d = new Date(s);
-            return isNaN(d.getTime()) ? 0 : d.getTime();
-        };
-        window.parseMoney = (v) => parseInt(String(v).replace(/[^0-9-]/g, '')) || 0;
-        window.formatMoney = (n) => '₩' + n.toLocaleString();
-        window.isUrgent = (r) => (r._status !== '처리완료' && (Date.now() - window.parseDate(r._date)) > 259200000);
-        window.getStatusIcon = (s) => s === '처리완료' ? '✔' : (s === '보류' ? '!' : '-');
-        window.showToast = (m) => {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-            const d = document.createElement('div'); d.className = 'toast show'; d.innerText = m;
-            container.appendChild(d);
-            setTimeout(() => { if (d.parentNode) d.remove(); }, 3000);
-        };
-        window.showLoading = (s) => { const overlay = document.getElementById('loadingOverlay'); if (overlay) overlay.classList.toggle('hidden', !s); };
-
-        window.updateSaveButton = () => {
-            const c = unsavedChanges.size;
-            const badge = document.getElementById('unsavedCount');
-            if (badge) badge.innerText = c;
-            const btn = document.getElementById('saveChangesBtn');
-            if (btn) { btn.classList.toggle('hidden', c === 0); btn.disabled = (c === 0); }
-        };
-
-        window.updateSelectionUI = () => {
-            const count = selectedIds.size;
-            const disp = document.getElementById('selectedCountDisplay');
-            if (disp) disp.innerText = count + '개 선택';
-            const container = document.getElementById('bulkActionContainer');
-            if (container) {
-                if (count > 0) { container.classList.remove('hidden'); container.classList.add('flex'); }
-                else { container.classList.add('hidden'); container.classList.remove('flex'); }
-            }
-            const cb = document.getElementById('selectAllCheckboxTop');
-            if (cb) cb.checked = (standardData.length > 0 && selectedIds.size === standardData.length);
-        };
-
-        window.updateTableCheckboxes = () => { document.querySelectorAll('.row-check').forEach(c => c.checked = selectedIds.has(c.value)); };
-
-        window.getMergedData = () => {
-            return standardData
-                .filter(d => d._customer || d._product || d._order_id)
-                .map(d => {
-                    const pending = unsavedChanges.get(String(d._id));
-                    return pending ? { ...d, ...pending } : d;
-                });
-        };
-
-        window.updateKPI = () => {
-            const data = window.getMergedData();
-            const total = data.length;
-            const unprocessed = data.filter(d => (d._status || '').trim() === '미처리').length;
-            const urgent = data.filter(d => window.isUrgent(d)).length;
-            const processed = data.filter(d => (d._status || '').trim() === '처리완료').length;
-            const defect = data.filter(d => (d._product_condition || '').trim() === '불량').length;
-            const exchange = data.filter(d => (d._type || '').includes('교환')).length;
-            const refundCount = data.filter(d => (d._type || '').includes('반품')).length;
-            const refundSum = data.reduce((acc, d) => acc + window.parseMoney(d._refund_amount), 0);
-            const defectRate = total > 0 ? ((defect / total) * 100).toFixed(1) : 0;
-
-            const qMap = { quickTotal: total, quickUnprocessed: unprocessed, quickUrgent: urgent, quickCompleted: processed, quickRefundTotal: window.formatMoney(refundSum) };
-            Object.entries(qMap).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.innerText = val.toLocaleString(); });
-            const kpiMap = { kpiTotal: total, kpiUnprocessed: unprocessed, kpiUrgent: urgent, kpiDefect: defect, kpiMisdelivery: data.filter(d => (d._reason || '').includes('오배송')).length, kpiExchangeRate: exchange, kpiReturnRate: refundCount, kpiDefectRate: defectRate + '%' };
-            Object.entries(kpiMap).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.innerText = val.toLocaleString(); });
-        };
-
-        window.renderRefundStats = () => {
-            const container = document.getElementById('refundDataContainer');
-            if (!container) return;
-            const data = window.getMergedData();
-            const aggregated = {};
-            data.forEach(row => {
-                const amount = window.parseMoney(row._refund_amount);
-                if (!amount || amount <= 0) return;
-                const ts = window.parseDate(row._date);
-                if (!ts) return;
-                const d = new Date(ts);
-                let key = '', label = '';
-                if (currentChartPeriod === 'daily') { key = d.toISOString().split('T')[0]; label = `${d.getMonth() + 1}/${d.getDate()}`; }
-                else if (currentChartPeriod === 'weekly') {
-                    const firstDay = new Date(d.getFullYear(), 0, 1);
-                    const week = Math.ceil(((d - firstDay) / 86400000 + firstDay.getDay() + 1) / 7);
-                    key = `${d.getFullYear()}-W${week.toString().padStart(2, '0')}`; label = `${d.getFullYear().toString().slice(-2)}년 ${week}주`;
-                } else { key = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`; label = `${d.getFullYear()}년 ${d.getMonth() + 1}월`; }
-                if (!aggregated[key]) aggregated[key] = { label, amount: 0 };
-                aggregated[key].amount += amount;
+            batch.update(ref, {
+                _archiving_status: deleteField(),
+                _delete_status: deleteField()
             });
-            const sorted = Object.entries(aggregated).sort((a, b) => a[0].localeCompare(b[0])).slice(-7);
-            container.innerHTML = sorted.map(([k, d]) => `<div class="bg-[#FAF3EE] p-3 rounded-lg text-center shadow-sm hover:bg-white transition-all border border-transparent hover:border-[#D97756]"><span class="text-[10px] font-bold text-[#8B7B6E] block mb-1">${d.label}</span><span class="text-sm font-bold text-[#D97756]">${window.formatMoney(d.amount)}</span></div>`).join('');
-        };
 
-        window.renderAllButtons = () => {
-            const sDiv = document.getElementById('statusButtons');
-            if (!sDiv) return;
-            const data = window.getMergedData();
-            const counts = { '미처리': 0, '처리완료': 0, '보류': 0 };
-            data.forEach(d => { if (counts[d._status] !== undefined) counts[d._status]++; else counts['미처리']++; });
-            sDiv.innerHTML = ['미처리', '처리완료', '보류'].map(s => `<button onclick="window.setActiveStatus('${s}')" class="status-btn px-4 py-1.5 border border-[#D4C4B8] rounded-md bg-white text-xs font-bold text-[#6B5D52] hover:bg-[#FAF3EE] transition-colors ${activeStatus === s ? 'active' : ''}"> ${s} <span class="count-badge ml-1 bg-[#F5EDE6] text-[#8B7B6E] px-1 rounded">${counts[s]}</span> </button>`).join('');
-            const rDiv = document.getElementById('reasonButtons');
-            if (rDiv) {
-                const reasons = [...new Set(standardData.map(d => d._reason).filter(r => r))];
-                rDiv.innerHTML = reasons.map(r => `<button onclick="window.setActiveReason('${r}')" class="reason-btn px-2 py-1 text-xs border border-[#E8DDD4] rounded-full hover:bg-[#F5EDE6] ${activeReason === r ? 'active' : ''}">${r}</button>`).join('');
+            batchCount++;
+            totalCleaned++;
+
+            if (batchCount >= 400) {
+                await batch.commit();
+                batch = writeBatch(db);
+                batchCount = 0;
             }
-        };
+        }
+        if (batchCount > 0) await batch.commit();
+        if (totalCleaned > 0) console.log(`[System] 작업 중단으로 멈춰있던 데이터 ${totalCleaned}건 메모리 기반 자동 복구 완료.`);
+    } catch (e) {
+        console.warn("[System] 데이터 자동 정리 실패:", e);
+    }
+};
 
-        window.renderTableHeader = () => {
-            const thead = document.getElementById('tableHeaderRow');
-            if (!thead) return;
-            let html = `<tr><th class="px-4 py-3 text-center sticky top-0 left-0 z-50 bg-[#FAF3EE] border-r border-[#E8DDD4] border-b min-w-[50px] w-[50px]"><input type="checkbox" id="selectAllCheckboxTop" onchange="window.toggleSelectAll(this.checked)" class="w-5 h-5 accent-[#D97756]"></th>`;
+window.escapeHtml = (unsafe) => {
+    if (unsafe == null) return '';
+    return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+};
 
-            COLUMNS.forEach(col => {
-                let stickyClass = 'sticky top-0 z-40 bg-[#FAF3EE]';
-                let style = `min-width:${col.width}; width:${col.width};`;
-                const sortIcon = columnSortField === col.id ? (columnSortOrder === 'asc' ? ' ▲' : ' ▼') : '';
-                html += `<th onclick="window.toggleColumnSort('${col.id}')" class="px-4 py-3 text-left text-xs font-bold text-[#8B7B6E] uppercase border-b border-[#E8DDD4] cursor-pointer hover:bg-[#F5EDE6] ${stickyClass}" style="${style}"> ${col.label}${sortIcon}</th>`;
-            });
-            html += `<th class="px-4 py-3 border-b border-[#E8DDD4] text-center sticky top-0 z-40 bg-[#FAF3EE] min-w-[50px]">관리</th></tr>`;
-            thead.innerHTML = html;
-        };
+window.pendingConfirmAction = null;
+window.showConfirm = (msg, action) => {
+    document.getElementById('genericConfirmMessage').innerText = msg;
+    window.pendingConfirmAction = action;
+    document.getElementById('genericConfirmModal').classList.remove('hidden');
+};
+window.closeGenericConfirm = () => {
+    document.getElementById('genericConfirmModal').classList.add('hidden');
+    window.pendingConfirmAction = null;
+};
+document.getElementById('genericConfirmBtn').onclick = () => {
+    if (window.pendingConfirmAction) window.pendingConfirmAction();
+    window.closeGenericConfirm();
+};
 
-        window.debounceSearch = () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => window.applyLocalFilters(true), 300); };
-        window.toggleSelectAll = (c) => { selectedIds = c ? new Set(window.currentTableData.map(d => String(d._id))) : new Set(); window.applyLocalFilters(); };
-        window.toggleRowSelection = (id) => { const s = String(id); if (selectedIds.has(s)) selectedIds.delete(s); else selectedIds.add(s); window.updateSelectionUI(); };
+window.parseDate = (s) => {
+    if (!s) return 0;
+    const koreanMatch = s.match(/(\d+)월\s*(\d+)일/);
+    const now = new Date();
+    let year = now.getFullYear();
+    if (koreanMatch) {
+        const parsed = new Date(year, parseInt(koreanMatch[1]) - 1, parseInt(koreanMatch[2]));
+        if (parsed.getTime() > now.getTime() + 7 * 24 * 60 * 60 * 1000) year--;
+        return new Date(year, parseInt(koreanMatch[1]) - 1, parseInt(koreanMatch[2])).getTime();
+    }
 
-﻿        window.renderTable = (data) => {
-            const tbody = document.getElementById('tableBody');
-            if (!tbody) return;
+    if (typeof s === 'string' && s.includes('-')) {
+        const parts = s.split('-');
+        if (parts.length >= 3) {
+            return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])).getTime();
+        }
+    }
 
-            let focusedRowId = null;
-            let focusedFieldClass = null;
-            let focusedSelection = null;
-            if (document.activeElement && tbody.contains(document.activeElement)) {
-                const tr = document.activeElement.closest('tr');
-                if (tr) focusedRowId = tr.id;
-                focusedFieldClass = Array.from(document.activeElement.classList).find(c => c.startsWith('field-'));
-                if (document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'text') {
-                    try { focusedSelection = document.activeElement.selectionStart; } catch (e) { }
-                }
-            }
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? 0 : d.getTime();
+};
+window.parseMoney = (v) => parseInt(String(v).replace(/[^0-9-]/g, '')) || 0;
+window.formatMoney = (n) => '₩' + n.toLocaleString();
+window.isUrgent = (r) => (r._status !== '처리완료' && (Date.now() - window.parseDate(r._date)) > 259200000);
+window.getStatusIcon = (s) => s === '처리완료' ? '✔' : (s === '보류' ? '!' : '-');
+window.showToast = (m) => {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const d = document.createElement('div'); d.className = 'toast show'; d.innerText = m;
+    container.appendChild(d);
+    setTimeout(() => { if (d.parentNode) d.remove(); }, 3000);
+};
+window.showLoading = (s) => { const overlay = document.getElementById('loadingOverlay'); if (overlay) overlay.classList.toggle('hidden', !s); };
 
-            if (data.length === 0) {
-                tbody.innerHTML = '';
-                document.getElementById('emptyState').classList.remove('hidden');
-                return;
-            }
-            document.getElementById('emptyState').classList.add('hidden');
+window.updateSaveButton = () => {
+    const c = unsavedChanges.size;
+    const badge = document.getElementById('unsavedCount');
+    if (badge) badge.innerText = c;
+    const btn = document.getElementById('saveChangesBtn');
+    if (btn) { btn.classList.toggle('hidden', c === 0); btn.disabled = (c === 0); }
+};
 
-            let rows = '';
-            const now = Date.now();
-            data.forEach(d => {
-                const pending = unsavedChanges.get(String(d._id)) || {};
-                const r = { ...d, ...pending };
-                let isUrgent = (r._status !== '처리완료' && (now - window.parseDate(r._date)) > 259200000);
+window.updateSelectionUI = () => {
+    const count = selectedIds.size;
+    const disp = document.getElementById('selectedCountDisplay');
+    if (disp) disp.innerText = count + '개 선택';
+    const container = document.getElementById('bulkActionContainer');
+    if (container) {
+        if (count > 0) { container.classList.remove('hidden'); container.classList.add('flex'); }
+        else { container.classList.add('hidden'); container.classList.remove('flex'); }
+    }
+    const cb = document.getElementById('selectAllCheckboxTop');
+    if (cb) cb.checked = (standardData.length > 0 && selectedIds.size === standardData.length);
+};
 
-                const bgClass = isUrgent ? 'bg-[#FEE2E2] hover:bg-[#FECACA]' : 'hover:bg-[#FAF3EE]';
-                const stickyBg = isUrgent ? 'bg-[#FEE2E2]' : 'bg-white';
-                const isSel = selectedIds.has(String(d._id));
+window.updateTableCheckboxes = () => { document.querySelectorAll('.row-check').forEach(c => c.checked = selectedIds.has(c.value)); };
 
-                const ropt = `<option value="">선택</option>` + ['변심', '불량', '색상', '사이즈', '색상/사이즈', '수선', '오배송'].map(x => `<option value="${x}" ${r._reason === x ? 'selected' : ''}>${x}</option>`).join('');
-                const sopt = `<option value="">선택</option>` + ['결제', '입금', '차감', '무상', '무료배송권', '동봉'].map(x => `<option value="${x}" ${r._shipping === x ? 'selected' : ''}>${x}</option>`).join('');
-                const copt = `<option value="">선택</option>` + ['정상', '불량'].map(x => `<option value="${x}" ${r._product_condition === x ? 'selected' : ''}>${x}</option>`).join('');
+window.getMergedData = () => {
+    return standardData
+        .filter(d => d._customer || d._product || d._order_id)
+        .map(d => {
+            const pending = unsavedChanges.get(String(d._id));
+            return pending ? { ...d, ...pending } : d;
+        });
+};
 
-                rows += `<tr id="row-${d._id}" class="${bgClass} border-b border-[#E8DDD4] transition-colors group">
+window.updateKPI = () => {
+    const data = window.getMergedData();
+    const total = data.length;
+    const unprocessed = data.filter(d => (d._status || '').trim() === '미처리').length;
+    const urgent = data.filter(d => window.isUrgent(d)).length;
+    const processed = data.filter(d => (d._status || '').trim() === '처리완료').length;
+    const defect = data.filter(d => (d._product_condition || '').trim() === '불량').length;
+    const exchange = data.filter(d => (d._type || '').includes('교환')).length;
+    const refundCount = data.filter(d => (d._type || '').includes('반품')).length;
+    const refundSum = data.reduce((acc, d) => acc + window.parseMoney(d._refund_amount), 0);
+    const defectRate = total > 0 ? ((defect / total) * 100).toFixed(1) : 0;
+
+    const qMap = { quickTotal: total, quickUnprocessed: unprocessed, quickUrgent: urgent, quickCompleted: processed, quickRefundTotal: window.formatMoney(refundSum) };
+    Object.entries(qMap).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.innerText = val.toLocaleString(); });
+    const kpiMap = { kpiTotal: total, kpiUnprocessed: unprocessed, kpiUrgent: urgent, kpiDefect: defect, kpiMisdelivery: data.filter(d => (d._reason || '').includes('오배송')).length, kpiExchangeRate: exchange, kpiReturnRate: refundCount, kpiDefectRate: defectRate + '%' };
+    Object.entries(kpiMap).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.innerText = val.toLocaleString(); });
+};
+
+window.renderRefundStats = () => {
+    const container = document.getElementById('refundDataContainer');
+    if (!container) return;
+    const data = window.getMergedData();
+    const aggregated = {};
+    data.forEach(row => {
+        const amount = window.parseMoney(row._refund_amount);
+        if (!amount || amount <= 0) return;
+        const ts = window.parseDate(row._date);
+        if (!ts) return;
+        const d = new Date(ts);
+        let key = '', label = '';
+        if (currentChartPeriod === 'daily') { key = d.toISOString().split('T')[0]; label = `${d.getMonth() + 1}/${d.getDate()}`; }
+        else if (currentChartPeriod === 'weekly') {
+            const firstDay = new Date(d.getFullYear(), 0, 1);
+            const week = Math.ceil(((d - firstDay) / 86400000 + firstDay.getDay() + 1) / 7);
+            key = `${d.getFullYear()}-W${week.toString().padStart(2, '0')}`; label = `${d.getFullYear().toString().slice(-2)}년 ${week}주`;
+        } else { key = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`; label = `${d.getFullYear()}년 ${d.getMonth() + 1}월`; }
+        if (!aggregated[key]) aggregated[key] = { label, amount: 0 };
+        aggregated[key].amount += amount;
+    });
+    const sorted = Object.entries(aggregated).sort((a, b) => a[0].localeCompare(b[0])).slice(-7);
+    container.innerHTML = sorted.map(([k, d]) => `<div class="bg-[#FAF3EE] p-3 rounded-lg text-center shadow-sm hover:bg-white transition-all border border-transparent hover:border-[#D97756]"><span class="text-[10px] font-bold text-[#8B7B6E] block mb-1">${d.label}</span><span class="text-sm font-bold text-[#D97756]">${window.formatMoney(d.amount)}</span></div>`).join('');
+};
+
+window.renderAllButtons = () => {
+    const sDiv = document.getElementById('statusButtons');
+    if (!sDiv) return;
+    const data = window.getMergedData();
+    const counts = { '미처리': 0, '처리완료': 0, '보류': 0 };
+    data.forEach(d => { if (counts[d._status] !== undefined) counts[d._status]++; else counts['미처리']++; });
+    sDiv.innerHTML = ['미처리', '처리완료', '보류'].map(s => `<button onclick="window.setActiveStatus('${s}')" class="status-btn px-4 py-1.5 border border-[#D4C4B8] rounded-md bg-white text-xs font-bold text-[#6B5D52] hover:bg-[#FAF3EE] transition-colors ${activeStatus === s ? 'active' : ''}"> ${s} <span class="count-badge ml-1 bg-[#F5EDE6] text-[#8B7B6E] px-1 rounded">${counts[s]}</span> </button>`).join('');
+    const rDiv = document.getElementById('reasonButtons');
+    if (rDiv) {
+        const reasons = [...new Set(standardData.map(d => d._reason).filter(r => r))];
+        rDiv.innerHTML = reasons.map(r => `<button onclick="window.setActiveReason('${r}')" class="reason-btn px-2 py-1 text-xs border border-[#E8DDD4] rounded-full hover:bg-[#F5EDE6] ${activeReason === r ? 'active' : ''}">${r}</button>`).join('');
+    }
+};
+
+window.renderTableHeader = () => {
+    const thead = document.getElementById('tableHeaderRow');
+    if (!thead) return;
+    let html = `<tr><th class="px-4 py-3 text-center sticky top-0 left-0 z-50 bg-[#FAF3EE] border-r border-[#E8DDD4] border-b min-w-[50px] w-[50px]"><input type="checkbox" id="selectAllCheckboxTop" onchange="window.toggleSelectAll(this.checked)" class="w-5 h-5 accent-[#D97756]"></th>`;
+
+    COLUMNS.forEach(col => {
+        let stickyClass = 'sticky top-0 z-40 bg-[#FAF3EE]';
+        let style = `min-width:${col.width}; width:${col.width};`;
+        const sortIcon = columnSortField === col.id ? (columnSortOrder === 'asc' ? ' ▲' : ' ▼') : '';
+        html += `<th onclick="window.toggleColumnSort('${col.id}')" class="px-4 py-3 text-left text-xs font-bold text-[#8B7B6E] uppercase border-b border-[#E8DDD4] cursor-pointer hover:bg-[#F5EDE6] ${stickyClass}" style="${style}"> ${col.label}${sortIcon}</th>`;
+    });
+    const role = localStorage.getItem('er_system_role');
+    if (role === 'admin' || role === 'system') {
+        html += `<th class="px-4 py-3 border-b border-[#E8DDD4] text-center sticky top-0 z-40 bg-[#FAF3EE] min-w-[50px]">관리</th></tr>`;
+    } else {
+        html += `<th class="px-4 py-3 border-b border-[#E8DDD4] text-center sticky top-0 z-40 bg-[#FAF3EE] min-w-[50px]"></th></tr>`;
+    }
+    thead.innerHTML = html;
+};
+
+window.debounceSearch = () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => window.applyLocalFilters(true), 300); };
+window.toggleSelectAll = (c) => { selectedIds = c ? new Set(window.currentTableData.map(d => String(d._id))) : new Set(); window.applyLocalFilters(); };
+window.toggleRowSelection = (id) => { const s = String(id); if (selectedIds.has(s)) selectedIds.delete(s); else selectedIds.add(s); window.updateSelectionUI(); };
+
+﻿window.renderTable = (data) => {
+    const tbody = document.getElementById('tableBody');
+    if (!tbody) return;
+
+    let focusedRowId = null;
+    let focusedFieldClass = null;
+    let focusedSelection = null;
+    if (document.activeElement && tbody.contains(document.activeElement)) {
+        const tr = document.activeElement.closest('tr');
+        if (tr) focusedRowId = tr.id;
+        focusedFieldClass = Array.from(document.activeElement.classList).find(c => c.startsWith('field-'));
+        if (document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'text') {
+            try { focusedSelection = document.activeElement.selectionStart; } catch (e) { }
+        }
+    }
+
+    if (data.length === 0) {
+        tbody.innerHTML = '';
+        document.getElementById('emptyState').classList.remove('hidden');
+        return;
+    }
+    document.getElementById('emptyState').classList.add('hidden');
+
+    let rows = '';
+    const now = Date.now();
+    data.forEach(d => {
+        const pending = unsavedChanges.get(String(d._id)) || {};
+        const r = { ...d, ...pending };
+        let isUrgent = (r._status !== '처리완료' && (now - window.parseDate(r._date)) > 259200000);
+
+        const bgClass = isUrgent ? 'bg-[#FEE2E2] hover:bg-[#FECACA]' : 'hover:bg-[#FAF3EE]';
+        const stickyBg = isUrgent ? 'bg-[#FEE2E2]' : 'bg-white';
+        const isSel = selectedIds.has(String(d._id));
+
+        const ropt = `<option value="">선택</option>` + ['변심', '불량', '색상', '사이즈', '색상/사이즈', '수선', '오배송'].map(x => `<option value="${x}" ${r._reason === x ? 'selected' : ''}>${x}</option>`).join('');
+        const sopt = `<option value="">선택</option>` + ['결제', '입금', '차감', '무상', '무료배송권', '동봉'].map(x => `<option value="${x}" ${r._shipping === x ? 'selected' : ''}>${x}</option>`).join('');
+        const copt = `<option value="">선택</option>` + ['정상', '불량'].map(x => `<option value="${x}" ${r._product_condition === x ? 'selected' : ''}>${x}</option>`).join('');
+
+        rows += `<tr id="row-${d._id}" class="${bgClass} border-b border-[#E8DDD4] transition-colors group">
                     <td class="px-4 py-2 text-center sticky left-0 z-30 ${stickyBg} border-r border-[#F0E8E0] min-w-[50px]">
                         <input type="checkbox" class="w-5 h-5 accent-[#D97756] row-check" value="${d._id}" ${isSel ? 'checked' : ''} onchange="window.toggleRowSelection('${d._id}')">
                     </td>`;
 
-                COLUMNS.forEach(col => {
-                    let tdClass = `px-2 py-2 align-top`;
-                    let tdStyle = '';
+        COLUMNS.forEach(col => {
+            let tdClass = `px-2 py-2 align-top`;
+            let tdStyle = '';
 
-                    const val = r[col.id] || '';
-                    let inputHtml = '';
-                    if (col.id === '_status') {
-                        const icon = val === '처리완료' ? '✔' : (val === '보류' ? '!' : '-');
-                        const color = val === '처리완료' ? 'text-[#5E7A4A]' : (val === '보류' ? 'text-[#A67A52]' : 'text-[#B8A99C]');
-                        const statusOpts = ['미처리', '처리완료', '보류'].map(x => `<option value="${x}" ${val === x ? 'selected' : ''}>${x}</option>`).join('');
-                        inputHtml = `<div class="flex items-center gap-1"><span class="status-icon text-xs font-bold w-3 text-center ${color}">${icon}</span><select class="flex-grow text-xs border rounded p-1 outline-none focus:border-[#D97756] font-bold ${color} field-_status ${pending._status ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}', '_status', this.value)">${statusOpts}</select></div>`;
-                    } else if (col.id === '_reason') {
-                        inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_reason ${pending._reason ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_reason',this.value)">${ropt}</select>`;
-                    } else if (col.id === '_shipping') {
-                        inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_shipping ${pending._shipping ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_shipping',this.value)">${sopt}</select>`;
-                    } else if (col.id === '_product_condition') {
-                        inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_product_condition ${pending._product_condition ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_product_condition',this.value)">${copt}</select>`;
-                    } else {
-                        const align = col.align === 'right' ? 'text-right' : '';
-                        const dateColor = (col.id === '_date' && isUrgent) ? 'text-[#B85C4A] font-bold' : '';
-                        inputHtml = `<input type="text" class="table-input field-${col.id} ${align} ${dateColor} ${pending[col.id] ? 'unsaved-input' : ''}" value="${window.escapeHtml(val)}" onchange="window.updateField('${d._id}', '${col.id}', this.value)" ${col.id === '_product' ? 'ondblclick="window.copyProductName(this)"' : ''}>`;
-                        if (col.id === '_product') inputHtml = `<div class="relative w-full">${inputHtml}<button onclick="window.openCombinedModal('${d._id}')" class="absolute right-0 top-1/2 -translate-y-1/2 combined-btn text-slate-300 hover:text-[#D97756] bg-white rounded p-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></button></div>`;
-                    }
-                    rows += `<td class="${tdClass}" style="${tdStyle}">${inputHtml}</td>`;
-                });
-                rows += `<td class="px-2 py-2 text-center text-[#D4C4B8] hover:text-[#B85C4A] cursor-pointer font-bold" onclick="window.promptDeleteModal('${d._id}')">×</td></tr>`;
-            });
-            tbody.innerHTML = rows;
+            const val = r[col.id] || '';
+            let inputHtml = '';
+            if (col.id === '_status') {
+                const icon = val === '처리완료' ? '✔' : (val === '보류' ? '!' : '-');
+                const color = val === '처리완료' ? 'text-[#5E7A4A]' : (val === '보류' ? 'text-[#A67A52]' : 'text-[#B8A99C]');
+                const statusOpts = ['미처리', '처리완료', '보류'].map(x => `<option value="${x}" ${val === x ? 'selected' : ''}>${x}</option>`).join('');
+                inputHtml = `<div class="flex items-center gap-1"><span class="status-icon text-xs font-bold w-3 text-center ${color}">${icon}</span><select class="flex-grow text-xs border rounded p-1 outline-none focus:border-[#D97756] font-bold ${color} field-_status ${pending._status ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}', '_status', this.value)">${statusOpts}</select></div>`;
+            } else if (col.id === '_reason') {
+                inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_reason ${pending._reason ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_reason',this.value)">${ropt}</select>`;
+            } else if (col.id === '_shipping') {
+                inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_shipping ${pending._shipping ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_shipping',this.value)">${sopt}</select>`;
+            } else if (col.id === '_product_condition') {
+                inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_product_condition ${pending._product_condition ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_product_condition',this.value)">${copt}</select>`;
+            } else {
+                const align = col.align === 'right' ? 'text-right' : '';
+                const dateColor = (col.id === '_date' && isUrgent) ? 'text-[#B85C4A] font-bold' : '';
+                inputHtml = `<input type="text" class="table-input field-${col.id} ${align} ${dateColor} ${pending[col.id] ? 'unsaved-input' : ''}" value="${window.escapeHtml(val)}" onchange="window.updateField('${d._id}', '${col.id}', this.value)" ${col.id === '_product' ? 'ondblclick="window.copyProductName(this)"' : ''}>`;
+                if (col.id === '_product') inputHtml = `<div class="relative w-full">${inputHtml}<button onclick="window.openCombinedModal('${d._id}')" class="absolute right-0 top-1/2 -translate-y-1/2 combined-btn text-slate-300 hover:text-[#D97756] bg-white rounded p-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></button></div>`;
+            }
+            rows += `<td class="${tdClass}" style="${tdStyle}">${inputHtml}</td>`;
+        });
+        const role = localStorage.getItem('er_system_role');
+        if (role === 'admin' || role === 'system') {
+            rows += `<td class="px-2 py-2 text-center text-[#D4C4B8] hover:text-[#B85C4A] cursor-pointer font-bold" onclick="window.promptDeleteModal('${d._id}')">×</td></tr>`;
+        } else {
+            rows += `<td class="px-2 py-2 text-center text-[#D4C4B8] font-bold"></td></tr>`;
+        }
+    });
+    tbody.innerHTML = rows;
 
-            if (focusedRowId && focusedFieldClass) {
-                const restoredTr = document.getElementById(focusedRowId);
-                if (restoredTr) {
-                    const restoredEl = restoredTr.querySelector(`.${focusedFieldClass}`);
-                    if (restoredEl) {
-                        restoredEl.focus();
-                        if (restoredEl.tagName === 'INPUT' && restoredEl.type === 'text' && focusedSelection !== null) {
-                            try { restoredEl.setSelectionRange(focusedSelection, focusedSelection); } catch (e) { }
-                        }
-                    }
+    if (focusedRowId && focusedFieldClass) {
+        const restoredTr = document.getElementById(focusedRowId);
+        if (restoredTr) {
+            const restoredEl = restoredTr.querySelector(`.${focusedFieldClass}`);
+            if (restoredEl) {
+                restoredEl.focus();
+                if (restoredEl.tagName === 'INPUT' && restoredEl.type === 'text' && focusedSelection !== null) {
+                    try { restoredEl.setSelectionRange(focusedSelection, focusedSelection); } catch (e) { }
                 }
             }
-        };
+        }
+    }
+};
 
-        window.updateField = (id, field, value) => {
-            if (isArchiveMode) return;
-            const strId = String(id); const row = standardData.find(d => String(d._id) === strId); if (!row) return;
-            if (field === '_reason' && value === '기타') { window.openReasonInputModal(id); return; }
-            const currentPending = unsavedChanges.get(strId) || {}; let updates = { [field]: value };
-            if (['_product_price', '_discount_amount', '_payment_amount', '_shipping_cost_paid'].includes(field)) {
-                const getVal = (k) => (updates.hasOwnProperty(k) ? updates[k] : (currentPending.hasOwnProperty(k) ? currentPending[k] : row[k]));
-                const p = window.parseMoney(getVal('_product_price')); const d = window.parseMoney(getVal('_discount_amount')); let pay = window.parseMoney(getVal('_payment_amount'));
-                if (field === '_product_price' || field === '_discount_amount') { pay = p - d; updates['_payment_amount'] = window.formatMoney(pay); }
-                const sPaid = window.parseMoney(getVal('_shipping_cost_paid')); updates['_refund_amount'] = window.formatMoney(pay - sPaid);
-            }
-            if (field === '_status' && value === '처리완료') updates['_pic'] = currentUserName;
-            unsavedChanges.set(strId, { ...currentPending, ...updates }); window.updateSaveButton();
+window.updateField = (id, field, value) => {
+    if (isArchiveMode) return;
+    const strId = String(id); const row = standardData.find(d => String(d._id) === strId); if (!row) return;
+    if (field === '_reason' && value === '기타') { window.openReasonInputModal(id); return; }
+    const currentPending = unsavedChanges.get(strId) || {}; let updates = { [field]: value };
+    if (['_product_price', '_discount_amount', '_payment_amount', '_shipping_cost_paid'].includes(field)) {
+        const getVal = (k) => (updates.hasOwnProperty(k) ? updates[k] : (currentPending.hasOwnProperty(k) ? currentPending[k] : row[k]));
+        const p = window.parseMoney(getVal('_product_price')); const d = window.parseMoney(getVal('_discount_amount')); let pay = window.parseMoney(getVal('_payment_amount'));
+        if (field === '_product_price' || field === '_discount_amount') { pay = p - d; updates['_payment_amount'] = window.formatMoney(pay); }
+        const sPaid = window.parseMoney(getVal('_shipping_cost_paid')); updates['_refund_amount'] = window.formatMoney(pay - sPaid);
+    }
+    if (field === '_status' && value === '처리완료') updates['_pic'] = currentUserName;
+    unsavedChanges.set(strId, { ...currentPending, ...updates }); window.updateSaveButton();
 
-            const tr = document.getElementById(`row-${strId}`);
-            if (tr) {
-                const input = tr.querySelector(`.field-${field}`);
-                if (input) {
-                    input.value = value;
-                    input.classList.add('unsaved-input');
-                    if (field === '_status') {
-                        const color = value === '처리완료' ? 'text-[#5E7A4A]' : (value === '보류' ? 'text-[#A67A52]' : 'text-[#B8A99C]');
-                        const icon = value === '처리완료' ? '✔' : (value === '보류' ? '!' : '-');
-                        const iconSpan = tr.querySelector('.status-icon');
-                        if (iconSpan) { iconSpan.className = `status-icon text-xs font-bold w-3 text-center ${color}`; iconSpan.innerText = icon; }
-                        input.className = `flex-grow text-xs border rounded p-1 outline-none focus:border-[#D97756] font-bold field-_status unsaved-input ${color}`;
-                    }
-                }
+    const tr = document.getElementById(`row-${strId}`);
+    if (tr) {
+        const input = tr.querySelector(`.field-${field}`);
+        if (input) {
+            input.value = value;
+            input.classList.add('unsaved-input');
+            if (field === '_status') {
+                const color = value === '처리완료' ? 'text-[#5E7A4A]' : (value === '보류' ? 'text-[#A67A52]' : 'text-[#B8A99C]');
+                const icon = value === '처리완료' ? '✔' : (value === '보류' ? '!' : '-');
+                const iconSpan = tr.querySelector('.status-icon');
+                if (iconSpan) { iconSpan.className = `status-icon text-xs font-bold w-3 text-center ${color}`; iconSpan.innerText = icon; }
+                input.className = `flex-grow text-xs border rounded p-1 outline-none focus:border-[#D97756] font-bold field-_status unsaved-input ${color}`;
             }
-        };
+        }
+    }
+};
 
 ﻿window.saveAllChanges = async () => {
     if (unsavedChanges.size === 0 || !db) return;
@@ -593,12 +603,15 @@ window.completeLogin = async (name, id, role) => {
 
     const adminBtn = document.getElementById('adminManagementBtn');
     const adminSettingsBtn = document.getElementById('btnAdminSettings');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
     if (role === 'admin' || role === 'system') {
         if (adminBtn) adminBtn.classList.remove('hidden');
         if (adminSettingsBtn) adminSettingsBtn.classList.remove('hidden');
+        if (bulkDeleteBtn) bulkDeleteBtn.classList.remove('hidden');
     } else {
         if (adminBtn) adminBtn.classList.add('hidden');
         if (adminSettingsBtn) adminSettingsBtn.classList.add('hidden');
+        if (bulkDeleteBtn) bulkDeleteBtn.classList.add('hidden');
     }
     window.showToast(`${name}님, 환영합니다.`);
     if (auth && auth.currentUser) {
@@ -1068,9 +1081,17 @@ window.addNewRow = async () => {
         _order_id: '주문번호 입력'
     });
 };
-window.promptDeleteModal = (id) => { deleteTargetIds = [id]; document.getElementById('deleteModal').classList.remove('hidden'); };
+window.promptDeleteModal = (id) => {
+    const r = localStorage.getItem('er_system_role');
+    if (r !== 'admin' && r !== 'system') { window.showToast('삭제 권한이 없습니다.'); return; }
+    deleteTargetIds = [id]; document.getElementById('deleteModal').classList.remove('hidden');
+};
 window.closeDeleteModal = () => document.getElementById('deleteModal').classList.add('hidden');
-window.promptDeleteSelected = () => { if (selectedIds.size > 0) { deleteTargetIds = Array.from(selectedIds); document.getElementById('deleteModal').classList.remove('hidden'); } };
+window.promptDeleteSelected = () => {
+    const r = localStorage.getItem('er_system_role');
+    if (r !== 'admin' && r !== 'system') { window.showToast('삭제 권한이 없습니다.'); return; }
+    if (selectedIds.size > 0) { deleteTargetIds = Array.from(selectedIds); document.getElementById('deleteModal').classList.remove('hidden'); }
+};
 
 document.getElementById('confirmDeleteBtn').onclick = async () => {
     window.showLoading(true);

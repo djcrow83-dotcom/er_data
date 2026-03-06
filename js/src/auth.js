@@ -118,12 +118,15 @@ window.completeLogin = async (name, id, role) => {
 
     const adminBtn = document.getElementById('adminManagementBtn');
     const adminSettingsBtn = document.getElementById('btnAdminSettings');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
     if (role === 'admin' || role === 'system') {
         if (adminBtn) adminBtn.classList.remove('hidden');
         if (adminSettingsBtn) adminSettingsBtn.classList.remove('hidden');
+        if (bulkDeleteBtn) bulkDeleteBtn.classList.remove('hidden');
     } else {
         if (adminBtn) adminBtn.classList.add('hidden');
         if (adminSettingsBtn) adminSettingsBtn.classList.add('hidden');
+        if (bulkDeleteBtn) bulkDeleteBtn.classList.add('hidden');
     }
     window.showToast(`${name}님, 환영합니다.`);
     if (auth && auth.currentUser) {
