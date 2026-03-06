@@ -26,16 +26,20 @@
             <div class="bg-[#FDF6F0] p-4 rounded-xl mb-6 border border-[#E8DDD4]">
                 <h4 class="text-xs font-bold text-[#D97756] mb-1 uppercase tracking-wider">신규 담당자 권한 부여</h4>
                 <p class="text-[10px] text-[#8B7B6E] mb-3 leading-tight">
-                    ⚠️ 직원의 로그인 계정(비밀번호)은 반드시 파이어베이스 콘솔(Authentication)에서 직접 생성해주세요.<br>
-                    이곳에서는 생성된 이메일 계정에 대한 시스템 접속 권한만 부여합니다.
+                    ✅ 새 직원의 <span class="text-[#D97756] font-bold">실제 로그인 계정(이메일/비밀번호)</span>을 즉시 생성하고 권한까지 일괄
+                    발급합니다.<br>
+                    비밀번호는 최소 6자리 이상이어야 합니다.
                 </p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
                     <input id="newUserName"
                         class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
                         placeholder="이름 (예: 김담당)">
                     <input id="newUserId" type="email"
                         class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
-                        placeholder="가입된 이메일 주소">
+                        placeholder="가입할 이메일 주소">
+                    <input id="newUserPw" type="password"
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
+                        placeholder="초기 암호 (6자 이상)">
                     <select id="newUserRole"
                         class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756] bg-white">
                         <option value="staff">일반 (Staff)</option>

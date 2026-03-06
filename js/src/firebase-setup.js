@@ -1,5 +1,5 @@
-﻿import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, signOut, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+﻿import { initializeApp, deleteApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, orderBy, limit, writeBatch, deleteDoc, getDocs, initializeFirestore, memoryLocalCache, deleteField, where } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 import { getAnalytics } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js';
 // --- 9. FINAL INITIALIZATION ---
@@ -8,7 +8,7 @@ window.initSystem = async () => {
         // [FIX: 1번 원인 완전 해결] 
         // 빈 객체({}) 대신 고객님의 실제 파이어베이스 설정값을 직접 하드코딩하여
         // 깃허브나 로컬 어디서든 DB 서버에 곧바로 연결되도록 복구했습니다.
-        const firebaseConfig = {
+        window.firebaseConfig = {
             apiKey: "AIzaSyBQL7JBP3q8gmqbuEO1Q11lRo5TtNEsNlI",
             authDomain: "er-database-f786b.firebaseapp.com",
             projectId: "er-database-f786b",
@@ -18,7 +18,7 @@ window.initSystem = async () => {
             measurementId: "G-KR48H62QY3"
         };
 
-        app = initializeApp(firebaseConfig);
+        app = initializeApp(window.firebaseConfig);
         analytics = getAnalytics(app);
         auth = getAuth(app);
         db = initializeFirestore(app, { localCache: memoryLocalCache() });

@@ -1,5 +1,5 @@
-﻿import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, signOut, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+﻿import { initializeApp, deleteApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, onSnapshot, query, orderBy, limit, writeBatch, deleteDoc, getDocs, initializeFirestore, memoryLocalCache, deleteField, where } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 import { getAnalytics } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js';
 // --- 9. FINAL INITIALIZATION ---
@@ -8,7 +8,7 @@ window.initSystem = async () => {
         // [FIX: 1번 원인 완전 해결] 
         // 빈 객체({}) 대신 고객님의 실제 파이어베이스 설정값을 직접 하드코딩하여
         // 깃허브나 로컬 어디서든 DB 서버에 곧바로 연결되도록 복구했습니다.
-        const firebaseConfig = {
+        window.firebaseConfig = {
             apiKey: "AIzaSyBQL7JBP3q8gmqbuEO1Q11lRo5TtNEsNlI",
             authDomain: "er-database-f786b.firebaseapp.com",
             projectId: "er-database-f786b",
@@ -18,7 +18,7 @@ window.initSystem = async () => {
             measurementId: "G-KR48H62QY3"
         };
 
-        app = initializeApp(firebaseConfig);
+        app = initializeApp(window.firebaseConfig);
         analytics = getAnalytics(app);
         auth = getAuth(app);
         db = initializeFirestore(app, { localCache: memoryLocalCache() });
@@ -899,15 +899,41 @@ window.closeUserManagementModal = () => document.getElementById('userManagementM
 window.addNewUser = async () => {
     const name = document.getElementById('newUserName').value.trim();
     const id = document.getElementById('newUserId').value.trim();
+    const pw = document.getElementById('newUserPw').value;
     const role = document.getElementById('newUserRole').value;
-    if (!name || !id) return window.showToast("입력 정보를 모두 채워주세요.");
+    if (!name || !id || !pw) return window.showToast("이름, 이메일, 비밀번호를 모두 입력해주세요.");
+    if (pw.length < 6) return window.showToast("비밀번호는 최소 6자 이상이어야 합니다.");
+
+    window.showLoading(true);
+    let secondaryApp;
     try {
+        // 1. 보조 앱(Secondary App)을 생성하여 메인 관리자 세션 로그아웃 방지
+        secondaryApp = initializeApp(window.firebaseConfig, "SecondaryApp_" + Date.now());
+        const secondaryAuth = getAuth(secondaryApp);
+
+        // 2. 실제 인증 계정 발급
+        await createUserWithEmailAndPassword(secondaryAuth, id, pw);
+
+        // 3. 기존 로직: Firestore 역할 맵핑 테이블에 등록
         // [FIX] Restore raw collection path
         await setDoc(doc(db, USERS_COLLECTION_NAME, id), { displayName: name, username: id, role: role });
-        window.showToast(`권한 등록됨 (${role})`);
-        ['newUserName', 'newUserId'].forEach(i => document.getElementById(i).value = '');
+
+        window.showToast(`실제 계정 발급 및 권한 등록됨 (${role})`);
+        ['newUserName', 'newUserId', 'newUserPw'].forEach(i => document.getElementById(i).value = '');
         window.loadUserList();
-    } catch (e) { window.showToast("생성 실패."); }
+    } catch (e) {
+        console.error("생성 실패:", e);
+        if (e.code === 'auth/email-already-in-use') {
+            window.showToast("이미 사용 중인 이메일 계정입니다.");
+        } else {
+            window.showToast("생성 실패: " + e.message);
+        }
+    } finally {
+        if (secondaryApp) {
+            await deleteApp(secondaryApp).catch(() => console.warn('보조 앱 삭제 처리됨'));
+        }
+        window.showLoading(false);
+    }
 };
 
 window.loadUserList = async () => {
