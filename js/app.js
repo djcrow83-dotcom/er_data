@@ -363,14 +363,17 @@ window.debounceSearch = () => { clearTimeout(searchTimeout); searchTimeout = set
 window.toggleSelectAll = (c) => { selectedIds = c ? new Set(window.currentTableData.map(d => String(d._id))) : new Set(); window.applyLocalFilters(); };
 window.toggleRowSelection = (id) => { const s = String(id); if (selectedIds.has(s)) selectedIds.delete(s); else selectedIds.add(s); window.updateSelectionUI(); };
 
-﻿window.renderTable = (data) => {
+﻿window.currentRenderLimit = 50;
+window.tableScrollObserver = null;
+
+window.renderTable = (data, append = false) => {
     const tbody = document.getElementById('tableBody');
     if (!tbody) return;
 
     let focusedRowId = null;
     let focusedFieldClass = null;
     let focusedSelection = null;
-    if (document.activeElement && tbody.contains(document.activeElement)) {
+    if (!append && document.activeElement && tbody.contains(document.activeElement)) {
         const tr = document.activeElement.closest('tr');
         if (tr) focusedRowId = tr.id;
         focusedFieldClass = Array.from(document.activeElement.classList).find(c => c.startsWith('field-'));
@@ -386,9 +389,16 @@ window.toggleRowSelection = (id) => { const s = String(id); if (selectedIds.has(
     }
     document.getElementById('emptyState').classList.add('hidden');
 
+    if (!append) window.currentRenderLimit = 50;
+
+    const startIdx = append ? window.currentRenderLimit - 50 : 0;
+    const dataToRender = data.slice(startIdx, window.currentRenderLimit);
+
     let rows = '';
     const now = Date.now();
-    data.forEach(d => {
+    const role = localStorage.getItem('er_system_role');
+
+    dataToRender.forEach(d => {
         const pending = unsavedChanges.get(String(d._id)) || {};
         const r = { ...d, ...pending };
         let isUrgent = (r._status !== '처리완료' && (now - window.parseDate(r._date)) > 259200000);
@@ -431,16 +441,39 @@ window.toggleRowSelection = (id) => { const s = String(id); if (selectedIds.has(
             }
             rows += `<td class="${tdClass}" style="${tdStyle}">${inputHtml}</td>`;
         });
-        const role = localStorage.getItem('er_system_role');
+
         if (role === 'admin' || role === 'system') {
             rows += `<td class="px-2 py-2 text-center text-[#D4C4B8] hover:text-[#B85C4A] cursor-pointer font-bold" onclick="window.promptDeleteModal('${d._id}')">×</td></tr>`;
         } else {
             rows += `<td class="px-2 py-2 text-center text-[#D4C4B8] font-bold"></td></tr>`;
         }
     });
-    tbody.innerHTML = rows;
 
-    if (focusedRowId && focusedFieldClass) {
+    if (append) {
+        const trigger = document.getElementById('scroll-trigger');
+        if (trigger) trigger.remove();
+        tbody.insertAdjacentHTML('beforeend', rows);
+    } else {
+        tbody.innerHTML = rows;
+    }
+
+    if (window.currentRenderLimit < data.length) {
+        const trigger = document.createElement('tr');
+        trigger.id = 'scroll-trigger';
+        trigger.innerHTML = `<td colspan="100%" class="text-center p-4 text-[#B8A99C] text-xs font-bold">더 불러오는 중... (${window.currentRenderLimit} / ${data.length})</td>`;
+        tbody.appendChild(trigger);
+
+        if (window.tableScrollObserver) window.tableScrollObserver.disconnect();
+        window.tableScrollObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                window.currentRenderLimit += 50;
+                window.renderTable(data, true);
+            }
+        }, { root: tbody.closest('.overflow-y-auto'), rootMargin: '200px' });
+        window.tableScrollObserver.observe(trigger);
+    }
+
+    if (!append && focusedRowId && focusedFieldClass) {
         const restoredTr = document.getElementById(focusedRowId);
         if (restoredTr) {
             const restoredEl = restoredTr.querySelector(`.${focusedFieldClass}`);
