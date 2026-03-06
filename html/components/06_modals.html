@@ -1,0 +1,303 @@
+<!-- [MODALS] -->
+
+<!-- [GENERIC CONFIRM MODAL (Replacement for confirm())] -->
+<div id="genericConfirmModal" class="fixed inset-0 z-[120] flex items-center justify-center modal-overlay hidden">
+    <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm text-center border border-[#E8DDD4]">
+        <h3 class="text-lg font-bold mb-2 text-[#2D1F17]">확인</h3>
+        <p class="text-sm text-[#8B7B6E] mb-6" id="genericConfirmMessage"></p>
+        <div class="flex gap-3">
+            <button onclick="window.closeGenericConfirm()"
+                class="flex-1 py-2 border border-[#E8DDD4] rounded-lg hover:bg-[#FAF3EE] font-medium text-[#6B5D52]">취소</button>
+            <button id="genericConfirmBtn"
+                class="flex-1 py-2 bg-[#D97756] text-white rounded-lg font-bold hover:bg-[#C4623E]">확인</button>
+        </div>
+    </div>
+</div>
+
+<!-- [ADMIN: USER MANAGEMENT MODAL] -->
+<div id="userManagementModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center modal-overlay">
+    <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl border border-[#E8DDD4]">
+        <div class="p-5 bg-[#FAF3EE] border-b border-[#E8DDD4] flex justify-between items-center">
+            <h3 class="font-bold text-[#3D2E24]">사용자 계정 권한 관리</h3>
+            <button onclick="window.closeUserManagementModal()"
+                class="text-[#B8A99C] hover:text-[#6B5D52] text-2xl">✕</button>
+        </div>
+        <div class="p-6">
+            <div class="bg-[#FDF6F0] p-4 rounded-xl mb-6 border border-[#E8DDD4]">
+                <h4 class="text-xs font-bold text-[#D97756] mb-1 uppercase tracking-wider">신규 담당자 권한 부여</h4>
+                <p class="text-[10px] text-[#8B7B6E] mb-3 leading-tight">
+                    ⚠️ 직원의 로그인 계정(비밀번호)은 반드시 파이어베이스 콘솔(Authentication)에서 직접 생성해주세요.<br>
+                    이곳에서는 생성된 이메일 계정에 대한 시스템 접속 권한만 부여합니다.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <input id="newUserName"
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
+                        placeholder="이름 (예: 김담당)">
+                    <input id="newUserId" type="email"
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
+                        placeholder="가입된 이메일 주소">
+                    <select id="newUserRole"
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756] bg-white">
+                        <option value="staff">일반 (Staff)</option>
+                        <option value="admin">관리자 (Admin)</option>
+                    </select>
+                </div>
+                <button onclick="window.addNewUser()"
+                    class="w-full mt-3 bg-[#D97756] text-white py-2.5 rounded-lg font-bold shadow-sm hover:bg-[#C4623E] transition-all">권한
+                    등록</button>
+            </div>
+
+            <h4 class="text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider">등록된 권한 목록</h4>
+            <div id="userListContainer" class="max-h-60 overflow-y-auto border rounded-xl divide-y custom-scrollbar">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Settings Modal (Existing) -->
+<div id="settingsModal" class="fixed inset-0 z-[100] flex items-center justify-center modal-overlay hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl h-[85vh] flex flex-col border border-slate-100">
+        <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-xl">
+            <div>
+                <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    관리자 설정
+                </h3>
+                <p class="text-xs text-slate-500 mt-1">공통 코드 및 데이터 관리를 수행합니다.</p>
+            </div>
+            <button onclick="closeSettingsModal()"
+                class="text-slate-400 hover:text-slate-600 p-2 hover:bg-slate-200 rounded-full transition-colors">✕</button>
+        </div>
+
+        <div class="flex border-b border-slate-200 px-5 overflow-x-auto">
+            <button onclick="switchSettingsTab('reasons')" id="tab-reasons"
+                class="px-4 py-3 text-sm font-bold text-indigo-600 border-b-2 border-indigo-600 transition-colors whitespace-nowrap">사유</button>
+            <button onclick="switchSettingsTab('shipping')" id="tab-shipping"
+                class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap">배송비</button>
+            <button onclick="switchSettingsTab('conditions')" id="tab-conditions"
+                class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap">제품상태</button>
+            <button onclick="switchSettingsTab('channels')" id="tab-channels"
+                class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap">판매처</button>
+            <button onclick="switchSettingsTab('archive')" id="tab-archive"
+                class="px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors whitespace-nowrap flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4">
+                    </path>
+                </svg>
+                데이터 관리 (아카이브)
+            </button>
+        </div>
+
+        <div class="flex-grow overflow-y-auto custom-scrollbar p-6 bg-white">
+            <div id="section-common-codes">
+                <div class="flex gap-2 mb-6">
+                    <input type="text" id="newOptionInput"
+                        class="flex-grow px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        placeholder="새 항목 입력" onkeyup="if(event.key === 'Enter') addCurrentOption()">
+                    <button onclick="addCurrentOption()"
+                        class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-md">추가</button>
+                </div>
+
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                    <h4 class="text-sm font-bold text-slate-600 mb-3" id="settingsListTitle">등록된 항목</h4>
+                    <div id="settingsChipsContainer" class="flex flex-wrap">
+                        <div class="text-slate-400 text-sm py-4">로딩 중...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-archive" class="hidden">
+                <div class="space-y-6">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h4 class="text-base font-bold text-slate-800 mb-2">아카이브 데이터 조회 모드</h4>
+                        <p class="text-sm text-slate-500 mb-4">현재 화면에 과거에 아카이빙된(보관된) 데이터를 불러옵니다. <br><span
+                                class="text-amber-600 font-bold">주의: 조회 모드에서는 데이터 수정이 불가능합니다.</span></p>
+                        <button id="btnToggleArchive" onclick="toggleArchiveMode()"
+                            class="w-full py-3 bg-white border border-slate-300 hover:bg-amber-50 hover:border-amber-300 text-slate-700 font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm">
+                            <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                                </path>
+                            </svg>
+                            <span>아카이브 데이터 조회하기</span>
+                        </button>
+                    </div>
+                    <hr class="border-slate-100">
+                    <div
+                        class="bg-white p-5 rounded-xl border-2 border-indigo-50 hover:border-indigo-100 transition-colors">
+                        <h4 class="text-base font-bold text-indigo-900 mb-2">데이터 아카이빙 (보관 처리)</h4>
+                        <p class="text-sm text-slate-500 mb-4">
+                            처리가 완료된 오래된 데이터를 별도 저장소로 이동하여 시스템 속도를 개선합니다.
+                        </p>
+                        <div class="flex items-center gap-3 mb-4 bg-indigo-50/50 p-3 rounded-lg">
+                            <span class="text-sm font-bold text-indigo-700">기준: 처리완료 상태 & </span>
+                            <select id="archiveThreshold"
+                                class="bg-white border border-indigo-200 text-indigo-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2">
+                                <option value="1">1개월 이전</option>
+                                <option value="3" selected>3개월 이전</option>
+                                <option value="6">6개월 이전</option>
+                                <option value="12">1년 이전</option>
+                            </select>
+                            <span class="text-sm font-bold text-indigo-700">데이터</span>
+                        </div>
+                        <button onclick="archiveProcessedData()"
+                            class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors shadow-md flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4">
+                                </path>
+                            </svg>
+                            아카이빙 실행
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log Modal (Existing) -->
+<div id="logModal" class="fixed inset-0 z-[95] flex items-center justify-center modal-overlay hidden">
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col border border-[#F0E8E0]">
+        <div class="p-4 border-b border-[#E8DDD4] flex justify-between items-center bg-[#FAF3EE] rounded-t-xl">
+            <h3 class="text-lg font-bold text-[#3D2E24] flex items-center gap-2">데이터 변경 이력</h3>
+            <button onclick="closeLogModal()" class="text-[#B8A99C] hover:text-[#6B5D52]">✕</button>
+        </div>
+        <div id="logListContainer" class="flex-grow overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#FAF3EE]/50">
+        </div>
+    </div>
+</div>
+
+<!-- Other Modals (Column Filter, Reason Input, Combined, Delete, Bulk Update) -->
+<div id="columnFilterModal"
+    class="absolute bg-white border border-[#E8DDD4] shadow-xl rounded-lg p-3 z-[90] hidden w-64 text-sm">
+    <div class="flex justify-between items-center mb-2 pb-2 border-b border-[#F0E8E0]"><span
+            class="font-bold text-[#5C4A3E]">필터 선택</span><button onclick="closeColumnFilterModal()"
+            class="text-[#B8A99C] hover:text-[#6B5D52]">✕</button></div>
+    <div class="flex items-center gap-2 mb-2 px-1"><input type="checkbox" id="columnFilterSelectAll"
+            class="custom-checkbox" onchange="toggleColumnFilterSelectAll(this.checked)"><label
+            for="columnFilterSelectAll" class="text-[#6B5D52] cursor-pointer select-none">전체 선택</label></div>
+    <div id="columnFilterList" class="max-h-60 overflow-y-auto custom-scrollbar space-y-1 mb-3"></div>
+    <div class="flex gap-2"><button onclick="clearColumnFilter()"
+            class="flex-1 py-1.5 border border-[#D4C4B8] rounded text-[#6B5D52] hover:bg-[#FAF3EE] text-xs font-bold">초기화</button><button
+            onclick="applyColumnFilter()"
+            class="flex-1 py-1.5 bg-[#D97756] text-white rounded hover:bg-[#C4623E] text-xs font-bold">적용</button>
+    </div>
+</div>
+
+<div id="reasonInputModal" class="fixed inset-0 z-[80] flex items-center justify-center modal-overlay hidden">
+    <div
+        class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm transform transition-all scale-100 opacity-100 border border-[#F0E8E0]">
+        <div class="mb-4">
+            <h3 class="text-lg font-bold text-[#3D2E24]">기타 사유 입력</h3>
+            <p class="text-sm text-[#8B7B6E]">구체적인 사유를 입력해주세요.</p>
+        </div>
+        <input type="text" id="reasonDetailInput"
+            class="w-full px-4 py-2 border border-[#D4C4B8] rounded-lg focus:ring-2 focus:ring-[#D97756] outline-none mb-4"
+            onkeyup="if(event.key==='Enter') submitReasonInput()">
+        <div class="flex gap-2">
+            <button onclick="closeReasonInputModal()"
+                class="flex-1 py-2 border border-[#D4C4B8] rounded-lg text-[#5C4A3E] hover:bg-[#FAF3EE] font-medium">건너뛰기</button>
+            <button onclick="submitReasonInput()"
+                class="flex-1 py-2 bg-[#D97756] text-white rounded-lg hover:bg-[#C4623E] font-bold">저장</button>
+        </div>
+    </div>
+</div>
+
+<div id="combinedModal" class="fixed inset-0 z-[70] flex items-center justify-center modal-overlay hidden">
+    <div
+        class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-5xl transform transition-all scale-100 opacity-100 border border-slate-100">
+        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+                합포(묶음배송) 상품 관리
+            </h3>
+            <button onclick="closeCombinedModal()" class="text-slate-400 hover:text-slate-600">✕</button>
+        </div>
+        <div class="flex gap-2 mb-2 text-xs font-bold text-slate-500 px-1 select-none">
+            <div class="flex-grow">상품명 <span class="text-red-500">*</span></div>
+            <div class="w-32">주문번호</div>
+            <div class="w-32">할인내용</div>
+            <div class="w-24 text-right">할인금액</div>
+            <div class="w-24 text-right">상품금액</div>
+            <div class="w-8"></div>
+        </div>
+        <div id="combinedItemsList" class="space-y-2 mb-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-1">
+        </div>
+        <button onclick="addCombinedItemInput()"
+            class="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-indigo-500 transition-colors text-sm font-bold flex items-center justify-center gap-2 mb-4">상품
+            추가하기</button>
+        <div class="flex justify-between items-center bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6">
+            <div class="flex gap-6">
+                <div><span class="text-xs font-bold text-slate-500 block">총 할인금액</span><span
+                        class="text-lg font-bold text-rose-500" id="combinedDiscountPreview">₩0</span></div>
+                <div><span class="text-xs font-bold text-slate-500 block">총 상품금액</span><span
+                        class="text-lg font-bold text-indigo-600" id="combinedTotalPreview">₩0</span></div>
+            </div>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="closeCombinedModal()"
+                class="flex-1 py-2.5 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors">취소</button>
+            <button onclick="saveCombinedItems()"
+                class="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 shadow-md transition-colors">적용하기</button>
+        </div>
+    </div>
+</div>
+
+<div id="userModal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden">
+    <div
+        class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md transform transition-all scale-100 opacity-100 border border-[#F0E8E0]">
+        <div class="text-center mb-6">
+            <h3 class="text-xl font-bold text-[#2D1F17]">작업자 이름 설정</h3>
+        </div>
+        <input type="text" id="usernameInput"
+            class="w-full px-4 py-3 border border-[#D4C4B8] rounded-lg text-center font-bold mb-4" placeholder="예: 김담당"
+            onkeyup="if(event.key === 'Enter') saveUserIdentity()">
+        <button onclick="saveUserIdentity()"
+            class="w-full py-3 bg-[#D97756] hover:bg-[#C4623E] text-white font-bold rounded-lg shadow-lg">
+            확인</button>
+    </div>
+</div>
+
+<div id="deleteModal" class="fixed inset-0 z-[60] flex items-center justify-center modal-overlay hidden">
+    <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm text-center">
+        <h3 class="text-lg font-bold mb-2 text-[#2D1F17]">삭제 확인</h3>
+        <p class="text-sm text-[#8B7B6E] mb-4" id="deleteModalMessage">삭제하시겠습니까?</p>
+        <div class="flex gap-3">
+            <button onclick="closeDeleteModal()" class="flex-1 py-2 border rounded-lg hover:bg-[#FAF3EE]">취소</button>
+            <button id="confirmDeleteBtn" class="flex-1 py-2 bg-[#B85C4A] text-white rounded-lg font-bold">삭제</button>
+        </div>
+    </div>
+</div>
+
+<div id="bulkUpdateModal" class="fixed inset-0 z-[85] flex items-center justify-center modal-overlay hidden">
+    <div class="bg-white rounded-xl p-6 w-full max-w-sm shadow-2xl">
+        <h3 class="text-lg font-bold mb-4">일괄 수정</h3>
+        <div class="space-y-3 mb-6">
+            <select id="bulkFieldSelect" class="w-full px-3 py-2 border rounded-lg text-sm"
+                onchange="updateBulkValueInput(this.value)">
+                <option value="_status">처리상태</option>
+                <option value="_pic">처리자</option>
+                <option value="_channel">판매처</option>
+                <option value="_reason">사유</option>
+                <option value="_courier">배송사</option>
+                <option value="_product_condition">제품상태</option>
+            </select>
+            <div id="bulkValueContainer"></div>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="closeBulkUpdateModal()" class="flex-1 py-2 border rounded-lg">취소</button>
+            <button onclick="submitBulkUpdate()" class="flex-1 py-2 bg-[#D97756] text-white rounded-lg">적용</button>
+        </div>
+    </div>
+</div>
