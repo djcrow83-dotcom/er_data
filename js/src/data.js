@@ -587,8 +587,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // === [BUG FIX] ===
     // HTML과 JS를 분리하면서 누락되었던 전역 초기화 함수들을 호출합니다.
     // HTML 문서가 전부 파싱된 후 인증 절차를 시작합니다.
-    if (typeof initSystem === 'function') {
-        initSystem();
+    if (typeof window.initSystem === 'function') {
+        window.initSystem();
     }
     if (typeof window.initializeTheme === 'function') {
         window.initializeTheme();
