@@ -413,6 +413,19 @@ window.applyLocalFilters = (clearSelection = false) => {
 
 window.toggleDashboard = () => { const content = document.getElementById('dashboardContent'); if (content) content.classList.toggle('hidden'); const arrow = document.getElementById('dashboardArrow'); if (arrow) arrow.style.transform = content.classList.contains('hidden') ? '' : 'rotate(180deg)'; if (content && !content.classList.contains('hidden')) window.renderRefundStats(); };
 window.addNewRow = async () => {
+    // 3순위 취약점 방어: 껍데기 데이터 무한 생성 방지
+    const emptyRowExists = standardData.some(d =>
+        d._status === '미처리' &&
+        d._customer === '신규고객' &&
+        d._product === '상품명을 입력해주세요' &&
+        d._order_id === '주문번호 입력'
+    );
+
+    if (emptyRowExists) {
+        window.showToast("이미 작성 대기 중인 신규 항목이 있습니다. 내용을 먼저 입력해주세요.");
+        return;
+    }
+
     const newId = crypto.randomUUID();
     // [FIX] Restore raw collection path
     await setDoc(doc(db, COLLECTION_NAME, newId), {
