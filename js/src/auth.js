@@ -152,7 +152,8 @@ window.completeLogin = async (name, id, role) => {
         window.syncData();
 
         // --- 🛡️ [보안 패치] 내 계정 권한 실시간 감시 (세션 무결성 방어) ---
-        onSnapshot(doc(db, USERS_COLLECTION_NAME, id), (docSnap) => {
+        if (window.unsubscribeAuthRole) window.unsubscribeAuthRole();
+        window.unsubscribeAuthRole = onSnapshot(doc(db, USERS_COLLECTION_NAME, id), (docSnap) => {
             if (!docSnap.exists()) {
                 window.showToast("관리자에 의해 계정 권한이 회수되었습니다.");
                 signOut(auth);

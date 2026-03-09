@@ -157,8 +157,7 @@ window.cleanupPendingData = async () => {
     }
 
     try {
-        const pendingItems = standardData.filter(d => d._archiving_status === 'pending' || d._delete_status === 'pending');
-
+        const pendingItems = standardData.filter(d => false); // All pending statuses and logic have been removed from the application
         if (pendingItems.length === 0) return;
 
         let batch = writeBatch(db);
@@ -171,8 +170,7 @@ window.cleanupPendingData = async () => {
             const ref = doc(db, LIVE_COLLECTION_NAME, docId);
 
             batch.update(ref, {
-                _archiving_status: deleteField(),
-                _delete_status: deleteField()
+                // Fields are already removed
             });
 
             batchCount++;
@@ -239,7 +237,10 @@ window.parseDate = (s) => {
 };
 window.parseMoney = (v) => parseInt(String(v).replace(/[^0-9-]/g, '')) || 0;
 window.formatMoney = (n) => '₩' + n.toLocaleString();
-window.isUrgent = (r) => (r._status !== '처리완료' && (Date.now() - window.parseDate(r._date)) > 259200000);
+window.isUrgent = (r) => {
+    const ts = window.parseDate(r._date);
+    return r._status !== '처리완료' && ts > 0 && (Date.now() - ts) > 259200000;
+};
 window.getStatusIcon = (s) => s === '처리완료' ? '✔' : (s === '보류' ? '!' : '-');
 window.showToast = (m) => {
     const container = document.getElementById('toast-container');
@@ -274,12 +275,18 @@ window.updateSelectionUI = () => {
 window.updateTableCheckboxes = () => { document.querySelectorAll('.row-check').forEach(c => c.checked = selectedIds.has(c.value)); };
 
 window.getMergedData = () => {
-    return standardData
-        .filter(d => d._customer || d._product || d._order_id)
-        .map(d => {
-            const pending = unsavedChanges.get(String(d._id));
-            return pending ? { ...d, ...pending } : d;
-        });
+    const validData = standardData.filter(d => d._customer || d._product || d._order_id);
+    if (unsavedChanges.size === 0) return validData;
+
+    // 수정된 항목(unsavedChanges)이 있을 때만 해당 항목을 찾아 덮어쓰기 (방안 1)
+    const merged = [...validData];
+    for (const [id, pending] of unsavedChanges.entries()) {
+        const idx = merged.findIndex(d => String(d._id) === id);
+        if (idx !== -1) {
+            merged[idx] = { ...merged[idx], ...pending };
+        }
+    }
+    return merged;
 };
 
 window.updateKPI = () => {
@@ -496,7 +503,10 @@ window.updateField = (id, field, value) => {
         const getVal = (k) => (updates.hasOwnProperty(k) ? updates[k] : (currentPending.hasOwnProperty(k) ? currentPending[k] : row[k]));
         const p = window.parseMoney(getVal('_product_price')); const d = window.parseMoney(getVal('_discount_amount')); let pay = window.parseMoney(getVal('_payment_amount'));
         if (field === '_product_price' || field === '_discount_amount') { pay = p - d; updates['_payment_amount'] = window.formatMoney(pay); }
-        const sPaid = window.parseMoney(getVal('_shipping_cost_paid')); updates['_refund_amount'] = window.formatMoney(pay - sPaid);
+        // [FIX] Ensure getVal returns at least '0' if undefined to prevent NaN
+        const sPaidVal = getVal('_shipping_cost_paid');
+        const sPaid = window.parseMoney(sPaidVal === undefined || sPaidVal === '' ? '0' : sPaidVal);
+        updates['_refund_amount'] = window.formatMoney(pay - sPaid);
     }
     if (field === '_status' && value === '처리완료') updates['_pic'] = currentUserName;
     unsavedChanges.set(strId, { ...currentPending, ...updates }); window.updateSaveButton();
@@ -672,7 +682,8 @@ window.completeLogin = async (name, id, role) => {
         window.syncData();
 
         // --- 🛡️ [보안 패치] 내 계정 권한 실시간 감시 (세션 무결성 방어) ---
-        onSnapshot(doc(db, USERS_COLLECTION_NAME, id), (docSnap) => {
+        if (window.unsubscribeAuthRole) window.unsubscribeAuthRole();
+        window.unsubscribeAuthRole = onSnapshot(doc(db, USERS_COLLECTION_NAME, id), (docSnap) => {
             if (!docSnap.exists()) {
                 window.showToast("관리자에 의해 계정 권한이 회수되었습니다.");
                 signOut(auth);
@@ -959,17 +970,7 @@ window.archiveProcessedData = async () => {
             for (const chunk of chunks) {
                 const batch = writeBatch(db);
                 chunk.forEach(docData => {
-                    // [FIX] Restore raw collection path
-                    batch.set(doc(db, LIVE_COLLECTION_NAME, docData._id.toString()), { _archiving_status: 'pending' }, { merge: true });
-                });
-                await batch.commit();
-            }
-
-            for (const chunk of chunks) {
-                const batch = writeBatch(db);
-                chunk.forEach(docData => {
                     const archiveData = { ...docData };
-                    delete archiveData._archiving_status;
                     // [FIX] Restore raw collection path
                     batch.set(doc(db, ARCHIVE_COLLECTION_NAME, docData._id.toString()), archiveData);
                 });
@@ -1195,15 +1196,7 @@ window.promptDeleteSelected = () => {
 document.getElementById('confirmDeleteBtn').onclick = async () => {
     window.showLoading(true);
     try {
-        const batchSize = 200;
-        for (let i = 0; i < deleteTargetIds.length; i += batchSize) {
-            const chunk = deleteTargetIds.slice(i, i + batchSize);
-            const batch = writeBatch(db);
-            // [FIX] Restore raw collection path
-            chunk.forEach(id => batch.set(doc(db, COLLECTION_NAME, String(id)), { _delete_status: 'pending' }, { merge: true }));
-            await batch.commit();
-        }
-
+        const batchSize = 400; // 파이어베이스 배치 권장 최대치는 500이므로 400으로 넉넉하게 잡음
         for (let i = 0; i < deleteTargetIds.length; i += batchSize) {
             const chunk = deleteTargetIds.slice(i, i + batchSize);
             const batch = writeBatch(db);
@@ -1365,6 +1358,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLogout = document.getElementById('btnLogout');
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
+            if (window.unsubscribeAuthRole) {
+                window.unsubscribeAuthRole();
+                window.unsubscribeAuthRole = null;
+            }
             await signOut(auth);
             localStorage.clear();
             window.location.reload();

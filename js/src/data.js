@@ -213,17 +213,7 @@ window.archiveProcessedData = async () => {
             for (const chunk of chunks) {
                 const batch = writeBatch(db);
                 chunk.forEach(docData => {
-                    // [FIX] Restore raw collection path
-                    batch.set(doc(db, LIVE_COLLECTION_NAME, docData._id.toString()), { _archiving_status: 'pending' }, { merge: true });
-                });
-                await batch.commit();
-            }
-
-            for (const chunk of chunks) {
-                const batch = writeBatch(db);
-                chunk.forEach(docData => {
                     const archiveData = { ...docData };
-                    delete archiveData._archiving_status;
                     // [FIX] Restore raw collection path
                     batch.set(doc(db, ARCHIVE_COLLECTION_NAME, docData._id.toString()), archiveData);
                 });
@@ -449,15 +439,7 @@ window.promptDeleteSelected = () => {
 document.getElementById('confirmDeleteBtn').onclick = async () => {
     window.showLoading(true);
     try {
-        const batchSize = 200;
-        for (let i = 0; i < deleteTargetIds.length; i += batchSize) {
-            const chunk = deleteTargetIds.slice(i, i + batchSize);
-            const batch = writeBatch(db);
-            // [FIX] Restore raw collection path
-            chunk.forEach(id => batch.set(doc(db, COLLECTION_NAME, String(id)), { _delete_status: 'pending' }, { merge: true }));
-            await batch.commit();
-        }
-
+        const batchSize = 400; // 파이어베이스 배치 권장 최대치는 500이므로 400으로 넉넉하게 잡음
         for (let i = 0; i < deleteTargetIds.length; i += batchSize) {
             const chunk = deleteTargetIds.slice(i, i + batchSize);
             const batch = writeBatch(db);
@@ -619,6 +601,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLogout = document.getElementById('btnLogout');
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
+            if (window.unsubscribeAuthRole) {
+                window.unsubscribeAuthRole();
+                window.unsubscribeAuthRole = null;
+            }
             await signOut(auth);
             localStorage.clear();
             window.location.reload();

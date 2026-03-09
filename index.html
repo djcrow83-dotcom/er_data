@@ -445,7 +445,7 @@
                 <div class="flex gap-2 w-full sm:w-auto">
                     <div class="relative w-full sm:w-64">
                         <input type="text" id="tableSearch" placeholder="통합 검색 (Space로 구분, Enter)"
-                            onkeyup="if(event.key === 'Enter') window.applyLocalFilters(true)"
+                            oninput="window.debounceSearch()"
                             class="w-full pl-10 pr-4 py-2 bg-[#FAF3EE] border border-[#D4C4B8] text-[#2D1F17] text-sm rounded-lg focus:ring-[#D97756] focus:border-[#D97756] transition-colors">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="w-4 h-4 text-[#B8A99C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

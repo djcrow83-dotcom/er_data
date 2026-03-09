@@ -131,7 +131,10 @@ window.updateField = (id, field, value) => {
         const getVal = (k) => (updates.hasOwnProperty(k) ? updates[k] : (currentPending.hasOwnProperty(k) ? currentPending[k] : row[k]));
         const p = window.parseMoney(getVal('_product_price')); const d = window.parseMoney(getVal('_discount_amount')); let pay = window.parseMoney(getVal('_payment_amount'));
         if (field === '_product_price' || field === '_discount_amount') { pay = p - d; updates['_payment_amount'] = window.formatMoney(pay); }
-        const sPaid = window.parseMoney(getVal('_shipping_cost_paid')); updates['_refund_amount'] = window.formatMoney(pay - sPaid);
+        // [FIX] Ensure getVal returns at least '0' if undefined to prevent NaN
+        const sPaidVal = getVal('_shipping_cost_paid');
+        const sPaid = window.parseMoney(sPaidVal === undefined || sPaidVal === '' ? '0' : sPaidVal);
+        updates['_refund_amount'] = window.formatMoney(pay - sPaid);
     }
     if (field === '_status' && value === '처리완료') updates['_pic'] = currentUserName;
     unsavedChanges.set(strId, { ...currentPending, ...updates }); window.updateSaveButton();

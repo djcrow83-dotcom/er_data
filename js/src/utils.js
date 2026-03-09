@@ -13,8 +13,7 @@ window.cleanupPendingData = async () => {
     }
 
     try {
-        const pendingItems = standardData.filter(d => d._archiving_status === 'pending' || d._delete_status === 'pending');
-
+        const pendingItems = standardData.filter(d => false); // All pending statuses and logic have been removed from the application
         if (pendingItems.length === 0) return;
 
         let batch = writeBatch(db);
@@ -27,8 +26,7 @@ window.cleanupPendingData = async () => {
             const ref = doc(db, LIVE_COLLECTION_NAME, docId);
 
             batch.update(ref, {
-                _archiving_status: deleteField(),
-                _delete_status: deleteField()
+                // Fields are already removed
             });
 
             batchCount++;
@@ -95,7 +93,10 @@ window.parseDate = (s) => {
 };
 window.parseMoney = (v) => parseInt(String(v).replace(/[^0-9-]/g, '')) || 0;
 window.formatMoney = (n) => '₩' + n.toLocaleString();
-window.isUrgent = (r) => (r._status !== '처리완료' && (Date.now() - window.parseDate(r._date)) > 259200000);
+window.isUrgent = (r) => {
+    const ts = window.parseDate(r._date);
+    return r._status !== '처리완료' && ts > 0 && (Date.now() - ts) > 259200000;
+};
 window.getStatusIcon = (s) => s === '처리완료' ? '✔' : (s === '보류' ? '!' : '-');
 window.showToast = (m) => {
     const container = document.getElementById('toast-container');
@@ -130,12 +131,18 @@ window.updateSelectionUI = () => {
 window.updateTableCheckboxes = () => { document.querySelectorAll('.row-check').forEach(c => c.checked = selectedIds.has(c.value)); };
 
 window.getMergedData = () => {
-    return standardData
-        .filter(d => d._customer || d._product || d._order_id)
-        .map(d => {
-            const pending = unsavedChanges.get(String(d._id));
-            return pending ? { ...d, ...pending } : d;
-        });
+    const validData = standardData.filter(d => d._customer || d._product || d._order_id);
+    if (unsavedChanges.size === 0) return validData;
+
+    // 수정된 항목(unsavedChanges)이 있을 때만 해당 항목을 찾아 덮어쓰기 (방안 1)
+    const merged = [...validData];
+    for (const [id, pending] of unsavedChanges.entries()) {
+        const idx = merged.findIndex(d => String(d._id) === id);
+        if (idx !== -1) {
+            merged[idx] = { ...merged[idx], ...pending };
+        }
+    }
+    return merged;
 };
 
 window.updateKPI = () => {
