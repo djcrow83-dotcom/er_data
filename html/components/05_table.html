@@ -1,11 +1,11 @@
-<!-- 데이터 리스트 -->
-<section class="bg-white rounded-lg shadow-sm border border-[#E8DDD4] overflow-hidden flex flex-col">
-    <div class="p-5 border-b border-[#E8DDD4]">
+﻿<!-- 데이터 리스트 -->
+<section class="bg-white rounded-lg shadow-sm border border-[#E2E8F0] overflow-hidden flex flex-col">
+    <div class="p-5 border-b border-[#E2E8F0]">
         <!-- 필터 -->
         <div class="flex items-center gap-2 mb-3 flex-wrap">
             <div id="statusButtons" class="flex flex-wrap gap-2"></div>
             <button onclick="resetStatusFilter()"
-                class="text-xs text-[#B8A99C] hover:text-[#D97756] ml-1 whitespace-nowrap">
+                class="text-xs text-[#94A3B8] hover:text-[#475569] ml-1 whitespace-nowrap">
                 <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                     </path>
@@ -16,33 +16,33 @@
         <!-- 도구 바 -->
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-2">
-                <h3 class="text-lg font-bold text-[#3D2E24]" id="tableTitle">상세 내역 리스트</h3>
+                <h3 class="text-lg font-bold text-[#1E293B]" id="tableTitle">상세 내역 리스트</h3>
                 <span id="activeFilterBadge"
-                    class="hidden px-2 py-1 bg-[#FDF0EB] text-[#C4623E] text-xs font-bold rounded-md"></span>
+                    class="hidden px-2 py-1 bg-[#F1F5F9] text-[#334155] text-xs font-bold rounded-md"></span>
 
                 <div id="bulkActionContainer"
-                    class="hidden flex items-center gap-2 ml-4 p-1 bg-[#FDF0EB] border border-[#FDF0EB] rounded-lg animate-fade-in">
-                    <span class="text-xs font-bold text-[#C4623E] ml-2" id="selectedCountDisplay">0개
+                    class="hidden flex items-center gap-2 ml-4 p-1 bg-[#F1F5F9] border border-[#F1F5F9] rounded-lg animate-fade-in">
+                    <span class="text-xs font-bold text-[#334155] ml-2" id="selectedCountDisplay">0개
                         선택</span>
-                    <div class="h-4 w-px bg-[#F5D5C8] mx-1"></div>
+                    <div class="h-4 w-px bg-[#E2E8F0] mx-1"></div>
                     <select onchange="if(this.value){ applyBulkStatus(this.value); this.value=''; }"
-                        class="text-xs border-[#F0C9B8] rounded px-2 py-1 focus:ring-[#D97756] outline-none">
+                        class="text-xs border-[#F0C9B8] rounded px-2 py-1 focus:ring-[#475569] outline-none">
                         <option value="">상태 변경...</option>
                         <option value="처리완료">처리완료</option>
                         <option value="보류">보류</option>
                         <option value="미처리">미처리</option>
                     </select>
                     <button onclick="applyBulkPicToSelf()"
-                        class="px-2 py-1 text-xs bg-white border border-[#F0C9B8] hover:bg-[#FDF0EB] text-[#C4623E] rounded whitespace-nowrap">담당자
+                        class="px-2 py-1 text-xs bg-white border border-[#F0C9B8] hover:bg-[#F1F5F9] text-[#334155] rounded whitespace-nowrap">담당자
                         배정</button>
-                    <div class="h-4 w-px bg-[#F5D5C8] mx-1"></div>
+                    <div class="h-4 w-px bg-[#E2E8F0] mx-1"></div>
                     <button id="bulkDeleteBtn" onclick="promptDeleteSelected()"
-                        class="px-2 py-1 text-xs bg-[#B85C4A] hover:bg-[#944839] text-white rounded whitespace-nowrap">삭제</button>
+                        class="px-2 py-1 text-xs bg-[#C85A6F] hover:bg-[#C85A6F] text-white rounded whitespace-nowrap">삭제</button>
                 </div>
 
                 <div class="flex gap-2 items-center ml-2">
                     <button id="btnAddRow" onclick="window.addNewRow()"
-                        class="px-3 py-1.5 text-xs font-bold text-white bg-[#6B8F5E] hover:bg-[#5A7A4E] rounded-md transition-colors flex items-center gap-1 shadow-sm">
+                        class="px-3 py-1.5 text-xs font-bold text-white bg-[#449171] hover:bg-[#5A7A4E] rounded-md transition-colors flex items-center gap-1 shadow-sm">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
                             </path>
@@ -50,7 +50,7 @@
                         신규 등록
                     </button>
                     <button onclick="document.getElementById('listCsvInput').click()"
-                        class="px-3 py-1.5 text-xs font-bold text-[#D97756] bg-[#FDF0EB] hover:bg-[#F5D5C8] rounded-md transition-colors flex items-center gap-1 shadow-sm">
+                        class="px-3 py-1.5 text-xs font-bold text-[#475569] bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-md transition-colors flex items-center gap-1 shadow-sm">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
@@ -64,32 +64,32 @@
             <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
                 <div class="flex items-center gap-1 flex-wrap">
                     <button onclick="setDateRange('all')" id="dr-all"
-                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-[#D97756] text-white border-[#D97756]">전체</button>
+                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-[#475569] text-white border-[#475569]">전체</button>
                     <button onclick="setDateRange('today')" id="dr-today"
-                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">오늘</button>
+                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#475569] border-[#E2E8F0] hover:border-[#94A3B8] hover:text-[#475569]">오늘</button>
                     <button onclick="setDateRange('7d')" id="dr-7d"
-                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">7일</button>
+                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#475569] border-[#E2E8F0] hover:border-[#94A3B8] hover:text-[#475569]">7일</button>
                     <button onclick="setDateRange('30d')" id="dr-30d"
-                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">30일</button>
+                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#475569] border-[#E2E8F0] hover:border-[#94A3B8] hover:text-[#475569]">30일</button>
                     <button onclick="setDateRange('custom')" id="dr-custom"
-                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">직접입력</button>
+                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#475569] border-[#E2E8F0] hover:border-[#94A3B8] hover:text-[#475569]">직접입력</button>
                 </div>
                 <div id="customDatePanel" class="hidden flex items-center gap-1">
                     <input type="date" id="dateFrom"
-                        class="px-2 py-1.5 text-xs border border-[#D4C4B8] rounded-lg focus:ring-[#D97756] focus:border-[#D97756]"
+                        class="px-2 py-1.5 text-xs border border-[#CBD5E1] rounded-lg focus:ring-[#475569] focus:border-[#475569]"
                         onchange="applyDateRange()">
-                    <span class="text-xs text-[#B8A99C]">~</span>
+                    <span class="text-xs text-[#94A3B8]">~</span>
                     <input type="date" id="dateTo"
-                        class="px-2 py-1.5 text-xs border border-[#D4C4B8] rounded-lg focus:ring-[#D97756] focus:border-[#D97756]"
+                        class="px-2 py-1.5 text-xs border border-[#CBD5E1] rounded-lg focus:ring-[#475569] focus:border-[#475569]"
                         onchange="applyDateRange()">
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
                     <div class="relative w-full sm:w-64">
                         <input type="text" id="tableSearch" placeholder="통합 검색 (Space로 구분, Enter)"
                             oninput="window.debounceSearch()"
-                            class="w-full pl-10 pr-4 py-2 bg-[#FAF3EE] border border-[#D4C4B8] text-[#2D1F17] text-sm rounded-lg focus:ring-[#D97756] focus:border-[#D97756] transition-colors">
+                            class="w-full pl-10 pr-4 py-2 bg-[#F8FAFC] border border-[#CBD5E1] text-[#0F172A] text-sm rounded-lg focus:ring-[#475569] focus:border-[#475569] transition-colors">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="w-4 h-4 text-[#B8A99C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-[#94A3B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
@@ -105,12 +105,12 @@
     </div>
 
     <div class="overflow-x-auto overflow-y-auto custom-scrollbar flex-grow" style="height: 600px;">
-        <table class="min-w-full divide-y divide-[#E8DDD4]">
-            <thead class="bg-[#FAF3EE]" id="tableHeaderRow"></thead>
-            <tbody id="tableBody" class="bg-white divide-y divide-[#E8DDD4] text-sm"></tbody>
+        <table class="min-w-full divide-y divide-[#E2E8F0]">
+            <thead class="bg-[#F8FAFC]" id="tableHeaderRow"></thead>
+            <tbody id="tableBody" class="bg-white divide-y divide-[#E2E8F0] text-sm"></tbody>
         </table>
     </div>
-    <div id="emptyState" class="hidden p-10 text-center text-[#B8A99C]">데이터가 없습니다.</div>
+    <div id="emptyState" class="hidden p-10 text-center text-[#94A3B8]">데이터가 없습니다.</div>
 </section>
 </div>
 </main>

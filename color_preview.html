@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette Preview (Final Muted Badges)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8FAFC;
+            color: #0F172A;
+        }
+    </style>
+</head>
+
+<body class="p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-2">디자인 개편 색상표 미리보기 (최종본)</h1>
+        <p class="text-slate-500 mb-8">안정감과 신뢰감을 주는 <strong>완벽한 무채색 베이스 & 파스텔톤 뱃지</strong> 테마입니다.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- 기존 컬러 (Warm/Terracotta) -->
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm opacity-30 relative">
+                <div
+                    class="absolute inset-0 z-10 bg-white/30 backdrop-blur-[1px] rounded-xl flex items-center justify-center">
+                    <span class="bg-gray-800 text-white px-3 py-1 rounded font-bold shadow select-none">이전 시안
+                        (폐기)</span>
+                </div>
+                <h2 class="text-xl font-bold mb-4 text-[#3D2E24] border-b pb-2">기존 쨍한 원색 뱃지</h2>
+                <!-- 기존 뱃지 샘플 -->
+                <div class="pt-2 border-t border-gray-100 mt-4">
+                    <div class="flex gap-2 text-xs font-bold mt-4">
+                        <span class="px-2 py-1 rounded border border-emerald-200"
+                            style="background-color: #F0FDF4; color: #059669">처리완료 (너무 쨍함)</span>
+                        <span class="px-2 py-1 rounded border border-amber-200"
+                            style="background-color: #FFFBEB; color: #D97706">보류 (너무 쨍함)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 신규 컬러 (Soft Pastel Badges + Muted Slate) -->
+            <div
+                class="bg-white p-6 rounded-xl border border-slate-300 shadow-xl transform scale-105 transition-transform relative ring-2 ring-emerald-300">
+                <div
+                    class="absolute -top-3 -right-3 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                    뱃지 원색 제거(파스텔톤 적용)</div>
+                <h2 class="text-xl font-bold mb-4 text-slate-800 border-b pb-2 border-slate-200">개편 시안 (뱃지 톤다운)</h2>
+
+                <div class="space-y-4">
+                    <div>
+                        <div class="text-sm text-slate-500 mb-1 flex items-center justify-between">
+                            메인 배경 및 포인트 버튼 (이전 확정본)
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="w-16 h-10 rounded border flex items-center justify-center text-xs font-bold shadow-sm"
+                                style="background-color: #F8FAFC; border-color: #E2E8F0; color: #0F172A">Base</div>
+                            <div class="px-4 py-2 rounded text-white text-xs font-bold border shadow-sm"
+                                style="background-color: #475569">버튼 (Slate)</div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-lg border border-slate-100">
+                        <div class="text-sm font-bold text-slate-800 mb-2 border-b border-slate-200 pb-1">상태 뱃지 (수정됨)
+                        </div>
+                        <div class="flex gap-3 mt-3 text-xs font-bold">
+                            <!-- 처리 완료: 쨍한 초록(#059669) -> 눈이 편한 채도 낮은 민트/그레이 그린(#449171) -->
+                            <span class="px-2.5 py-1.5 rounded items-center shadow-sm"
+                                style="background-color: #E6F3EE; color: #449171; border: 1px solid #CDE2D8">✔ 처리완료
+                                (#449171)</span>
+
+                            <!-- 보류: 쨍한 주황/노랑(#D97706) -> 차분한 연갈색/골드(#B89254) -->
+                            <span class="px-2.5 py-1.5 rounded items-center shadow-sm"
+                                style="background-color: #F9F4EB; color: #B89254; border: 1px solid #EBE1CE">! 보류
+                                (#B89254)</span>
+
+                            <!-- 오류/삭제: 일관성을 위해 살짝 부드러운 장미색(#C85A6F)으로 톤다운 -->
+                            <span class="px-2.5 py-1.5 rounded items-center shadow-sm"
+                                style="background-color: #F9EAEF; color: #C85A6F; border: 1px solid #F0D5DB">-
+                                오류/삭제</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-3 bg-white px-2 py-1 inline-block rounded border">💡눈을
+                            찌르는 느낌이 없도록 <b>탁한 무채색을 섞어 부드러운 파스텔 톤</b>으로 변경했습니다.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-8 p-6 bg-white border border-slate-200 rounded-xl shadow-sm">
+            <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                테이블 렌더링 시뮬레이션 (최종)
+            </h3>
+            <div class="border border-slate-200 rounded-lg overflow-hidden">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200">
+                        <tr>
+                            <th class="px-4 py-3">상태</th>
+                            <th class="px-4 py-3">고객명</th>
+                            <th class="px-4 py-3">상품명</th>
+                            <th class="px-4 py-3 text-right">환불액</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-4 py-2"><span class="font-bold text-xs px-2 py-1 rounded"
+                                    style="background-color: #E6F3EE; color: #449171; border: 1px solid #CDE2D8">✔
+                                    처리완료</span></td>
+                            <td class="px-4 py-2 text-slate-800 font-medium">홍길동</td>
+                            <td class="px-4 py-2 text-slate-600">여름 반팔 티셔츠</td>
+                            <td class="px-4 py-2 text-slate-800 text-right font-bold">₩ 0</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-4 py-2"><span class="font-bold text-xs px-2 py-1 rounded"
+                                    style="background-color: #F9F4EB; color: #B89254; border: 1px solid #EBE1CE">!
+                                    보류</span></td>
+                            <td class="px-4 py-2 text-slate-800 font-medium">이철민</td>
+                            <td class="px-4 py-2 text-slate-600">가을 니트 카디건</td>
+                            <td class="px-4 py-2 text-slate-800 text-right font-bold">₩ 0</td>
+                        </tr>
+                        <!-- 차분한 Slate 배경 -->
+                        <tr class="bg-slate-100/80 hover:bg-slate-100 transition-colors">
+                            <td class="px-4 py-2"><span
+                                    class="text-slate-500 font-bold text-xs bg-white border border-slate-300 shadow-sm px-2 py-1 rounded">-
+                                    미처리</span></td>
+                            <td class="px-4 py-2 text-slate-800 font-medium">김기수</td>
+                            <td class="px-4 py-2 text-slate-600">청바지 (Light Blue)</td>
+                            <td class="px-4 py-2 text-slate-800 text-right font-bold">₩ 35,000</td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-4 py-2"><span class="font-bold text-xs px-2 py-1 rounded"
+                                    style="background-color: #F9EAEF; color: #C85A6F; border: 1px solid #F0D5DB">기타
+                                    에러</span></td>
+                            <td class="px-4 py-2 text-slate-800 font-medium">이지은</td>
+                            <td class="px-4 py-2 text-slate-600">원피스 블랙</td>
+                            <td class="px-4 py-2 text-slate-800 text-right font-bold">₩ 50,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="mt-4 text-sm text-slate-500">배경, 버튼, 표의 색상, 상태 뱃지까지 모든 구성 요소가 원색 없이 <b>한 톤 내려간 무채색(Pastel
+                    Slate)</b>으로 통일되었습니다. 극강의 눈의 편안함을 자랑합니다.</p>
+        </div>
+    </div>
+</body>
+
+</html>

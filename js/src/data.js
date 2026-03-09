@@ -29,7 +29,7 @@
         }
 
         const cloud = document.getElementById('cloudStatus');
-        if (cloud) { cloud.innerText = "실시간 동기화됨"; cloud.className = "text-xs px-2 py-0.5 rounded-full bg-[#E8EDE2] text-[#5E7A4A] font-medium ml-2 tracking-normal"; }
+        if (cloud) { cloud.innerText = "실시간 동기화됨"; cloud.className = "text-xs px-2 py-0.5 rounded-full bg-[#E6F3EE] text-[#449171] font-medium ml-2 tracking-normal"; }
         window.showLoading(false);
     }, err => { window.showLoading(false); });
 };
@@ -40,7 +40,7 @@ window.openLogModal = async () => {
 
     container.innerHTML = '';
     const loadingText = document.createElement('div');
-    loadingText.className = 'p-4 text-center text-sm text-[#8B7B6E]';
+    loadingText.className = 'p-4 text-center text-sm text-[#64748B]';
     loadingText.textContent = '로딩 중...';
     container.appendChild(loadingText);
 
@@ -53,7 +53,7 @@ window.openLogModal = async () => {
 
         if (logs.length === 0) {
             const emptyText = document.createElement('div');
-            emptyText.className = 'p-4 text-center text-sm text-[#8B7B6E]';
+            emptyText.className = 'p-4 text-center text-sm text-[#64748B]';
             emptyText.textContent = '로그가 없습니다.';
             container.appendChild(emptyText);
             return;
@@ -61,7 +61,7 @@ window.openLogModal = async () => {
 
         logs.forEach(log => {
             const logCard = document.createElement('div');
-            logCard.className = 'bg-white p-3 rounded border border-[#E8DDD4] shadow-sm';
+            logCard.className = 'bg-white p-3 rounded border border-[#E2E8F0] shadow-sm';
 
             const headerFlex = document.createElement('div');
             headerFlex.className = 'flex justify-between text-xs font-bold text-[#5C4A3E] mb-1';
@@ -76,7 +76,7 @@ window.openLogModal = async () => {
             headerFlex.appendChild(timeSpan);
 
             const userDiv = document.createElement('div');
-            userDiv.className = 'text-[10px] text-[#8B7B6E] mb-1';
+            userDiv.className = 'text-[10px] text-[#64748B] mb-1';
             userDiv.textContent = `작업자: ${log.user}`;
 
             logCard.appendChild(headerFlex);
@@ -93,7 +93,7 @@ window.openLogModal = async () => {
                 const oldText = document.createTextNode(`${d.old} → `);
 
                 const newSpan = document.createElement('span');
-                newSpan.className = 'text-[#D97756]';
+                newSpan.className = 'text-[#475569]';
                 newSpan.textContent = d.new;
 
                 detailDiv.appendChild(fieldSpan);
@@ -297,17 +297,17 @@ window.loadUserList = async () => {
         container.innerHTML = snap.docs.map(d => {
             const u = d.data();
             const isAdm = u.role === 'admin' || u.role === 'system';
-            return `<div class="flex justify-between items-center p-3 hover:bg-[#FAF3EE] transition-colors">
+            return `<div class="flex justify-between items-center p-3 hover:bg-[#F8FAFC] transition-colors">
                         <div class="flex flex-col">
                             <div class="flex items-center gap-2">
-                                <span class="text-sm font-bold text-[#3D2E24]">${window.escapeHtml(u.displayName)}</span>
+                                <span class="text-sm font-bold text-[#1E293B]">${window.escapeHtml(u.displayName)}</span>
                                 <span class="text-[10px] px-1.5 py-0.5 rounded-full ${isAdm ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-500'} font-bold uppercase">${u.role}</span>
                             </div>
-                            <span class="text-[10px] text-[#8B7B6E]">Email: ${d.id}</span>
+                            <span class="text-[10px] text-[#64748B]">Email: ${d.id}</span>
                         </div>
-                        <button onclick="window.deleteUserAcc('${d.id}')" class="text-xs text-[#B85C4A] font-bold hover:underline">삭제</button>
+                        <button onclick="window.deleteUserAcc('${d.id}')" class="text-xs text-[#C85A6F] font-bold hover:underline">삭제</button>
                     </div>`;
-        }).join('') || '<div class="p-4 text-center text-[#B8A99C] text-xs">사용자가 없습니다.</div>';
+        }).join('') || '<div class="p-4 text-center text-[#94A3B8] text-xs">사용자가 없습니다.</div>';
     } catch (e) { container.innerHTML = '로드 실패'; }
 };
 
@@ -336,20 +336,20 @@ window.closeBulkUpdateModal = () => document.getElementById('bulkUpdateModal').c
 window.updateBulkValueInput = (f) => {
     const c = document.getElementById('bulkValueContainer');
     if (f === '_status') {
-        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none"><option value="미처리">미처리</option><option value="처리완료">처리완료</option><option value="보류">보류</option></select>`;
+        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none"><option value="미처리">미처리</option><option value="처리완료">처리완료</option><option value="보류">보류</option></select>`;
     } else if (f === '_product_condition') {
-        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + ['정상', '불량'].map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
+        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none">` + ['정상', '불량'].map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
     } else if (f === '_reason') {
         const reasonOptions = ['변심', '불량', '색상', '사이즈', '색상/사이즈', '수선', '오배송'];
-        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + reasonOptions.map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
+        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none">` + reasonOptions.map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
     } else if (f === '_shipping') {
         const shippingOptions = ['결제', '입금', '차감', '무상', '무료배송권', '동봉'];
-        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + shippingOptions.map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
+        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none">` + shippingOptions.map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
     } else if (f === '_pic') {
-        c.innerHTML = `<input type="text" id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">`;
+        c.innerHTML = `<input type="text" id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none">`;
         document.getElementById('bulkValueInput').value = currentUserName;
     } else {
-        c.innerHTML = `<input type="text" id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none" placeholder="내용 입력">`;
+        c.innerHTML = `<input type="text" id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none" placeholder="내용 입력">`;
     }
 };
 
@@ -475,8 +475,8 @@ document.getElementById('confirmDeleteBtn').onclick = async () => {
 
 window.setDateRange = (m) => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    document.querySelectorAll('[id^="dr-"]').forEach(b => b.className = "px-3 py-1 text-xs font-bold rounded border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]");
-    const activeBtn = document.getElementById(`dr-${m}`); if (activeBtn) activeBtn.className = "px-3 py-1 text-xs font-bold rounded border bg-[#D97756] text-white border-[#D97756]";
+    document.querySelectorAll('[id^="dr-"]').forEach(b => b.className = "px-3 py-1 text-xs font-bold rounded border transition-colors bg-white text-[#475569] border-[#E2E8F0] hover:border-[#94A3B8] hover:text-[#475569]");
+    const activeBtn = document.getElementById(`dr-${m}`); if (activeBtn) activeBtn.className = "px-3 py-1 text-xs font-bold rounded border bg-[#475569] text-white border-[#475569]";
     document.getElementById('customDatePanel').classList.toggle('hidden', m !== 'custom');
     if (m === 'all') { dateRangeFrom = null; dateRangeTo = null; }
     else if (m === 'today') { dateRangeFrom = today; dateRangeTo = today; }
@@ -504,7 +504,7 @@ window.filterByTotal = () => { window.resetFilters(); };
 
 window.openCombinedModal = (id) => { activeCombinedRowId = String(id); const row = standardData.find(d => String(d._id) === activeCombinedRowId); const container = document.getElementById('combinedItemsList'); container.innerHTML = ''; (row._product || '').split(' / ').forEach(p => window.addCombinedItemInput(p)); window.updateCombinedTotal(); document.getElementById('combinedModal').classList.remove('hidden'); };
 window.closeCombinedModal = () => document.getElementById('combinedModal').classList.add('hidden');
-window.addCombinedItemInput = (v = '') => { const div = document.createElement('div'); div.className = "flex gap-2 mb-2 items-center"; div.innerHTML = `<input type="text" value="${window.escapeHtml(v)}" class="flex-grow border border-[#D4C4B8] p-2 rounded text-sm outline-none comb-item-input" oninput="window.updateCombinedTotal()"><button onclick="this.parentElement.remove(); window.updateCombinedTotal();" class="text-[#B85C4A] px-2 font-bold">×</button>`; document.getElementById('combinedItemsList').appendChild(div); };
+window.addCombinedItemInput = (v = '') => { const div = document.createElement('div'); div.className = "flex gap-2 mb-2 items-center"; div.innerHTML = `<input type="text" value="${window.escapeHtml(v)}" class="flex-grow border border-[#CBD5E1] p-2 rounded text-sm outline-none comb-item-input" oninput="window.updateCombinedTotal()"><button onclick="this.parentElement.remove(); window.updateCombinedTotal();" class="text-[#C85A6F] px-2 font-bold">×</button>`; document.getElementById('combinedItemsList').appendChild(div); };
 window.updateCombinedTotal = () => { const count = document.querySelectorAll('.comb-item-input').length; document.getElementById('combinedTotalPreview').innerText = `${count}건 합산 중`; };
 window.saveCombinedItems = () => { const values = Array.from(document.querySelectorAll('.comb-item-input')).map(i => i.value.trim()).filter(v => v); window.updateField(activeCombinedRowId, '_product', values.join(' / ')); document.getElementById('combinedModal').classList.add('hidden'); };
 window.openColumnFilter = (e, f) => { e.stopPropagation(); const modal = document.getElementById('columnFilterModal'); const rect = e.currentTarget.getBoundingClientRect(); modal.style.top = `${rect.bottom + window.scrollY + 5}px`; modal.style.left = `${rect.left + window.scrollX}px`; const uniqueValues = [...new Set(standardData.map(d => (d[f] || '').toString().trim() || '(공백)'))].sort(); const currentSelection = columnFilters[f] || new Set(); document.getElementById('columnFilterList').innerHTML = uniqueValues.map(v => `<div class="flex items-center gap-2"><input type="checkbox" class="col-filter-check" value="${window.escapeHtml(v)}" ${currentSelection.has(v) ? 'checked' : ''}><span>${window.escapeHtml(v)}</span></div>`).join(''); activeColumnFilter = { field: f }; modal.classList.remove('hidden'); const closer = (evt) => { if (!modal.contains(evt.target)) { modal.classList.add('hidden'); document.removeEventListener('click', closer); } }; setTimeout(() => document.addEventListener('click', closer), 10); };
@@ -636,5 +636,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.saveUserIdentity = () => { const n = document.getElementById('usernameInput').value; if (n) { currentUserName = n; localStorage.setItem('er_system_username', n); document.getElementById('userNameDisplay').innerText = n; document.getElementById('userModal').classList.add('hidden'); } };
 window.openUserModal = () => document.getElementById('userModal').classList.remove('hidden');
-window.setChartPeriod = (p) => { currentChartPeriod = p;['daily', 'weekly', 'monthly'].forEach(m => { const btn = document.getElementById(`btn-chart-${m}`); if (btn) btn.className = (m === p ? "px-3 py-1.5 rounded-md transition-colors bg-white text-[#D97756] shadow-sm" : "px-3 py-1.5 rounded-md text-[#8B7B6E] hover:bg-white/50"); }); window.renderRefundStats(); };
+window.setChartPeriod = (p) => { currentChartPeriod = p;['daily', 'weekly', 'monthly'].forEach(m => { const btn = document.getElementById(`btn-chart-${m}`); if (btn) btn.className = (m === p ? "px-3 py-1.5 rounded-md transition-colors bg-white text-[#475569] shadow-sm" : "px-3 py-1.5 rounded-md text-[#64748B] hover:bg-white/50"); }); window.renderRefundStats(); };
+
 

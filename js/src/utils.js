@@ -185,7 +185,7 @@ window.renderRefundStats = () => {
         aggregated[key].amount += amount;
     });
     const sorted = Object.entries(aggregated).sort((a, b) => a[0].localeCompare(b[0])).slice(-7);
-    container.innerHTML = sorted.map(([k, d]) => `<div class="bg-[#FAF3EE] p-3 rounded-lg text-center shadow-sm hover:bg-white transition-all border border-transparent hover:border-[#D97756]"><span class="text-[10px] font-bold text-[#8B7B6E] block mb-1">${d.label}</span><span class="text-sm font-bold text-[#D97756]">${window.formatMoney(d.amount)}</span></div>`).join('');
+    container.innerHTML = sorted.map(([k, d]) => `<div class="bg-[#F8FAFC] p-3 rounded-lg text-center shadow-sm hover:bg-white transition-all border border-transparent hover:border-[#475569]"><span class="text-[10px] font-bold text-[#64748B] block mb-1">${d.label}</span><span class="text-sm font-bold text-[#475569]">${window.formatMoney(d.amount)}</span></div>`).join('');
 };
 
 window.renderAllButtons = () => {
@@ -194,30 +194,30 @@ window.renderAllButtons = () => {
     const data = window.getMergedData();
     const counts = { '미처리': 0, '처리완료': 0, '보류': 0 };
     data.forEach(d => { if (counts[d._status] !== undefined) counts[d._status]++; else counts['미처리']++; });
-    sDiv.innerHTML = ['미처리', '처리완료', '보류'].map(s => `<button onclick="window.setActiveStatus('${s}')" class="status-btn px-4 py-1.5 border border-[#D4C4B8] rounded-md bg-white text-xs font-bold text-[#6B5D52] hover:bg-[#FAF3EE] transition-colors ${activeStatus === s ? 'active' : ''}"> ${s} <span class="count-badge ml-1 bg-[#F5EDE6] text-[#8B7B6E] px-1 rounded">${counts[s]}</span> </button>`).join('');
+    sDiv.innerHTML = ['미처리', '처리완료', '보류'].map(s => `<button onclick="window.setActiveStatus('${s}')" class="status-btn px-4 py-1.5 border border-[#CBD5E1] rounded-md bg-white text-xs font-bold text-[#475569] hover:bg-[#F8FAFC] transition-colors ${activeStatus === s ? 'active' : ''}"> ${s} <span class="count-badge ml-1 bg-[#F5EDE6] text-[#64748B] px-1 rounded">${counts[s]}</span> </button>`).join('');
     const rDiv = document.getElementById('reasonButtons');
     if (rDiv) {
         const reasons = [...new Set(standardData.map(d => d._reason).filter(r => r))];
-        rDiv.innerHTML = reasons.map(r => `<button onclick="window.setActiveReason('${r}')" class="reason-btn px-2 py-1 text-xs border border-[#E8DDD4] rounded-full hover:bg-[#F5EDE6] ${activeReason === r ? 'active' : ''}">${r}</button>`).join('');
+        rDiv.innerHTML = reasons.map(r => `<button onclick="window.setActiveReason('${r}')" class="reason-btn px-2 py-1 text-xs border border-[#E2E8F0] rounded-full hover:bg-[#F5EDE6] ${activeReason === r ? 'active' : ''}">${r}</button>`).join('');
     }
 };
 
 window.renderTableHeader = () => {
     const thead = document.getElementById('tableHeaderRow');
     if (!thead) return;
-    let html = `<tr><th class="px-4 py-3 text-center sticky top-0 left-0 z-50 bg-[#FAF3EE] border-r border-[#E8DDD4] border-b min-w-[50px] w-[50px]"><input type="checkbox" id="selectAllCheckboxTop" onchange="window.toggleSelectAll(this.checked)" class="w-5 h-5 accent-[#D97756]"></th>`;
+    let html = `<tr><th class="px-4 py-3 text-center sticky top-0 left-0 z-50 bg-[#F8FAFC] border-r border-[#E2E8F0] border-b min-w-[50px] w-[50px]"><input type="checkbox" id="selectAllCheckboxTop" onchange="window.toggleSelectAll(this.checked)" class="w-5 h-5 accent-[#475569]"></th>`;
 
     COLUMNS.forEach(col => {
-        let stickyClass = 'sticky top-0 z-40 bg-[#FAF3EE]';
+        let stickyClass = 'sticky top-0 z-40 bg-[#F8FAFC]';
         let style = `min-width:${col.width}; width:${col.width};`;
         const sortIcon = columnSortField === col.id ? (columnSortOrder === 'asc' ? ' ▲' : ' ▼') : '';
-        html += `<th onclick="window.toggleColumnSort('${col.id}')" class="px-4 py-3 text-left text-xs font-bold text-[#8B7B6E] uppercase border-b border-[#E8DDD4] cursor-pointer hover:bg-[#F5EDE6] ${stickyClass}" style="${style}"> ${col.label}${sortIcon}</th>`;
+        html += `<th onclick="window.toggleColumnSort('${col.id}')" class="px-4 py-3 text-left text-xs font-bold text-[#64748B] uppercase border-b border-[#E2E8F0] cursor-pointer hover:bg-[#F5EDE6] ${stickyClass}" style="${style}"> ${col.label}${sortIcon}</th>`;
     });
     const role = localStorage.getItem('er_system_role');
     if (role === 'admin' || role === 'system') {
-        html += `<th class="px-4 py-3 border-b border-[#E8DDD4] text-center sticky top-0 z-40 bg-[#FAF3EE] min-w-[50px]">관리</th></tr>`;
+        html += `<th class="px-4 py-3 border-b border-[#E2E8F0] text-center sticky top-0 z-40 bg-[#F8FAFC] min-w-[50px]">관리</th></tr>`;
     } else {
-        html += `<th class="px-4 py-3 border-b border-[#E8DDD4] text-center sticky top-0 z-40 bg-[#FAF3EE] min-w-[50px]"></th></tr>`;
+        html += `<th class="px-4 py-3 border-b border-[#E2E8F0] text-center sticky top-0 z-40 bg-[#F8FAFC] min-w-[50px]"></th></tr>`;
     }
     thead.innerHTML = html;
 };
@@ -225,4 +225,5 @@ window.renderTableHeader = () => {
 window.debounceSearch = () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => window.applyLocalFilters(true), 300); };
 window.toggleSelectAll = (c) => { selectedIds = c ? new Set(window.currentTableData.map(d => String(d._id))) : new Set(); window.applyLocalFilters(); };
 window.toggleRowSelection = (id) => { const s = String(id); if (selectedIds.has(s)) selectedIds.delete(s); else selectedIds.add(s); window.updateSelectionUI(); };
+
 

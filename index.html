@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 
 <head>
@@ -25,38 +25,39 @@
     <link rel="stylesheet" href="./css/style.css">
 </head>
 
-<body class="text-[#3D2E24] overflow-hidden"><!-- [LOGIN VIEW] -->
+<body class="text-[#1E293B] overflow-hidden">
+﻿<!-- [LOGIN VIEW] -->
 <div id="login-view" class="fixed inset-0 z-[10000] flex items-center justify-center bg-[#FDF6F0]">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-10 border border-[#E8DDD4] relative">
-        <div class="absolute top-0 left-0 w-full h-1.5 bg-[#D97756]"></div>
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-10 border border-[#E2E8F0] relative">
+        <div class="absolute top-0 left-0 w-full h-1.5 bg-[#475569]"></div>
         <div class="text-center mb-10">
             <div
-                class="mx-auto w-16 h-16 bg-[#D97756] rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-[#F0C9B8]">
+                class="mx-auto w-16 h-16 bg-[#475569] rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-[#F0C9B8]">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
                     </path>
                 </svg>
             </div>
-            <h1 class="text-2xl font-bold text-[#3D2E24] tracking-tight">ER 처리 현황 시스템</h1>
-            <p class="text-[#8B7B6E] mt-2 text-sm" id="auth-status-msg">인증 상태 확인 중...</p>
+            <h1 class="text-2xl font-bold text-[#1E293B] tracking-tight">ER 처리 현황 시스템</h1>
+            <p class="text-[#64748B] mt-2 text-sm" id="auth-status-msg">인증 상태 확인 중...</p>
         </div>
         <div class="space-y-5">
             <div>
-                <label class="block text-xs font-bold text-[#6B5D52] mb-1.5 ml-1">이메일 계정</label>
+                <label class="block text-xs font-bold text-[#475569] mb-1.5 ml-1">이메일 계정</label>
                 <input type="email" id="loginId"
-                    class="w-full px-4 py-3 bg-[#FAF3EE] border border-[#E8DDD4] rounded-lg focus:outline-none focus:border-[#D97756] text-[#3D2E24]"
+                    class="w-full px-4 py-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg focus:outline-none focus:border-[#475569] text-[#1E293B]"
                     placeholder="admin@example.com"
                     onkeyup="if(event.key==='Enter') document.getElementById('loginPw').focus()">
             </div>
             <div>
-                <label class="block text-xs font-bold text-[#6B5D52] mb-1.5 ml-1">비밀번호</label>
+                <label class="block text-xs font-bold text-[#475569] mb-1.5 ml-1">비밀번호</label>
                 <input type="password" id="loginPw"
-                    class="w-full px-4 py-3 bg-[#FAF3EE] border border-[#E8DDD4] rounded-lg focus:outline-none focus:border-[#D97756] text-[#3D2E24]"
+                    class="w-full px-4 py-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg focus:outline-none focus:border-[#475569] text-[#1E293B]"
                     placeholder="Password" onkeyup="if(event.key==='Enter') window.loginSystem()">
             </div>
             <button onclick="window.loginSystem()" id="loginBtn"
-                class="w-full py-3.5 bg-[#D97756] hover:bg-[#C4623E] text-white font-bold rounded-lg transition-colors shadow-md mt-4 flex items-center justify-center gap-2 group"
+                class="w-full py-3.5 bg-[#475569] hover:bg-[#334155] text-white font-bold rounded-lg transition-colors shadow-md mt-4 flex items-center justify-center gap-2 group"
                 disabled>
                 <span>안전하게 로그인</span>
                 <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
@@ -66,17 +67,18 @@
                 </svg>
             </button>
         </div>
-        <div class="mt-8 pt-6 border-t border-[#FAF3EE] text-center">
-            <p class="text-xs text-[#B8A99C]">시스템 문의: <span class="font-bold text-[#8B7B6E]">IT 지원팀</span></p>
+        <div class="mt-8 pt-6 border-t border-[#F8FAFC] text-center">
+            <p class="text-xs text-[#94A3B8]">시스템 문의: <span class="font-bold text-[#64748B]">IT 지원팀</span></p>
         </div>
     </div>
-</div><!-- [MAIN APP] -->
+</div>
+﻿<!-- [MAIN APP] -->
 <div id="main-app" class="hidden h-screen flex flex-col w-full">
     <!-- Header -->
-    <header class="bg-white border-b border-[#E8DDD4] shrink-0 z-20">
+    <header class="bg-white border-b border-[#E2E8F0] shrink-0 z-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="bg-[#D97756] text-white p-2 rounded-lg shadow-sm">
+                <div class="bg-[#475569] text-white p-2 rounded-lg shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
@@ -84,7 +86,7 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold text-[#3D2E24] tracking-tight flex items-center gap-2">
+                    <h1 class="text-xl font-bold text-[#1E293B] tracking-tight flex items-center gap-2">
                         ER 처리 현황 시스템 V60.40
                         <span
                             class="text-xs font-medium text-white bg-gray-400 px-2 py-0.5 rounded-full transition-all duration-500 flex items-center gap-1"
@@ -114,7 +116,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <button id="saveChangesBtn" onclick="saveAllChanges()"
-                    class="hidden px-4 py-2 text-sm font-bold text-white bg-[#B8A99C] rounded-lg transition-all flex items-center gap-2 shadow-sm"
+                    class="hidden px-4 py-2 text-sm font-bold text-white bg-[#94A3B8] rounded-lg transition-all flex items-center gap-2 shadow-sm"
                     disabled>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -123,13 +125,13 @@
                     </svg>
                     변경사항 저장 <span id="unsavedCount" class="bg-white/20 px-1.5 rounded text-xs ml-1">0</span>
                 </button>
-                <div class="h-6 w-px bg-[#E8DDD4] mx-1"></div>
+                <div class="h-6 w-px bg-[#E2E8F0] mx-1"></div>
 
                 <!-- [ADMIN: 사용자 관리 버튼] -->
                 <button id="adminManagementBtn" onclick="window.openUserManagementModal()"
-                    class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#FAF3EE] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]"
+                    class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#F8FAFC] hover:bg-[#E2E8F0] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E2E8F0]"
                     title="사용자 관리">
-                    <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-[#64748B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
                         </path>
@@ -139,9 +141,9 @@
 
                 <!-- Admin Settings Button -->
                 <button id="btnAdminSettings" onclick="openSettingsModal()"
-                    class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#FAF3EE] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]"
+                    class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#F8FAFC] hover:bg-[#E2E8F0] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E2E8F0]"
                     title="관리자 설정">
-                    <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-[#64748B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
                         </path>
@@ -152,9 +154,9 @@
                 </button>
 
                 <button onclick="openLogModal()"
-                    class="flex items-center gap-2 px-3 py-1.5 bg-[#F5EDE6] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]"
+                    class="flex items-center gap-2 px-3 py-1.5 bg-[#F5EDE6] hover:bg-[#E2E8F0] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E2E8F0]"
                     title="변경 로그">
-                    <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-[#64748B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -170,71 +172,72 @@
                     백업
                 </button>
 
-                <div class="h-6 w-px bg-[#E8DDD4] mx-1"></div>
+                <div class="h-6 w-px bg-[#E2E8F0] mx-1"></div>
 
                 <!-- User Profile & Logout -->
                 <div class="flex items-center gap-3 pl-1">
                     <div class="flex flex-col items-end">
-                        <span id="userNameDisplay" class="text-sm font-bold text-[#3D2E24]">사용자</span>
+                        <span id="userNameDisplay" class="text-sm font-bold text-[#1E293B]">사용자</span>
                         <button id="btnLogout"
-                            class="text-[11px] text-[#B85C4A] hover:underline font-bold tracking-wide">로그아웃</button>
+                            class="text-[11px] text-[#C85A6F] hover:underline font-bold tracking-wide">로그아웃</button>
                     </div>
                     <div id="userAvatar"
-                        class="w-9 h-9 rounded-full bg-[#D97756] text-white flex items-center justify-center font-bold text-sm shadow-sm uppercase border-2 border-white">
+                        class="w-9 h-9 rounded-full bg-[#475569] text-white flex items-center justify-center font-bold text-sm shadow-sm uppercase border-2 border-white">
                         ?</div>
                 </div>
             </div>
         </div>
-    </header><!-- Main Content -->
+    </header>
+﻿<!-- Main Content -->
 <main class="flex-grow overflow-y-auto custom-scrollbar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 w-full">
     <div id="dashboard" class="space-y-4 animate-fade-in">
 
         <!-- [UI개선1] 핵심 숫자 바 -->
-        <section class="bg-white rounded-lg shadow-sm border border-[#E8DDD4] px-5 py-3">
+        <section class="bg-white rounded-lg shadow-sm border border-[#E2E8F0] px-5 py-3">
             <div class="flex items-center gap-3 flex-wrap">
                 <div onclick="filterByTotal()"
-                    class="flex items-center gap-2 px-3 py-1.5 bg-[#FAF3EE] hover:bg-[#F5EDE6] rounded-md cursor-pointer transition-colors border border-[#E8DDD4]">
-                    <span class="text-xs font-medium text-[#8B7B6E]">전체</span>
-                    <span class="text-sm font-bold text-[#3D2E24]" id="quickTotal">0</span>
+                    class="flex items-center gap-2 px-3 py-1.5 bg-[#F8FAFC] hover:bg-[#F5EDE6] rounded-md cursor-pointer transition-colors border border-[#E2E8F0]">
+                    <span class="text-xs font-medium text-[#64748B]">전체</span>
+                    <span class="text-sm font-bold text-[#1E293B]" id="quickTotal">0</span>
                 </div>
                 <div onclick="filterByUnprocessed()"
                     class="flex items-center gap-2 px-3 py-1.5 bg-[#FFF5EB] hover:bg-[#FFECD9] rounded-md cursor-pointer transition-colors border border-[#E8D0B8]">
-                    <span class="text-xs font-medium text-[#A67A52]">미처리</span>
+                    <span class="text-xs font-medium text-[#B89254]">미처리</span>
                     <span class="text-sm font-bold text-[#8B5E3C]" id="quickUnprocessed">0</span>
                 </div>
                 <div onclick="filterByUrgent()"
                     class="flex items-center gap-2 px-3 py-1.5 bg-[#FFF0EC] hover:bg-[#FFE4DD] rounded-md cursor-pointer transition-colors border border-[#E8C0B4]">
-                    <span class="text-xs font-medium text-[#B85C4A]">장기미처리</span>
-                    <span class="text-sm font-bold text-[#944839]" id="quickUrgent">0</span>
+                    <span class="text-xs font-medium text-[#C85A6F]">장기미처리</span>
+                    <span class="text-sm font-bold text-[#C85A6F]" id="quickUrgent">0</span>
                 </div>
                 <div class="flex items-center gap-2 px-3 py-1.5 bg-[#F2F0E8] rounded-md border border-[#DDD9CE]">
                     <span class="text-xs font-medium text-[#6B7B5E]">처리완료</span>
                     <span class="text-sm font-bold text-[#4D5E3E]" id="quickCompleted">0</span>
                 </div>
-                <div class="h-5 w-px bg-[#E8DDD4] mx-1"></div>
-                <div class="flex items-center gap-2 px-3 py-1.5 bg-[#FDF0EB] rounded-md border border-[#F0C9B8]">
-                    <span class="text-xs font-medium text-[#D97756]">환불총액</span>
-                    <span class="text-sm font-bold text-[#C4623E]" id="quickRefundTotal">₩0</span>
+                <div class="h-5 w-px bg-[#E2E8F0] mx-1"></div>
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-[#F1F5F9] rounded-md border border-[#F0C9B8]">
+                    <span class="text-xs font-medium text-[#475569]">환불총액</span>
+                    <span class="text-sm font-bold text-[#334155]" id="quickRefundTotal">₩0</span>
                 </div>
             </div>
         </section>
 
         <!-- 현황 대시보드 -->
-        <section class="bg-white rounded-lg shadow-sm border border-[#E8DDD4] overflow-hidden">
+        <section class="bg-white rounded-lg shadow-sm border border-[#E2E8F0] overflow-hidden">
             <button onclick="toggleDashboard()"
-                class="w-full px-6 py-3 flex justify-between items-center bg-[#FAF3EE] hover:bg-[#F5EDE6] transition-colors text-left group">
+                class="w-full px-6 py-3 flex justify-between items-center bg-[#F8FAFC] hover:bg-[#F5EDE6] transition-colors text-left group">
                 <div class="flex items-center gap-2">
                     <div
-                        class="p-1.5 bg-white rounded-md border border-[#E8DDD4] text-[#D97756] shadow-sm group-hover:border-[#E8B4A0] transition-colors">
+                        class="p-1.5 bg-white rounded-md border border-[#E2E8F0] text-[#475569] shadow-sm group-hover:border-[#94A3B8] transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z">
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-base font-bold text-[#3D2E24]">현황 대시보드</h3>
+                    <h3 class="text-base font-bold text-[#1E293B]">현황 대시보드</h3>
                 </div>
-                <div class="flex items-center gap-2 text-[#B8A99C]">
+                <div class="flex items-center gap-2 text-[#94A3B8]">
                     <span class="text-xs font-medium">열기/닫기</span>
                     <svg id="dashboardArrow" class="w-5 h-5 transform transition-transform duration-200" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
@@ -243,53 +246,53 @@
                 </div>
             </button>
 
-            <div id="dashboardContent" class="hidden border-t border-[#E8DDD4] bg-white animate-fade-in">
+            <div id="dashboardContent" class="hidden border-t border-[#E2E8F0] bg-white animate-fade-in">
                 <!-- KPI 카드 -->
-                <div id="kpiContent" class="p-6 bg-[#FAF3EE]/50">
+                <div id="kpiContent" class="p-6 bg-[#F8FAFC]/50">
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
                         <div onclick="filterByTotal()"
-                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#6B5D52] clickable-card card-hover"
+                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#475569] clickable-card card-hover"
                             title="전체 건 보기">
                             <div class="flex flex-col h-full justify-between">
-                                <p class="text-xs font-bold text-[#6B5D52] uppercase tracking-wider mb-2">전체 건수
+                                <p class="text-xs font-bold text-[#475569] uppercase tracking-wider mb-2">전체 건수
                                 </p>
-                                <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiTotal">0</h3>
+                                <h3 class="text-2xl font-bold text-[#1E293B]" id="kpiTotal">0</h3>
                             </div>
                         </div>
                         <div onclick="filterByUnprocessed()"
-                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#8B7B6E] clickable-card card-hover"
+                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#64748B] clickable-card card-hover"
                             title="미처리 건만 보기">
                             <div class="flex flex-col h-full justify-between">
-                                <p class="text-xs font-bold text-[#8B7B6E] uppercase tracking-wider mb-2">미처리 건수
+                                <p class="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-2">미처리 건수
                                 </p>
-                                <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiUnprocessed">0</h3>
+                                <h3 class="text-2xl font-bold text-[#1E293B]" id="kpiUnprocessed">0</h3>
                             </div>
                         </div>
                         <div onclick="filterByUrgent()"
-                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#B85C4A] clickable-card card-hover"
+                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#C85A6F] clickable-card card-hover"
                             title="장기 미처리 건만 보기">
                             <div class="flex flex-col h-full justify-between">
-                                <p class="text-xs font-bold text-[#B85C4A] uppercase tracking-wider mb-2">장기 미처리
+                                <p class="text-xs font-bold text-[#C85A6F] uppercase tracking-wider mb-2">장기 미처리
                                 </p>
-                                <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiUrgent">0</h3>
+                                <h3 class="text-2xl font-bold text-[#1E293B]" id="kpiUrgent">0</h3>
                             </div>
                         </div>
                         <div onclick="filterByDefect()"
-                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#C4623E] clickable-card card-hover"
+                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#334155] clickable-card card-hover"
                             title="불량 건만 보기">
                             <div class="flex flex-col h-full justify-between">
-                                <p class="text-xs font-bold text-[#C4623E] uppercase tracking-wider mb-2">불량 판정
+                                <p class="text-xs font-bold text-[#334155] uppercase tracking-wider mb-2">불량 판정
                                 </p>
-                                <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiDefect">0</h3>
+                                <h3 class="text-2xl font-bold text-[#1E293B]" id="kpiDefect">0</h3>
                             </div>
                         </div>
                         <div onclick="filterByMisdelivery()"
-                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#A67A52] clickable-card card-hover"
+                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#B89254] clickable-card card-hover"
                             title="오배송 건만 보기">
                             <div class="flex flex-col h-full justify-between">
-                                <p class="text-xs font-bold text-[#A67A52] uppercase tracking-wider mb-2">오배송
+                                <p class="text-xs font-bold text-[#B89254] uppercase tracking-wider mb-2">오배송
                                 </p>
-                                <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiMisdelivery">0</h3>
+                                <h3 class="text-2xl font-bold text-[#1E293B]" id="kpiMisdelivery">0</h3>
                             </div>
                         </div>
                         <div onclick="filterByExchange()"
@@ -298,39 +301,39 @@
                             <div class="flex flex-col h-full justify-between">
                                 <p class="text-xs font-bold text-sky-500 uppercase tracking-wider mb-2">교환 건수
                                 </p>
-                                <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiExchangeRate">0</h3>
+                                <h3 class="text-2xl font-bold text-[#1E293B]" id="kpiExchangeRate">0</h3>
                             </div>
                         </div>
                         <div onclick="filterByReturn()"
-                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#D97756] clickable-card card-hover"
+                            class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#475569] clickable-card card-hover"
                             title="반품 건만 보기">
                             <div class="flex flex-col h-full justify-between">
-                                <p class="text-xs font-bold text-[#D97756] uppercase tracking-wider mb-2">반품 건수
+                                <p class="text-xs font-bold text-[#475569] uppercase tracking-wider mb-2">반품 건수
                                 </p>
-                                <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiReturnRate">0</h3>
+                                <h3 class="text-2xl font-bold text-[#1E293B]" id="kpiReturnRate">0</h3>
                             </div>
                         </div>
                         <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-[#B8A060]">
                             <div class="flex flex-col h-full justify-between">
                                 <p class="text-xs font-bold text-[#A6905A] uppercase tracking-wider mb-2">불량률
                                 </p>
-                                <h3 class="text-2xl font-bold text-[#3D2E24]" id="kpiDefectRate">0%</h3>
+                                <h3 class="text-2xl font-bold text-[#1E293B]" id="kpiDefectRate">0%</h3>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="border-t border-[#E8DDD4]"></div>
+                <div class="border-t border-[#E2E8F0]"></div>
                 <!-- 환불액 추이 -->
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h4 class="text-sm font-bold text-[#5C4A3E]">환불액 추이</h4>
                         <div class="bg-[#F5EDE6] p-1 rounded-lg flex text-xs font-bold">
                             <button onclick="setChartPeriod('daily')" id="btn-chart-daily"
-                                class="px-3 py-1.5 rounded-md transition-colors bg-white text-[#D97756] shadow-sm">일간</button>
+                                class="px-3 py-1.5 rounded-md transition-colors bg-white text-[#475569] shadow-sm">일간</button>
                             <button onclick="setChartPeriod('weekly')" id="btn-chart-weekly"
-                                class="px-3 py-1.5 rounded-md transition-colors text-[#8B7B6E] hover:bg-white/50">주간</button>
+                                class="px-3 py-1.5 rounded-md transition-colors text-[#64748B] hover:bg-white/50">주간</button>
                             <button onclick="setChartPeriod('monthly')" id="btn-chart-monthly"
-                                class="px-3 py-1.5 rounded-md transition-colors text-[#8B7B6E] hover:bg-white/50">월간</button>
+                                class="px-3 py-1.5 rounded-md transition-colors text-[#64748B] hover:bg-white/50">월간</button>
                         </div>
                     </div>
                     <div id="refundChartContent">
@@ -338,13 +341,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="border-t border-[#E8DDD4]"></div>
+                <div class="border-t border-[#E2E8F0]"></div>
                 <!-- 사유별 현황판 -->
                 <div class="p-6">
                     <div class="mb-4 flex justify-between items-center">
                         <h4 class="text-sm font-bold text-[#5C4A3E]">사유별 현황판</h4>
                         <button onclick="filterByTotal()"
-                            class="text-xs text-[#8B7B6E] hover:text-[#D97756] underline flex items-center gap-1">
+                            class="text-xs text-[#64748B] hover:text-[#475569] underline flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12"></path>
@@ -357,14 +360,15 @@
                     </div>
                 </div>
             </div>
-        </section><!-- 데이터 리스트 -->
-<section class="bg-white rounded-lg shadow-sm border border-[#E8DDD4] overflow-hidden flex flex-col">
-    <div class="p-5 border-b border-[#E8DDD4]">
+        </section>
+﻿<!-- 데이터 리스트 -->
+<section class="bg-white rounded-lg shadow-sm border border-[#E2E8F0] overflow-hidden flex flex-col">
+    <div class="p-5 border-b border-[#E2E8F0]">
         <!-- 필터 -->
         <div class="flex items-center gap-2 mb-3 flex-wrap">
             <div id="statusButtons" class="flex flex-wrap gap-2"></div>
             <button onclick="resetStatusFilter()"
-                class="text-xs text-[#B8A99C] hover:text-[#D97756] ml-1 whitespace-nowrap">
+                class="text-xs text-[#94A3B8] hover:text-[#475569] ml-1 whitespace-nowrap">
                 <svg class="w-3 h-3 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                     </path>
@@ -375,33 +379,33 @@
         <!-- 도구 바 -->
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-2">
-                <h3 class="text-lg font-bold text-[#3D2E24]" id="tableTitle">상세 내역 리스트</h3>
+                <h3 class="text-lg font-bold text-[#1E293B]" id="tableTitle">상세 내역 리스트</h3>
                 <span id="activeFilterBadge"
-                    class="hidden px-2 py-1 bg-[#FDF0EB] text-[#C4623E] text-xs font-bold rounded-md"></span>
+                    class="hidden px-2 py-1 bg-[#F1F5F9] text-[#334155] text-xs font-bold rounded-md"></span>
 
                 <div id="bulkActionContainer"
-                    class="hidden flex items-center gap-2 ml-4 p-1 bg-[#FDF0EB] border border-[#FDF0EB] rounded-lg animate-fade-in">
-                    <span class="text-xs font-bold text-[#C4623E] ml-2" id="selectedCountDisplay">0개
+                    class="hidden flex items-center gap-2 ml-4 p-1 bg-[#F1F5F9] border border-[#F1F5F9] rounded-lg animate-fade-in">
+                    <span class="text-xs font-bold text-[#334155] ml-2" id="selectedCountDisplay">0개
                         선택</span>
-                    <div class="h-4 w-px bg-[#F5D5C8] mx-1"></div>
+                    <div class="h-4 w-px bg-[#E2E8F0] mx-1"></div>
                     <select onchange="if(this.value){ applyBulkStatus(this.value); this.value=''; }"
-                        class="text-xs border-[#F0C9B8] rounded px-2 py-1 focus:ring-[#D97756] outline-none">
+                        class="text-xs border-[#F0C9B8] rounded px-2 py-1 focus:ring-[#475569] outline-none">
                         <option value="">상태 변경...</option>
                         <option value="처리완료">처리완료</option>
                         <option value="보류">보류</option>
                         <option value="미처리">미처리</option>
                     </select>
                     <button onclick="applyBulkPicToSelf()"
-                        class="px-2 py-1 text-xs bg-white border border-[#F0C9B8] hover:bg-[#FDF0EB] text-[#C4623E] rounded whitespace-nowrap">담당자
+                        class="px-2 py-1 text-xs bg-white border border-[#F0C9B8] hover:bg-[#F1F5F9] text-[#334155] rounded whitespace-nowrap">담당자
                         배정</button>
-                    <div class="h-4 w-px bg-[#F5D5C8] mx-1"></div>
+                    <div class="h-4 w-px bg-[#E2E8F0] mx-1"></div>
                     <button id="bulkDeleteBtn" onclick="promptDeleteSelected()"
-                        class="px-2 py-1 text-xs bg-[#B85C4A] hover:bg-[#944839] text-white rounded whitespace-nowrap">삭제</button>
+                        class="px-2 py-1 text-xs bg-[#C85A6F] hover:bg-[#C85A6F] text-white rounded whitespace-nowrap">삭제</button>
                 </div>
 
                 <div class="flex gap-2 items-center ml-2">
                     <button id="btnAddRow" onclick="window.addNewRow()"
-                        class="px-3 py-1.5 text-xs font-bold text-white bg-[#6B8F5E] hover:bg-[#5A7A4E] rounded-md transition-colors flex items-center gap-1 shadow-sm">
+                        class="px-3 py-1.5 text-xs font-bold text-white bg-[#449171] hover:bg-[#5A7A4E] rounded-md transition-colors flex items-center gap-1 shadow-sm">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
                             </path>
@@ -409,7 +413,7 @@
                         신규 등록
                     </button>
                     <button onclick="document.getElementById('listCsvInput').click()"
-                        class="px-3 py-1.5 text-xs font-bold text-[#D97756] bg-[#FDF0EB] hover:bg-[#F5D5C8] rounded-md transition-colors flex items-center gap-1 shadow-sm">
+                        class="px-3 py-1.5 text-xs font-bold text-[#475569] bg-[#F1F5F9] hover:bg-[#E2E8F0] rounded-md transition-colors flex items-center gap-1 shadow-sm">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
@@ -423,32 +427,32 @@
             <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
                 <div class="flex items-center gap-1 flex-wrap">
                     <button onclick="setDateRange('all')" id="dr-all"
-                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-[#D97756] text-white border-[#D97756]">전체</button>
+                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-[#475569] text-white border-[#475569]">전체</button>
                     <button onclick="setDateRange('today')" id="dr-today"
-                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">오늘</button>
+                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#475569] border-[#E2E8F0] hover:border-[#94A3B8] hover:text-[#475569]">오늘</button>
                     <button onclick="setDateRange('7d')" id="dr-7d"
-                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">7일</button>
+                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#475569] border-[#E2E8F0] hover:border-[#94A3B8] hover:text-[#475569]">7일</button>
                     <button onclick="setDateRange('30d')" id="dr-30d"
-                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">30일</button>
+                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#475569] border-[#E2E8F0] hover:border-[#94A3B8] hover:text-[#475569]">30일</button>
                     <button onclick="setDateRange('custom')" id="dr-custom"
-                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]">직접입력</button>
+                        class="px-3 py-1.5 text-xs font-bold rounded-md border transition-colors bg-white text-[#475569] border-[#E2E8F0] hover:border-[#94A3B8] hover:text-[#475569]">직접입력</button>
                 </div>
                 <div id="customDatePanel" class="hidden flex items-center gap-1">
                     <input type="date" id="dateFrom"
-                        class="px-2 py-1.5 text-xs border border-[#D4C4B8] rounded-lg focus:ring-[#D97756] focus:border-[#D97756]"
+                        class="px-2 py-1.5 text-xs border border-[#CBD5E1] rounded-lg focus:ring-[#475569] focus:border-[#475569]"
                         onchange="applyDateRange()">
-                    <span class="text-xs text-[#B8A99C]">~</span>
+                    <span class="text-xs text-[#94A3B8]">~</span>
                     <input type="date" id="dateTo"
-                        class="px-2 py-1.5 text-xs border border-[#D4C4B8] rounded-lg focus:ring-[#D97756] focus:border-[#D97756]"
+                        class="px-2 py-1.5 text-xs border border-[#CBD5E1] rounded-lg focus:ring-[#475569] focus:border-[#475569]"
                         onchange="applyDateRange()">
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
                     <div class="relative w-full sm:w-64">
                         <input type="text" id="tableSearch" placeholder="통합 검색 (Space로 구분, Enter)"
                             oninput="window.debounceSearch()"
-                            class="w-full pl-10 pr-4 py-2 bg-[#FAF3EE] border border-[#D4C4B8] text-[#2D1F17] text-sm rounded-lg focus:ring-[#D97756] focus:border-[#D97756] transition-colors">
+                            class="w-full pl-10 pr-4 py-2 bg-[#F8FAFC] border border-[#CBD5E1] text-[#0F172A] text-sm rounded-lg focus:ring-[#475569] focus:border-[#475569] transition-colors">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="w-4 h-4 text-[#B8A99C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-[#94A3B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
@@ -464,66 +468,67 @@
     </div>
 
     <div class="overflow-x-auto overflow-y-auto custom-scrollbar flex-grow" style="height: 600px;">
-        <table class="min-w-full divide-y divide-[#E8DDD4]">
-            <thead class="bg-[#FAF3EE]" id="tableHeaderRow"></thead>
-            <tbody id="tableBody" class="bg-white divide-y divide-[#E8DDD4] text-sm"></tbody>
+        <table class="min-w-full divide-y divide-[#E2E8F0]">
+            <thead class="bg-[#F8FAFC]" id="tableHeaderRow"></thead>
+            <tbody id="tableBody" class="bg-white divide-y divide-[#E2E8F0] text-sm"></tbody>
         </table>
     </div>
-    <div id="emptyState" class="hidden p-10 text-center text-[#B8A99C]">데이터가 없습니다.</div>
+    <div id="emptyState" class="hidden p-10 text-center text-[#94A3B8]">데이터가 없습니다.</div>
 </section>
 </div>
 </main>
-</div><!-- [MODALS] -->
+</div>
+﻿<!-- [MODALS] -->
 
 <!-- [GENERIC CONFIRM MODAL (Replacement for confirm())] -->
 <div id="genericConfirmModal" class="fixed inset-0 z-[120] flex items-center justify-center modal-overlay hidden">
-    <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm text-center border border-[#E8DDD4]">
-        <h3 class="text-lg font-bold mb-2 text-[#2D1F17]">확인</h3>
-        <p class="text-sm text-[#8B7B6E] mb-6" id="genericConfirmMessage"></p>
+    <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm text-center border border-[#E2E8F0]">
+        <h3 class="text-lg font-bold mb-2 text-[#0F172A]">확인</h3>
+        <p class="text-sm text-[#64748B] mb-6" id="genericConfirmMessage"></p>
         <div class="flex gap-3">
             <button onclick="window.closeGenericConfirm()"
-                class="flex-1 py-2 border border-[#E8DDD4] rounded-lg hover:bg-[#FAF3EE] font-medium text-[#6B5D52]">취소</button>
+                class="flex-1 py-2 border border-[#E2E8F0] rounded-lg hover:bg-[#F8FAFC] font-medium text-[#475569]">취소</button>
             <button id="genericConfirmBtn"
-                class="flex-1 py-2 bg-[#D97756] text-white rounded-lg font-bold hover:bg-[#C4623E]">확인</button>
+                class="flex-1 py-2 bg-[#475569] text-white rounded-lg font-bold hover:bg-[#334155]">확인</button>
         </div>
     </div>
 </div>
 
 <!-- [ADMIN: USER MANAGEMENT MODAL] -->
 <div id="userManagementModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center modal-overlay">
-    <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl border border-[#E8DDD4]">
-        <div class="p-5 bg-[#FAF3EE] border-b border-[#E8DDD4] flex justify-between items-center">
-            <h3 class="font-bold text-[#3D2E24]">사용자 계정 권한 관리</h3>
+    <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl border border-[#E2E8F0]">
+        <div class="p-5 bg-[#F8FAFC] border-b border-[#E2E8F0] flex justify-between items-center">
+            <h3 class="font-bold text-[#1E293B]">사용자 계정 권한 관리</h3>
             <button onclick="window.closeUserManagementModal()"
-                class="text-[#B8A99C] hover:text-[#6B5D52] text-2xl">✕</button>
+                class="text-[#94A3B8] hover:text-[#475569] text-2xl">✕</button>
         </div>
         <div class="p-6">
-            <div class="bg-[#FDF6F0] p-4 rounded-xl mb-6 border border-[#E8DDD4]">
-                <h4 class="text-xs font-bold text-[#D97756] mb-1 uppercase tracking-wider">신규 담당자 권한 부여</h4>
-                <p class="text-[10px] text-[#8B7B6E] mb-3 leading-tight">
-                    ✅ 새 직원의 <span class="text-[#D97756] font-bold">실제 로그인 계정(이메일/비밀번호)</span>을 즉시 생성하고 권한까지 일괄
+            <div class="bg-[#FDF6F0] p-4 rounded-xl mb-6 border border-[#E2E8F0]">
+                <h4 class="text-xs font-bold text-[#475569] mb-1 uppercase tracking-wider">신규 담당자 권한 부여</h4>
+                <p class="text-[10px] text-[#64748B] mb-3 leading-tight">
+                    ✅ 새 직원의 <span class="text-[#475569] font-bold">실제 로그인 계정(이메일/비밀번호)</span>을 즉시 생성하고 권한까지 일괄
                     발급합니다.<br>
                     비밀번호는 최소 6자리 이상이어야 합니다.
                 </p>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
                     <input id="newUserName"
-                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#475569]"
                         placeholder="이름 (예: 김담당)">
                     <input id="newUserId" type="email"
-                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#475569]"
                         placeholder="가입할 이메일 주소">
                     <input id="newUserPw" type="password"
-                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#475569]"
                         placeholder="초기 암호 (6자 이상)">
                     <select id="newUserRole"
-                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756] bg-white">
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#475569] bg-white">
                         <option value="staff">일반 (Staff)</option>
                         <option value="admin">관리자 (Admin)</option>
                         <option value="system">시스템 마스터 (System)</option>
                     </select>
                 </div>
                 <button onclick="window.addNewUser()"
-                    class="w-full mt-3 bg-[#D97756] text-white py-2.5 rounded-lg font-bold shadow-sm hover:bg-[#C4623E] transition-all">권한
+                    class="w-full mt-3 bg-[#475569] text-white py-2.5 rounded-lg font-bold shadow-sm hover:bg-[#334155] transition-all">권한
                     등록</button>
             </div>
 
@@ -645,48 +650,48 @@
 
 <!-- Log Modal (Existing) -->
 <div id="logModal" class="fixed inset-0 z-[95] flex items-center justify-center modal-overlay hidden">
-    <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col border border-[#F0E8E0]">
-        <div class="p-4 border-b border-[#E8DDD4] flex justify-between items-center bg-[#FAF3EE] rounded-t-xl">
-            <h3 class="text-lg font-bold text-[#3D2E24] flex items-center gap-2">데이터 변경 이력</h3>
-            <button onclick="closeLogModal()" class="text-[#B8A99C] hover:text-[#6B5D52]">✕</button>
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col border border-[#CBD5E1]">
+        <div class="p-4 border-b border-[#E2E8F0] flex justify-between items-center bg-[#F8FAFC] rounded-t-xl">
+            <h3 class="text-lg font-bold text-[#1E293B] flex items-center gap-2">데이터 변경 이력</h3>
+            <button onclick="closeLogModal()" class="text-[#94A3B8] hover:text-[#475569]">✕</button>
         </div>
-        <div id="logListContainer" class="flex-grow overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#FAF3EE]/50">
+        <div id="logListContainer" class="flex-grow overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#F8FAFC]/50">
         </div>
     </div>
 </div>
 
 <!-- Other Modals (Column Filter, Reason Input, Combined, Delete, Bulk Update) -->
 <div id="columnFilterModal"
-    class="absolute bg-white border border-[#E8DDD4] shadow-xl rounded-lg p-3 z-[90] hidden w-64 text-sm">
-    <div class="flex justify-between items-center mb-2 pb-2 border-b border-[#F0E8E0]"><span
+    class="absolute bg-white border border-[#E2E8F0] shadow-xl rounded-lg p-3 z-[90] hidden w-64 text-sm">
+    <div class="flex justify-between items-center mb-2 pb-2 border-b border-[#CBD5E1]"><span
             class="font-bold text-[#5C4A3E]">필터 선택</span><button onclick="closeColumnFilterModal()"
-            class="text-[#B8A99C] hover:text-[#6B5D52]">✕</button></div>
+            class="text-[#94A3B8] hover:text-[#475569]">✕</button></div>
     <div class="flex items-center gap-2 mb-2 px-1"><input type="checkbox" id="columnFilterSelectAll"
             class="custom-checkbox" onchange="toggleColumnFilterSelectAll(this.checked)"><label
-            for="columnFilterSelectAll" class="text-[#6B5D52] cursor-pointer select-none">전체 선택</label></div>
+            for="columnFilterSelectAll" class="text-[#475569] cursor-pointer select-none">전체 선택</label></div>
     <div id="columnFilterList" class="max-h-60 overflow-y-auto custom-scrollbar space-y-1 mb-3"></div>
     <div class="flex gap-2"><button onclick="clearColumnFilter()"
-            class="flex-1 py-1.5 border border-[#D4C4B8] rounded text-[#6B5D52] hover:bg-[#FAF3EE] text-xs font-bold">초기화</button><button
+            class="flex-1 py-1.5 border border-[#CBD5E1] rounded text-[#475569] hover:bg-[#F8FAFC] text-xs font-bold">초기화</button><button
             onclick="applyColumnFilter()"
-            class="flex-1 py-1.5 bg-[#D97756] text-white rounded hover:bg-[#C4623E] text-xs font-bold">적용</button>
+            class="flex-1 py-1.5 bg-[#475569] text-white rounded hover:bg-[#334155] text-xs font-bold">적용</button>
     </div>
 </div>
 
 <div id="reasonInputModal" class="fixed inset-0 z-[80] flex items-center justify-center modal-overlay hidden">
     <div
-        class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm transform transition-all scale-100 opacity-100 border border-[#F0E8E0]">
+        class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm transform transition-all scale-100 opacity-100 border border-[#CBD5E1]">
         <div class="mb-4">
-            <h3 class="text-lg font-bold text-[#3D2E24]">기타 사유 입력</h3>
-            <p class="text-sm text-[#8B7B6E]">구체적인 사유를 입력해주세요.</p>
+            <h3 class="text-lg font-bold text-[#1E293B]">기타 사유 입력</h3>
+            <p class="text-sm text-[#64748B]">구체적인 사유를 입력해주세요.</p>
         </div>
         <input type="text" id="reasonDetailInput"
-            class="w-full px-4 py-2 border border-[#D4C4B8] rounded-lg focus:ring-2 focus:ring-[#D97756] outline-none mb-4"
+            class="w-full px-4 py-2 border border-[#CBD5E1] rounded-lg focus:ring-2 focus:ring-[#475569] outline-none mb-4"
             onkeyup="if(event.key==='Enter') submitReasonInput()">
         <div class="flex gap-2">
             <button onclick="closeReasonInputModal()"
-                class="flex-1 py-2 border border-[#D4C4B8] rounded-lg text-[#5C4A3E] hover:bg-[#FAF3EE] font-medium">건너뛰기</button>
+                class="flex-1 py-2 border border-[#CBD5E1] rounded-lg text-[#5C4A3E] hover:bg-[#F8FAFC] font-medium">건너뛰기</button>
             <button onclick="submitReasonInput()"
-                class="flex-1 py-2 bg-[#D97756] text-white rounded-lg hover:bg-[#C4623E] font-bold">저장</button>
+                class="flex-1 py-2 bg-[#475569] text-white rounded-lg hover:bg-[#334155] font-bold">저장</button>
         </div>
     </div>
 </div>
@@ -736,26 +741,26 @@
 
 <div id="userModal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden">
     <div
-        class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md transform transition-all scale-100 opacity-100 border border-[#F0E8E0]">
+        class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md transform transition-all scale-100 opacity-100 border border-[#CBD5E1]">
         <div class="text-center mb-6">
-            <h3 class="text-xl font-bold text-[#2D1F17]">작업자 이름 설정</h3>
+            <h3 class="text-xl font-bold text-[#0F172A]">작업자 이름 설정</h3>
         </div>
         <input type="text" id="usernameInput"
-            class="w-full px-4 py-3 border border-[#D4C4B8] rounded-lg text-center font-bold mb-4" placeholder="예: 김담당"
+            class="w-full px-4 py-3 border border-[#CBD5E1] rounded-lg text-center font-bold mb-4" placeholder="예: 김담당"
             onkeyup="if(event.key === 'Enter') saveUserIdentity()">
         <button onclick="saveUserIdentity()"
-            class="w-full py-3 bg-[#D97756] hover:bg-[#C4623E] text-white font-bold rounded-lg shadow-lg">
+            class="w-full py-3 bg-[#475569] hover:bg-[#334155] text-white font-bold rounded-lg shadow-lg">
             확인</button>
     </div>
 </div>
 
 <div id="deleteModal" class="fixed inset-0 z-[60] flex items-center justify-center modal-overlay hidden">
     <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm text-center">
-        <h3 class="text-lg font-bold mb-2 text-[#2D1F17]">삭제 확인</h3>
-        <p class="text-sm text-[#8B7B6E] mb-4" id="deleteModalMessage">삭제하시겠습니까?</p>
+        <h3 class="text-lg font-bold mb-2 text-[#0F172A]">삭제 확인</h3>
+        <p class="text-sm text-[#64748B] mb-4" id="deleteModalMessage">삭제하시겠습니까?</p>
         <div class="flex gap-3">
-            <button onclick="closeDeleteModal()" class="flex-1 py-2 border rounded-lg hover:bg-[#FAF3EE]">취소</button>
-            <button id="confirmDeleteBtn" class="flex-1 py-2 bg-[#B85C4A] text-white rounded-lg font-bold">삭제</button>
+            <button onclick="closeDeleteModal()" class="flex-1 py-2 border rounded-lg hover:bg-[#F8FAFC]">취소</button>
+            <button id="confirmDeleteBtn" class="flex-1 py-2 bg-[#C85A6F] text-white rounded-lg font-bold">삭제</button>
         </div>
     </div>
 </div>
@@ -777,10 +782,11 @@
         </div>
         <div class="flex gap-2">
             <button onclick="closeBulkUpdateModal()" class="flex-1 py-2 border rounded-lg">취소</button>
-            <button onclick="submitBulkUpdate()" class="flex-1 py-2 bg-[#D97756] text-white rounded-lg">적용</button>
+            <button onclick="submitBulkUpdate()" class="flex-1 py-2 bg-[#475569] text-white rounded-lg">적용</button>
         </div>
     </div>
-</div><datalist id="channel-options"></datalist><script type="module" src="./js/app.js"></script>
+</div>
+<datalist id="channel-options"></datalist><script type="module" src="./js/app.js"></script>
 </body>
 
 </html>

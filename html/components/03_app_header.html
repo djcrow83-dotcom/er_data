@@ -1,10 +1,10 @@
-<!-- [MAIN APP] -->
+﻿<!-- [MAIN APP] -->
 <div id="main-app" class="hidden h-screen flex flex-col w-full">
     <!-- Header -->
-    <header class="bg-white border-b border-[#E8DDD4] shrink-0 z-20">
+    <header class="bg-white border-b border-[#E2E8F0] shrink-0 z-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="bg-[#D97756] text-white p-2 rounded-lg shadow-sm">
+                <div class="bg-[#475569] text-white p-2 rounded-lg shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
@@ -12,7 +12,7 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold text-[#3D2E24] tracking-tight flex items-center gap-2">
+                    <h1 class="text-xl font-bold text-[#1E293B] tracking-tight flex items-center gap-2">
                         ER 처리 현황 시스템 V60.40
                         <span
                             class="text-xs font-medium text-white bg-gray-400 px-2 py-0.5 rounded-full transition-all duration-500 flex items-center gap-1"
@@ -42,7 +42,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <button id="saveChangesBtn" onclick="saveAllChanges()"
-                    class="hidden px-4 py-2 text-sm font-bold text-white bg-[#B8A99C] rounded-lg transition-all flex items-center gap-2 shadow-sm"
+                    class="hidden px-4 py-2 text-sm font-bold text-white bg-[#94A3B8] rounded-lg transition-all flex items-center gap-2 shadow-sm"
                     disabled>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -51,13 +51,13 @@
                     </svg>
                     변경사항 저장 <span id="unsavedCount" class="bg-white/20 px-1.5 rounded text-xs ml-1">0</span>
                 </button>
-                <div class="h-6 w-px bg-[#E8DDD4] mx-1"></div>
+                <div class="h-6 w-px bg-[#E2E8F0] mx-1"></div>
 
                 <!-- [ADMIN: 사용자 관리 버튼] -->
                 <button id="adminManagementBtn" onclick="window.openUserManagementModal()"
-                    class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#FAF3EE] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]"
+                    class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#F8FAFC] hover:bg-[#E2E8F0] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E2E8F0]"
                     title="사용자 관리">
-                    <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-[#64748B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
                         </path>
@@ -67,9 +67,9 @@
 
                 <!-- Admin Settings Button -->
                 <button id="btnAdminSettings" onclick="openSettingsModal()"
-                    class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#FAF3EE] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]"
+                    class="hidden flex items-center gap-2 px-3 py-1.5 bg-[#F8FAFC] hover:bg-[#E2E8F0] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E2E8F0]"
                     title="관리자 설정">
-                    <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-[#64748B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
                         </path>
@@ -80,9 +80,9 @@
                 </button>
 
                 <button onclick="openLogModal()"
-                    class="flex items-center gap-2 px-3 py-1.5 bg-[#F5EDE6] hover:bg-[#E8DDD4] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E8DDD4]"
+                    class="flex items-center gap-2 px-3 py-1.5 bg-[#F5EDE6] hover:bg-[#E2E8F0] rounded-lg transition-colors text-sm font-medium text-[#5C4A3E] border border-[#E2E8F0]"
                     title="변경 로그">
-                    <svg class="w-4 h-4 text-[#8B7B6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-[#64748B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -98,17 +98,17 @@
                     백업
                 </button>
 
-                <div class="h-6 w-px bg-[#E8DDD4] mx-1"></div>
+                <div class="h-6 w-px bg-[#E2E8F0] mx-1"></div>
 
                 <!-- User Profile & Logout -->
                 <div class="flex items-center gap-3 pl-1">
                     <div class="flex flex-col items-end">
-                        <span id="userNameDisplay" class="text-sm font-bold text-[#3D2E24]">사용자</span>
+                        <span id="userNameDisplay" class="text-sm font-bold text-[#1E293B]">사용자</span>
                         <button id="btnLogout"
-                            class="text-[11px] text-[#B85C4A] hover:underline font-bold tracking-wide">로그아웃</button>
+                            class="text-[11px] text-[#C85A6F] hover:underline font-bold tracking-wide">로그아웃</button>
                     </div>
                     <div id="userAvatar"
-                        class="w-9 h-9 rounded-full bg-[#D97756] text-white flex items-center justify-center font-bold text-sm shadow-sm uppercase border-2 border-white">
+                        class="w-9 h-9 rounded-full bg-[#475569] text-white flex items-center justify-center font-bold text-sm shadow-sm uppercase border-2 border-white">
                         ?</div>
                 </div>
             </div>
