@@ -146,47 +146,8 @@ initSystem();
 
 let cleanupRetryCount = 0;
 window.cleanupPendingData = async () => {
-    if (!db) return;
-
-    if (standardData.length === 0) {
-        if (cleanupRetryCount < 10) {
-            cleanupRetryCount++;
-            setTimeout(window.cleanupPendingData, 1000);
-        }
-        return;
-    }
-
-    try {
-        const pendingItems = standardData.filter(d => false); // All pending statuses and logic have been removed from the application
-        if (pendingItems.length === 0) return;
-
-        let batch = writeBatch(db);
-        let batchCount = 0;
-        let totalCleaned = 0;
-
-        for (const data of pendingItems) {
-            const docId = String(data._id);
-            // [FIX] Restore raw collection path without 'artifacts/appId...'
-            const ref = doc(db, LIVE_COLLECTION_NAME, docId);
-
-            batch.update(ref, {
-                // Fields are already removed
-            });
-
-            batchCount++;
-            totalCleaned++;
-
-            if (batchCount >= 400) {
-                await batch.commit();
-                batch = writeBatch(db);
-                batchCount = 0;
-            }
-        }
-        if (batchCount > 0) await batch.commit();
-        if (totalCleaned > 0) console.log(`[System] 작업 중단으로 멈춰있던 데이터 ${totalCleaned}건 메모리 기반 자동 복구 완료.`);
-    } catch (e) {
-        console.warn("[System] 데이터 자동 정리 실패:", e);
-    }
+    // [System] 현재 Pending(휴지통/삭제대기) 기믹은 사용하지 않으므로 즉시 리턴
+    return;
 };
 
 window.escapeHtml = (unsafe) => {
