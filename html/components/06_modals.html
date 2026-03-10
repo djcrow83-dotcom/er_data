@@ -1,54 +1,54 @@
-﻿<!-- [MODALS] -->
+<!-- [MODALS] -->
 
 <!-- [GENERIC CONFIRM MODAL (Replacement for confirm())] -->
 <div id="genericConfirmModal" class="fixed inset-0 z-[120] flex items-center justify-center modal-overlay hidden">
-    <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm text-center border border-[#E2E8F0]">
-        <h3 class="text-lg font-bold mb-2 text-[#0F172A]">확인</h3>
-        <p class="text-sm text-[#64748B] mb-6" id="genericConfirmMessage"></p>
+    <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm text-center border border-[#E8DDD4]">
+        <h3 class="text-lg font-bold mb-2 text-[#2D1F17]">확인</h3>
+        <p class="text-sm text-[#8B7B6E] mb-6" id="genericConfirmMessage"></p>
         <div class="flex gap-3">
             <button onclick="window.closeGenericConfirm()"
-                class="flex-1 py-2 border border-[#E2E8F0] rounded-lg hover:bg-[#F8FAFC] font-medium text-[#475569]">취소</button>
+                class="flex-1 py-2 border border-[#E8DDD4] rounded-lg hover:bg-[#FAF3EE] font-medium text-[#6B5D52]">취소</button>
             <button id="genericConfirmBtn"
-                class="flex-1 py-2 bg-[#475569] text-white rounded-lg font-bold hover:bg-[#334155]">확인</button>
+                class="flex-1 py-2 bg-[#D97756] text-white rounded-lg font-bold hover:bg-[#C4623E]">확인</button>
         </div>
     </div>
 </div>
 
 <!-- [ADMIN: USER MANAGEMENT MODAL] -->
 <div id="userManagementModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center modal-overlay">
-    <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl border border-[#E2E8F0]">
-        <div class="p-5 bg-[#F8FAFC] border-b border-[#E2E8F0] flex justify-between items-center">
-            <h3 class="font-bold text-[#1E293B]">사용자 계정 권한 관리</h3>
+    <div class="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl border border-[#E8DDD4]">
+        <div class="p-5 bg-[#FAF3EE] border-b border-[#E8DDD4] flex justify-between items-center">
+            <h3 class="font-bold text-[#3D2E24]">사용자 계정 권한 관리</h3>
             <button onclick="window.closeUserManagementModal()"
-                class="text-[#94A3B8] hover:text-[#475569] text-2xl">✕</button>
+                class="text-[#B8A99C] hover:text-[#6B5D52] text-2xl">✕</button>
         </div>
         <div class="p-6">
-            <div class="bg-[#FDF6F0] p-4 rounded-xl mb-6 border border-[#E2E8F0]">
-                <h4 class="text-xs font-bold text-[#475569] mb-1 uppercase tracking-wider">신규 담당자 권한 부여</h4>
-                <p class="text-[10px] text-[#64748B] mb-3 leading-tight">
-                    ✅ 새 직원의 <span class="text-[#475569] font-bold">실제 로그인 계정(이메일/비밀번호)</span>을 즉시 생성하고 권한까지 일괄
+            <div class="bg-[#FDF6F0] p-4 rounded-xl mb-6 border border-[#E8DDD4]">
+                <h4 class="text-xs font-bold text-[#D97756] mb-1 uppercase tracking-wider">신규 담당자 권한 부여</h4>
+                <p class="text-[10px] text-[#8B7B6E] mb-3 leading-tight">
+                    ✅ 새 직원의 <span class="text-[#D97756] font-bold">실제 로그인 계정(이메일/비밀번호)</span>을 즉시 생성하고 권한까지 일괄
                     발급합니다.<br>
                     비밀번호는 최소 6자리 이상이어야 합니다.
                 </p>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
                     <input id="newUserName"
-                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#475569]"
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
                         placeholder="이름 (예: 김담당)">
                     <input id="newUserId" type="email"
-                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#475569]"
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
                         placeholder="가입할 이메일 주소">
                     <input id="newUserPw" type="password"
-                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#475569]"
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756]"
                         placeholder="초기 암호 (6자 이상)">
                     <select id="newUserRole"
-                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#475569] bg-white">
+                        class="border p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-[#D97756] bg-white">
                         <option value="staff">일반 (Staff)</option>
                         <option value="admin">관리자 (Admin)</option>
                         <option value="system">시스템 마스터 (System)</option>
                     </select>
                 </div>
                 <button onclick="window.addNewUser()"
-                    class="w-full mt-3 bg-[#475569] text-white py-2.5 rounded-lg font-bold shadow-sm hover:bg-[#334155] transition-all">권한
+                    class="w-full mt-3 bg-[#D97756] text-white py-2.5 rounded-lg font-bold shadow-sm hover:bg-[#C4623E] transition-all">권한
                     등록</button>
             </div>
 
@@ -170,48 +170,48 @@
 
 <!-- Log Modal (Existing) -->
 <div id="logModal" class="fixed inset-0 z-[95] flex items-center justify-center modal-overlay hidden">
-    <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col border border-[#CBD5E1]">
-        <div class="p-4 border-b border-[#E2E8F0] flex justify-between items-center bg-[#F8FAFC] rounded-t-xl">
-            <h3 class="text-lg font-bold text-[#1E293B] flex items-center gap-2">데이터 변경 이력</h3>
-            <button onclick="closeLogModal()" class="text-[#94A3B8] hover:text-[#475569]">✕</button>
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl h-[80vh] flex flex-col border border-[#F0E8E0]">
+        <div class="p-4 border-b border-[#E8DDD4] flex justify-between items-center bg-[#FAF3EE] rounded-t-xl">
+            <h3 class="text-lg font-bold text-[#3D2E24] flex items-center gap-2">데이터 변경 이력</h3>
+            <button onclick="closeLogModal()" class="text-[#B8A99C] hover:text-[#6B5D52]">✕</button>
         </div>
-        <div id="logListContainer" class="flex-grow overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#F8FAFC]/50">
+        <div id="logListContainer" class="flex-grow overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#FAF3EE]/50">
         </div>
     </div>
 </div>
 
 <!-- Other Modals (Column Filter, Reason Input, Combined, Delete, Bulk Update) -->
 <div id="columnFilterModal"
-    class="absolute bg-white border border-[#E2E8F0] shadow-xl rounded-lg p-3 z-[90] hidden w-64 text-sm">
-    <div class="flex justify-between items-center mb-2 pb-2 border-b border-[#CBD5E1]"><span
+    class="absolute bg-white border border-[#E8DDD4] shadow-xl rounded-lg p-3 z-[90] hidden w-64 text-sm">
+    <div class="flex justify-between items-center mb-2 pb-2 border-b border-[#F0E8E0]"><span
             class="font-bold text-[#5C4A3E]">필터 선택</span><button onclick="closeColumnFilterModal()"
-            class="text-[#94A3B8] hover:text-[#475569]">✕</button></div>
+            class="text-[#B8A99C] hover:text-[#6B5D52]">✕</button></div>
     <div class="flex items-center gap-2 mb-2 px-1"><input type="checkbox" id="columnFilterSelectAll"
             class="custom-checkbox" onchange="toggleColumnFilterSelectAll(this.checked)"><label
-            for="columnFilterSelectAll" class="text-[#475569] cursor-pointer select-none">전체 선택</label></div>
+            for="columnFilterSelectAll" class="text-[#6B5D52] cursor-pointer select-none">전체 선택</label></div>
     <div id="columnFilterList" class="max-h-60 overflow-y-auto custom-scrollbar space-y-1 mb-3"></div>
     <div class="flex gap-2"><button onclick="clearColumnFilter()"
-            class="flex-1 py-1.5 border border-[#CBD5E1] rounded text-[#475569] hover:bg-[#F8FAFC] text-xs font-bold">초기화</button><button
+            class="flex-1 py-1.5 border border-[#D4C4B8] rounded text-[#6B5D52] hover:bg-[#FAF3EE] text-xs font-bold">초기화</button><button
             onclick="applyColumnFilter()"
-            class="flex-1 py-1.5 bg-[#475569] text-white rounded hover:bg-[#334155] text-xs font-bold">적용</button>
+            class="flex-1 py-1.5 bg-[#D97756] text-white rounded hover:bg-[#C4623E] text-xs font-bold">적용</button>
     </div>
 </div>
 
 <div id="reasonInputModal" class="fixed inset-0 z-[80] flex items-center justify-center modal-overlay hidden">
     <div
-        class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm transform transition-all scale-100 opacity-100 border border-[#CBD5E1]">
+        class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm transform transition-all scale-100 opacity-100 border border-[#F0E8E0]">
         <div class="mb-4">
-            <h3 class="text-lg font-bold text-[#1E293B]">기타 사유 입력</h3>
-            <p class="text-sm text-[#64748B]">구체적인 사유를 입력해주세요.</p>
+            <h3 class="text-lg font-bold text-[#3D2E24]">기타 사유 입력</h3>
+            <p class="text-sm text-[#8B7B6E]">구체적인 사유를 입력해주세요.</p>
         </div>
         <input type="text" id="reasonDetailInput"
-            class="w-full px-4 py-2 border border-[#CBD5E1] rounded-lg focus:ring-2 focus:ring-[#475569] outline-none mb-4"
+            class="w-full px-4 py-2 border border-[#D4C4B8] rounded-lg focus:ring-2 focus:ring-[#D97756] outline-none mb-4"
             onkeyup="if(event.key==='Enter') submitReasonInput()">
         <div class="flex gap-2">
             <button onclick="closeReasonInputModal()"
-                class="flex-1 py-2 border border-[#CBD5E1] rounded-lg text-[#5C4A3E] hover:bg-[#F8FAFC] font-medium">건너뛰기</button>
+                class="flex-1 py-2 border border-[#D4C4B8] rounded-lg text-[#5C4A3E] hover:bg-[#FAF3EE] font-medium">건너뛰기</button>
             <button onclick="submitReasonInput()"
-                class="flex-1 py-2 bg-[#475569] text-white rounded-lg hover:bg-[#334155] font-bold">저장</button>
+                class="flex-1 py-2 bg-[#D97756] text-white rounded-lg hover:bg-[#C4623E] font-bold">저장</button>
         </div>
     </div>
 </div>
@@ -261,26 +261,26 @@
 
 <div id="userModal" class="fixed inset-0 z-50 flex items-center justify-center modal-overlay hidden">
     <div
-        class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md transform transition-all scale-100 opacity-100 border border-[#CBD5E1]">
+        class="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md transform transition-all scale-100 opacity-100 border border-[#F0E8E0]">
         <div class="text-center mb-6">
-            <h3 class="text-xl font-bold text-[#0F172A]">작업자 이름 설정</h3>
+            <h3 class="text-xl font-bold text-[#2D1F17]">작업자 이름 설정</h3>
         </div>
         <input type="text" id="usernameInput"
-            class="w-full px-4 py-3 border border-[#CBD5E1] rounded-lg text-center font-bold mb-4" placeholder="예: 김담당"
+            class="w-full px-4 py-3 border border-[#D4C4B8] rounded-lg text-center font-bold mb-4" placeholder="예: 김담당"
             onkeyup="if(event.key === 'Enter') saveUserIdentity()">
         <button onclick="saveUserIdentity()"
-            class="w-full py-3 bg-[#475569] hover:bg-[#334155] text-white font-bold rounded-lg shadow-lg">
+            class="w-full py-3 bg-[#D97756] hover:bg-[#C4623E] text-white font-bold rounded-lg shadow-lg">
             확인</button>
     </div>
 </div>
 
 <div id="deleteModal" class="fixed inset-0 z-[60] flex items-center justify-center modal-overlay hidden">
     <div class="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm text-center">
-        <h3 class="text-lg font-bold mb-2 text-[#0F172A]">삭제 확인</h3>
-        <p class="text-sm text-[#64748B] mb-4" id="deleteModalMessage">삭제하시겠습니까?</p>
+        <h3 class="text-lg font-bold mb-2 text-[#2D1F17]">삭제 확인</h3>
+        <p class="text-sm text-[#8B7B6E] mb-4" id="deleteModalMessage">삭제하시겠습니까?</p>
         <div class="flex gap-3">
-            <button onclick="closeDeleteModal()" class="flex-1 py-2 border rounded-lg hover:bg-[#F8FAFC]">취소</button>
-            <button id="confirmDeleteBtn" class="flex-1 py-2 bg-[#C85A6F] text-white rounded-lg font-bold">삭제</button>
+            <button onclick="closeDeleteModal()" class="flex-1 py-2 border rounded-lg hover:bg-[#FAF3EE]">취소</button>
+            <button id="confirmDeleteBtn" class="flex-1 py-2 bg-[#B85C4A] text-white rounded-lg font-bold">삭제</button>
         </div>
     </div>
 </div>
@@ -302,7 +302,7 @@
         </div>
         <div class="flex gap-2">
             <button onclick="closeBulkUpdateModal()" class="flex-1 py-2 border rounded-lg">취소</button>
-            <button onclick="submitBulkUpdate()" class="flex-1 py-2 bg-[#475569] text-white rounded-lg">적용</button>
+            <button onclick="submitBulkUpdate()" class="flex-1 py-2 bg-[#D97756] text-white rounded-lg">적용</button>
         </div>
     </div>
 </div>

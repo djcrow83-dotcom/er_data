@@ -329,7 +329,7 @@ window.renderRefundStats = () => {
         aggregated[key].amount += amount;
     });
     const sorted = Object.entries(aggregated).sort((a, b) => a[0].localeCompare(b[0])).slice(-7);
-    container.innerHTML = sorted.map(([k, d]) => `<div class="bg-[#F8FAFC] p-3 rounded-lg text-center shadow-sm hover:bg-white transition-all border border-transparent hover:border-[#475569]"><span class="text-[10px] font-bold text-[#64748B] block mb-1">${d.label}</span><span class="text-sm font-bold text-[#475569]">${window.formatMoney(d.amount)}</span></div>`).join('');
+    container.innerHTML = sorted.map(([k, d]) => `<div class="bg-[#FAF3EE] p-3 rounded-lg text-center shadow-sm hover:bg-white transition-all border border-transparent hover:border-[#D97756]"><span class="text-[10px] font-bold text-[#8B7B6E] block mb-1">${d.label}</span><span class="text-sm font-bold text-[#D97756]">${window.formatMoney(d.amount)}</span></div>`).join('');
 };
 
 window.renderAllButtons = () => {
@@ -338,30 +338,30 @@ window.renderAllButtons = () => {
     const data = window.getMergedData();
     const counts = { '미처리': 0, '처리완료': 0, '보류': 0 };
     data.forEach(d => { if (counts[d._status] !== undefined) counts[d._status]++; else counts['미처리']++; });
-    sDiv.innerHTML = ['미처리', '처리완료', '보류'].map(s => `<button onclick="window.setActiveStatus('${s}')" class="status-btn px-4 py-1.5 border border-[#CBD5E1] rounded-md bg-white text-xs font-bold text-[#475569] hover:bg-[#F8FAFC] transition-colors ${activeStatus === s ? 'active' : ''}"> ${s} <span class="count-badge ml-1 bg-[#F5EDE6] text-[#64748B] px-1 rounded">${counts[s]}</span> </button>`).join('');
+    sDiv.innerHTML = ['미처리', '처리완료', '보류'].map(s => `<button onclick="window.setActiveStatus('${s}')" class="status-btn px-4 py-1.5 border border-[#D4C4B8] rounded-md bg-white text-xs font-bold text-[#6B5D52] hover:bg-[#FAF3EE] transition-colors ${activeStatus === s ? 'active' : ''}"> ${s} <span class="count-badge ml-1 bg-[#F5EDE6] text-[#8B7B6E] px-1 rounded">${counts[s]}</span> </button>`).join('');
     const rDiv = document.getElementById('reasonButtons');
     if (rDiv) {
         const reasons = [...new Set(standardData.map(d => d._reason).filter(r => r))];
-        rDiv.innerHTML = reasons.map(r => `<button onclick="window.setActiveReason('${r}')" class="reason-btn px-2 py-1 text-xs border border-[#E2E8F0] rounded-full hover:bg-[#F5EDE6] ${activeReason === r ? 'active' : ''}">${r}</button>`).join('');
+        rDiv.innerHTML = reasons.map(r => `<button onclick="window.setActiveReason('${r}')" class="reason-btn px-2 py-1 text-xs border border-[#E8DDD4] rounded-full hover:bg-[#F5EDE6] ${activeReason === r ? 'active' : ''}">${r}</button>`).join('');
     }
 };
 
 window.renderTableHeader = () => {
     const thead = document.getElementById('tableHeaderRow');
     if (!thead) return;
-    let html = `<tr><th class="px-4 py-3 text-center sticky top-0 left-0 z-50 bg-[#F8FAFC] border-r border-[#E2E8F0] border-b min-w-[50px] w-[50px]"><input type="checkbox" id="selectAllCheckboxTop" onchange="window.toggleSelectAll(this.checked)" class="w-5 h-5 accent-[#475569]"></th>`;
+    let html = `<tr><th class="px-4 py-3 text-center sticky top-0 left-0 z-50 bg-[#FAF3EE] border-r border-[#E8DDD4] border-b min-w-[50px] w-[50px]"><input type="checkbox" id="selectAllCheckboxTop" onchange="window.toggleSelectAll(this.checked)" class="w-5 h-5 accent-[#D97756]"></th>`;
 
     COLUMNS.forEach(col => {
-        let stickyClass = 'sticky top-0 z-40 bg-[#F8FAFC]';
+        let stickyClass = 'sticky top-0 z-40 bg-[#FAF3EE]';
         let style = `min-width:${col.width}; width:${col.width};`;
         const sortIcon = columnSortField === col.id ? (columnSortOrder === 'asc' ? ' ▲' : ' ▼') : '';
-        html += `<th onclick="window.toggleColumnSort('${col.id}')" class="px-4 py-3 text-left text-xs font-bold text-[#64748B] uppercase border-b border-[#E2E8F0] cursor-pointer hover:bg-[#F5EDE6] ${stickyClass}" style="${style}"> ${col.label}${sortIcon}</th>`;
+        html += `<th onclick="window.toggleColumnSort('${col.id}')" class="px-4 py-3 text-left text-xs font-bold text-[#8B7B6E] uppercase border-b border-[#E8DDD4] cursor-pointer hover:bg-[#F5EDE6] ${stickyClass}" style="${style}"> ${col.label}${sortIcon}</th>`;
     });
     const role = localStorage.getItem('er_system_role');
     if (role === 'admin' || role === 'system') {
-        html += `<th class="px-4 py-3 border-b border-[#E2E8F0] text-center sticky top-0 z-40 bg-[#F8FAFC] min-w-[50px]">관리</th></tr>`;
+        html += `<th class="px-4 py-3 border-b border-[#E8DDD4] text-center sticky top-0 z-40 bg-[#FAF3EE] min-w-[50px]">관리</th></tr>`;
     } else {
-        html += `<th class="px-4 py-3 border-b border-[#E2E8F0] text-center sticky top-0 z-40 bg-[#F8FAFC] min-w-[50px]"></th></tr>`;
+        html += `<th class="px-4 py-3 border-b border-[#E8DDD4] text-center sticky top-0 z-40 bg-[#FAF3EE] min-w-[50px]"></th></tr>`;
     }
     thead.innerHTML = html;
 };
@@ -369,7 +369,6 @@ window.renderTableHeader = () => {
 window.debounceSearch = () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => window.applyLocalFilters(true), 300); };
 window.toggleSelectAll = (c) => { selectedIds = c ? new Set(window.currentTableData.map(d => String(d._id))) : new Set(); window.applyLocalFilters(); };
 window.toggleRowSelection = (id) => { const s = String(id); if (selectedIds.has(s)) selectedIds.delete(s); else selectedIds.add(s); window.updateSelectionUI(); };
-
 
 ﻿window.currentRenderLimit = 50;
 window.tableScrollObserver = null;
@@ -411,17 +410,17 @@ window.renderTable = (data, append = false) => {
         const r = { ...d, ...pending };
         let isUrgent = (r._status !== '처리완료' && (now - window.parseDate(r._date)) > 259200000);
 
-        const bgClass = isUrgent ? 'bg-[#F9EAEF] hover:bg-[#FECACA]' : 'hover:bg-[#F8FAFC]';
-        const stickyBg = isUrgent ? 'bg-[#F9EAEF]' : 'bg-white';
+        const bgClass = isUrgent ? 'bg-[#FEE2E2] hover:bg-[#FECACA]' : 'hover:bg-[#FAF3EE]';
+        const stickyBg = isUrgent ? 'bg-[#FEE2E2]' : 'bg-white';
         const isSel = selectedIds.has(String(d._id));
 
         const ropt = `<option value="">선택</option>` + ['변심', '불량', '색상', '사이즈', '색상/사이즈', '수선', '오배송'].map(x => `<option value="${x}" ${r._reason === x ? 'selected' : ''}>${x}</option>`).join('');
         const sopt = `<option value="">선택</option>` + ['결제', '입금', '차감', '무상', '무료배송권', '동봉'].map(x => `<option value="${x}" ${r._shipping === x ? 'selected' : ''}>${x}</option>`).join('');
         const copt = `<option value="">선택</option>` + ['정상', '불량'].map(x => `<option value="${x}" ${r._product_condition === x ? 'selected' : ''}>${x}</option>`).join('');
 
-        rows += `<tr id="row-${d._id}" class="${bgClass} border-b border-[#E2E8F0] transition-colors group">
-                    <td class="px-4 py-2 text-center sticky left-0 z-30 ${stickyBg} border-r border-[#CBD5E1] min-w-[50px]">
-                        <input type="checkbox" class="w-5 h-5 accent-[#475569] row-check" value="${d._id}" ${isSel ? 'checked' : ''} onchange="window.toggleRowSelection('${d._id}')">
+        rows += `<tr id="row-${d._id}" class="${bgClass} border-b border-[#E8DDD4] transition-colors group">
+                    <td class="px-4 py-2 text-center sticky left-0 z-30 ${stickyBg} border-r border-[#F0E8E0] min-w-[50px]">
+                        <input type="checkbox" class="w-5 h-5 accent-[#D97756] row-check" value="${d._id}" ${isSel ? 'checked' : ''} onchange="window.toggleRowSelection('${d._id}')">
                     </td>`;
 
         COLUMNS.forEach(col => {
@@ -432,28 +431,28 @@ window.renderTable = (data, append = false) => {
             let inputHtml = '';
             if (col.id === '_status') {
                 const icon = val === '처리완료' ? '✔' : (val === '보류' ? '!' : '-');
-                const color = val === '처리완료' ? 'text-[#449171]' : (val === '보류' ? 'text-[#B89254]' : 'text-[#94A3B8]');
+                const color = val === '처리완료' ? 'text-[#5E7A4A]' : (val === '보류' ? 'text-[#A67A52]' : 'text-[#B8A99C]');
                 const statusOpts = ['미처리', '처리완료', '보류'].map(x => `<option value="${x}" ${val === x ? 'selected' : ''}>${x}</option>`).join('');
-                inputHtml = `<div class="flex items-center gap-1"><span class="status-icon text-xs font-bold w-3 text-center ${color}">${icon}</span><select class="flex-grow text-xs border rounded p-1 outline-none focus:border-[#475569] font-bold ${color} field-_status ${pending._status ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}', '_status', this.value)">${statusOpts}</select></div>`;
+                inputHtml = `<div class="flex items-center gap-1"><span class="status-icon text-xs font-bold w-3 text-center ${color}">${icon}</span><select class="flex-grow text-xs border rounded p-1 outline-none focus:border-[#D97756] font-bold ${color} field-_status ${pending._status ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}', '_status', this.value)">${statusOpts}</select></div>`;
             } else if (col.id === '_reason') {
-                inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#475569] field-_reason ${pending._reason ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_reason',this.value)">${ropt}</select>`;
+                inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_reason ${pending._reason ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_reason',this.value)">${ropt}</select>`;
             } else if (col.id === '_shipping') {
-                inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#475569] field-_shipping ${pending._shipping ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_shipping',this.value)">${sopt}</select>`;
+                inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_shipping ${pending._shipping ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_shipping',this.value)">${sopt}</select>`;
             } else if (col.id === '_product_condition') {
-                inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#475569] field-_product_condition ${pending._product_condition ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_product_condition',this.value)">${copt}</select>`;
+                inputHtml = `<select class="w-full text-xs border rounded p-1 outline-none focus:border-[#D97756] field-_product_condition ${pending._product_condition ? 'unsaved-input' : ''}" onchange="window.updateField('${d._id}','_product_condition',this.value)">${copt}</select>`;
             } else {
                 const align = col.align === 'right' ? 'text-right' : '';
-                const dateColor = (col.id === '_date' && isUrgent) ? 'text-[#C85A6F] font-bold' : '';
+                const dateColor = (col.id === '_date' && isUrgent) ? 'text-[#B85C4A] font-bold' : '';
                 inputHtml = `<input type="text" class="table-input field-${col.id} ${align} ${dateColor} ${pending[col.id] ? 'unsaved-input' : ''}" value="${window.escapeHtml(val)}" onchange="window.updateField('${d._id}', '${col.id}', this.value)" ${col.id === '_product' ? 'ondblclick="window.copyProductName(this)"' : ''}>`;
-                if (col.id === '_product') inputHtml = `<div class="relative w-full">${inputHtml}<button onclick="window.openCombinedModal('${d._id}')" class="absolute right-0 top-1/2 -translate-y-1/2 combined-btn text-slate-300 hover:text-[#475569] bg-white rounded p-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></button></div>`;
+                if (col.id === '_product') inputHtml = `<div class="relative w-full">${inputHtml}<button onclick="window.openCombinedModal('${d._id}')" class="absolute right-0 top-1/2 -translate-y-1/2 combined-btn text-slate-300 hover:text-[#D97756] bg-white rounded p-0.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg></button></div>`;
             }
             rows += `<td class="${tdClass}" style="${tdStyle}">${inputHtml}</td>`;
         });
 
         if (role === 'admin' || role === 'system') {
-            rows += `<td class="px-2 py-2 text-center text-[#CBD5E1] hover:text-[#C85A6F] cursor-pointer font-bold" onclick="window.promptDeleteModal('${d._id}')">×</td></tr>`;
+            rows += `<td class="px-2 py-2 text-center text-[#D4C4B8] hover:text-[#B85C4A] cursor-pointer font-bold" onclick="window.promptDeleteModal('${d._id}')">×</td></tr>`;
         } else {
-            rows += `<td class="px-2 py-2 text-center text-[#CBD5E1] font-bold"></td></tr>`;
+            rows += `<td class="px-2 py-2 text-center text-[#D4C4B8] font-bold"></td></tr>`;
         }
     });
 
@@ -468,7 +467,7 @@ window.renderTable = (data, append = false) => {
     if (window.currentRenderLimit < data.length) {
         const trigger = document.createElement('tr');
         trigger.id = 'scroll-trigger';
-        trigger.innerHTML = `<td colspan="100%" class="text-center p-4 text-[#94A3B8] text-xs font-bold">더 불러오는 중... (${window.currentRenderLimit} / ${data.length})</td>`;
+        trigger.innerHTML = `<td colspan="100%" class="text-center p-4 text-[#B8A99C] text-xs font-bold">더 불러오는 중... (${window.currentRenderLimit} / ${data.length})</td>`;
         tbody.appendChild(trigger);
 
         if (window.tableScrollObserver) window.tableScrollObserver.disconnect();
@@ -519,16 +518,15 @@ window.updateField = (id, field, value) => {
             input.value = value;
             input.classList.add('unsaved-input');
             if (field === '_status') {
-                const color = value === '처리완료' ? 'text-[#449171]' : (value === '보류' ? 'text-[#B89254]' : 'text-[#94A3B8]');
+                const color = value === '처리완료' ? 'text-[#5E7A4A]' : (value === '보류' ? 'text-[#A67A52]' : 'text-[#B8A99C]');
                 const icon = value === '처리완료' ? '✔' : (value === '보류' ? '!' : '-');
                 const iconSpan = tr.querySelector('.status-icon');
                 if (iconSpan) { iconSpan.className = `status-icon text-xs font-bold w-3 text-center ${color}`; iconSpan.innerText = icon; }
-                input.className = `flex-grow text-xs border rounded p-1 outline-none focus:border-[#475569] font-bold field-_status unsaved-input ${color}`;
+                input.className = `flex-grow text-xs border rounded p-1 outline-none focus:border-[#D97756] font-bold field-_status unsaved-input ${color}`;
             }
         }
     }
 };
-
 
 ﻿window.saveAllChanges = async () => {
     if (unsavedChanges.size === 0 || !db) return;
@@ -788,7 +786,7 @@ window.toggleDataMode = () => {
         }
 
         const cloud = document.getElementById('cloudStatus');
-        if (cloud) { cloud.innerText = "실시간 동기화됨"; cloud.className = "text-xs px-2 py-0.5 rounded-full bg-[#E6F3EE] text-[#449171] font-medium ml-2 tracking-normal"; }
+        if (cloud) { cloud.innerText = "실시간 동기화됨"; cloud.className = "text-xs px-2 py-0.5 rounded-full bg-[#E8EDE2] text-[#5E7A4A] font-medium ml-2 tracking-normal"; }
         window.showLoading(false);
     }, err => { window.showLoading(false); });
 };
@@ -799,7 +797,7 @@ window.openLogModal = async () => {
 
     container.innerHTML = '';
     const loadingText = document.createElement('div');
-    loadingText.className = 'p-4 text-center text-sm text-[#64748B]';
+    loadingText.className = 'p-4 text-center text-sm text-[#8B7B6E]';
     loadingText.textContent = '로딩 중...';
     container.appendChild(loadingText);
 
@@ -812,7 +810,7 @@ window.openLogModal = async () => {
 
         if (logs.length === 0) {
             const emptyText = document.createElement('div');
-            emptyText.className = 'p-4 text-center text-sm text-[#64748B]';
+            emptyText.className = 'p-4 text-center text-sm text-[#8B7B6E]';
             emptyText.textContent = '로그가 없습니다.';
             container.appendChild(emptyText);
             return;
@@ -820,7 +818,7 @@ window.openLogModal = async () => {
 
         logs.forEach(log => {
             const logCard = document.createElement('div');
-            logCard.className = 'bg-white p-3 rounded border border-[#E2E8F0] shadow-sm';
+            logCard.className = 'bg-white p-3 rounded border border-[#E8DDD4] shadow-sm';
 
             const headerFlex = document.createElement('div');
             headerFlex.className = 'flex justify-between text-xs font-bold text-[#5C4A3E] mb-1';
@@ -835,7 +833,7 @@ window.openLogModal = async () => {
             headerFlex.appendChild(timeSpan);
 
             const userDiv = document.createElement('div');
-            userDiv.className = 'text-[10px] text-[#64748B] mb-1';
+            userDiv.className = 'text-[10px] text-[#8B7B6E] mb-1';
             userDiv.textContent = `작업자: ${log.user}`;
 
             logCard.appendChild(headerFlex);
@@ -852,7 +850,7 @@ window.openLogModal = async () => {
                 const oldText = document.createTextNode(`${d.old} → `);
 
                 const newSpan = document.createElement('span');
-                newSpan.className = 'text-[#475569]';
+                newSpan.className = 'text-[#D97756]';
                 newSpan.textContent = d.new;
 
                 detailDiv.appendChild(fieldSpan);
@@ -1056,17 +1054,17 @@ window.loadUserList = async () => {
         container.innerHTML = snap.docs.map(d => {
             const u = d.data();
             const isAdm = u.role === 'admin' || u.role === 'system';
-            return `<div class="flex justify-between items-center p-3 hover:bg-[#F8FAFC] transition-colors">
+            return `<div class="flex justify-between items-center p-3 hover:bg-[#FAF3EE] transition-colors">
                         <div class="flex flex-col">
                             <div class="flex items-center gap-2">
-                                <span class="text-sm font-bold text-[#1E293B]">${window.escapeHtml(u.displayName)}</span>
+                                <span class="text-sm font-bold text-[#3D2E24]">${window.escapeHtml(u.displayName)}</span>
                                 <span class="text-[10px] px-1.5 py-0.5 rounded-full ${isAdm ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-500'} font-bold uppercase">${u.role}</span>
                             </div>
-                            <span class="text-[10px] text-[#64748B]">Email: ${d.id}</span>
+                            <span class="text-[10px] text-[#8B7B6E]">Email: ${d.id}</span>
                         </div>
-                        <button onclick="window.deleteUserAcc('${d.id}')" class="text-xs text-[#C85A6F] font-bold hover:underline">삭제</button>
+                        <button onclick="window.deleteUserAcc('${d.id}')" class="text-xs text-[#B85C4A] font-bold hover:underline">삭제</button>
                     </div>`;
-        }).join('') || '<div class="p-4 text-center text-[#94A3B8] text-xs">사용자가 없습니다.</div>';
+        }).join('') || '<div class="p-4 text-center text-[#B8A99C] text-xs">사용자가 없습니다.</div>';
     } catch (e) { container.innerHTML = '로드 실패'; }
 };
 
@@ -1095,20 +1093,20 @@ window.closeBulkUpdateModal = () => document.getElementById('bulkUpdateModal').c
 window.updateBulkValueInput = (f) => {
     const c = document.getElementById('bulkValueContainer');
     if (f === '_status') {
-        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none"><option value="미처리">미처리</option><option value="처리완료">처리완료</option><option value="보류">보류</option></select>`;
+        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none"><option value="미처리">미처리</option><option value="처리완료">처리완료</option><option value="보류">보류</option></select>`;
     } else if (f === '_product_condition') {
-        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none">` + ['정상', '불량'].map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
+        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + ['정상', '불량'].map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
     } else if (f === '_reason') {
         const reasonOptions = ['변심', '불량', '색상', '사이즈', '색상/사이즈', '수선', '오배송'];
-        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none">` + reasonOptions.map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
+        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + reasonOptions.map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
     } else if (f === '_shipping') {
         const shippingOptions = ['결제', '입금', '차감', '무상', '무료배송권', '동봉'];
-        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none">` + shippingOptions.map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
+        c.innerHTML = `<select id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">` + shippingOptions.map(x => `<option value="${x}">${x}</option>`).join('') + `</select>`;
     } else if (f === '_pic') {
-        c.innerHTML = `<input type="text" id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none">`;
+        c.innerHTML = `<input type="text" id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none">`;
         document.getElementById('bulkValueInput').value = currentUserName;
     } else {
-        c.innerHTML = `<input type="text" id="bulkValueInput" class="w-full border border-[#CBD5E1] rounded-lg p-2.5 outline-none" placeholder="내용 입력">`;
+        c.innerHTML = `<input type="text" id="bulkValueInput" class="w-full border border-[#D4C4B8] rounded-lg p-2.5 outline-none" placeholder="내용 입력">`;
     }
 };
 
@@ -1234,8 +1232,8 @@ document.getElementById('confirmDeleteBtn').onclick = async () => {
 
 window.setDateRange = (m) => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    document.querySelectorAll('[id^="dr-"]').forEach(b => b.className = "px-3 py-1 text-xs font-bold rounded border transition-colors bg-white text-[#475569] border-[#E2E8F0] hover:border-[#94A3B8] hover:text-[#475569]");
-    const activeBtn = document.getElementById(`dr-${m}`); if (activeBtn) activeBtn.className = "px-3 py-1 text-xs font-bold rounded border bg-[#475569] text-white border-[#475569]";
+    document.querySelectorAll('[id^="dr-"]').forEach(b => b.className = "px-3 py-1 text-xs font-bold rounded border transition-colors bg-white text-[#6B5D52] border-[#E8DDD4] hover:border-[#E8B4A0] hover:text-[#D97756]");
+    const activeBtn = document.getElementById(`dr-${m}`); if (activeBtn) activeBtn.className = "px-3 py-1 text-xs font-bold rounded border bg-[#D97756] text-white border-[#D97756]";
     document.getElementById('customDatePanel').classList.toggle('hidden', m !== 'custom');
     if (m === 'all') { dateRangeFrom = null; dateRangeTo = null; }
     else if (m === 'today') { dateRangeFrom = today; dateRangeTo = today; }
@@ -1263,7 +1261,7 @@ window.filterByTotal = () => { window.resetFilters(); };
 
 window.openCombinedModal = (id) => { activeCombinedRowId = String(id); const row = standardData.find(d => String(d._id) === activeCombinedRowId); const container = document.getElementById('combinedItemsList'); container.innerHTML = ''; (row._product || '').split(' / ').forEach(p => window.addCombinedItemInput(p)); window.updateCombinedTotal(); document.getElementById('combinedModal').classList.remove('hidden'); };
 window.closeCombinedModal = () => document.getElementById('combinedModal').classList.add('hidden');
-window.addCombinedItemInput = (v = '') => { const div = document.createElement('div'); div.className = "flex gap-2 mb-2 items-center"; div.innerHTML = `<input type="text" value="${window.escapeHtml(v)}" class="flex-grow border border-[#CBD5E1] p-2 rounded text-sm outline-none comb-item-input" oninput="window.updateCombinedTotal()"><button onclick="this.parentElement.remove(); window.updateCombinedTotal();" class="text-[#C85A6F] px-2 font-bold">×</button>`; document.getElementById('combinedItemsList').appendChild(div); };
+window.addCombinedItemInput = (v = '') => { const div = document.createElement('div'); div.className = "flex gap-2 mb-2 items-center"; div.innerHTML = `<input type="text" value="${window.escapeHtml(v)}" class="flex-grow border border-[#D4C4B8] p-2 rounded text-sm outline-none comb-item-input" oninput="window.updateCombinedTotal()"><button onclick="this.parentElement.remove(); window.updateCombinedTotal();" class="text-[#B85C4A] px-2 font-bold">×</button>`; document.getElementById('combinedItemsList').appendChild(div); };
 window.updateCombinedTotal = () => { const count = document.querySelectorAll('.comb-item-input').length; document.getElementById('combinedTotalPreview').innerText = `${count}건 합산 중`; };
 window.saveCombinedItems = () => { const values = Array.from(document.querySelectorAll('.comb-item-input')).map(i => i.value.trim()).filter(v => v); window.updateField(activeCombinedRowId, '_product', values.join(' / ')); document.getElementById('combinedModal').classList.add('hidden'); };
 window.openColumnFilter = (e, f) => { e.stopPropagation(); const modal = document.getElementById('columnFilterModal'); const rect = e.currentTarget.getBoundingClientRect(); modal.style.top = `${rect.bottom + window.scrollY + 5}px`; modal.style.left = `${rect.left + window.scrollX}px`; const uniqueValues = [...new Set(standardData.map(d => (d[f] || '').toString().trim() || '(공백)'))].sort(); const currentSelection = columnFilters[f] || new Set(); document.getElementById('columnFilterList').innerHTML = uniqueValues.map(v => `<div class="flex items-center gap-2"><input type="checkbox" class="col-filter-check" value="${window.escapeHtml(v)}" ${currentSelection.has(v) ? 'checked' : ''}><span>${window.escapeHtml(v)}</span></div>`).join(''); activeColumnFilter = { field: f }; modal.classList.remove('hidden'); const closer = (evt) => { if (!modal.contains(evt.target)) { modal.classList.add('hidden'); document.removeEventListener('click', closer); } }; setTimeout(() => document.addEventListener('click', closer), 10); };
@@ -1395,6 +1393,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.saveUserIdentity = () => { const n = document.getElementById('usernameInput').value; if (n) { currentUserName = n; localStorage.setItem('er_system_username', n); document.getElementById('userNameDisplay').innerText = n; document.getElementById('userModal').classList.add('hidden'); } };
 window.openUserModal = () => document.getElementById('userModal').classList.remove('hidden');
-window.setChartPeriod = (p) => { currentChartPeriod = p;['daily', 'weekly', 'monthly'].forEach(m => { const btn = document.getElementById(`btn-chart-${m}`); if (btn) btn.className = (m === p ? "px-3 py-1.5 rounded-md transition-colors bg-white text-[#475569] shadow-sm" : "px-3 py-1.5 rounded-md text-[#64748B] hover:bg-white/50"); }); window.renderRefundStats(); };
-
+window.setChartPeriod = (p) => { currentChartPeriod = p;['daily', 'weekly', 'monthly'].forEach(m => { const btn = document.getElementById(`btn-chart-${m}`); if (btn) btn.className = (m === p ? "px-3 py-1.5 rounded-md transition-colors bg-white text-[#D97756] shadow-sm" : "px-3 py-1.5 rounded-md text-[#8B7B6E] hover:bg-white/50"); }); window.renderRefundStats(); };
 
